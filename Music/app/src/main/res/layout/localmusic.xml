@@ -10,10 +10,16 @@
     android:layout_marginLeft="40dp"
    >
     <RelativeLayout
-        android:id="@+id/albumCover"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/image">
+        >
+        <ImageView
+            android:id="@+id/albumCover"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/image"
+            android:scaleType="fitXY"
+            />
        <LinearLayout
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
@@ -53,21 +59,13 @@
     </RelativeLayout>
 </LinearLayout>
     <RelativeLayout
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:layout_width="0dp"
         android:layout_weight="4"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="30dp"
         android:layout_height="match_parent">
-        <TextView
-            android:layout_margin="20dp"
-             android:layout_centerHorizontal="true"
-            android:gravity="center"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:textSize="30sp"
-            android:textStyle="bold"
-            android:text="aksfjdkasjfdlkaskldfalks"/>
+        <include layout="@layout/show_lyric"></include>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -75,26 +73,26 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
          android:layout_marginBottom="75dp">
-        <ImageButton
+        <ImageView
             android:id="@+id/prevMusicButton"
             android:layout_width="70dp"
             android:layout_height="70dp"
           android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-        android:background="@drawable/prev_music" />
-        <ImageButton
+        android:src="@drawable/prev_music" />
+        <ImageView
             android:id="@+id/playMusicButton"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:layout_centerInParent="true"
-            android:background="@drawable/pause_image"/>
-        <ImageButton
+            android:src="@drawable/pause_image"/>
+        <ImageView
             android:id="@+id/nextMusicButton"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:background="@drawable/next_music"/>
+            android:src="@drawable/next_music"/>
     </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"
@@ -110,6 +108,7 @@
              android:layout_height="wrap_content"
              android:text="04:45"
             android:layout_alignParentLeft="true"
+             android:textColor="@android:color/white"
              />
             <TextView
                 android:id="@+id/playMusicStopTimeTextView"
@@ -117,6 +116,7 @@
                 android:layout_height="wrap_content"
                 android:text="03:24"
                  android:layout_alignParentRight="true"
+                android:textColor="@android:color/white"
                 />
         </RelativeLayout>
        <SeekBar

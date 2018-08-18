@@ -12,7 +12,7 @@ public class Music {
 	private int length; // 长度
 	private String image; // icon
 	private String artist; // 艺术家
-     private String lrcpath;
+     private String lrcpath;//歌词路径
 
 	public String getLrcpath() {
 		return lrcpath;

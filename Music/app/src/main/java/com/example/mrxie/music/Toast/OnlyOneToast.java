@@ -1,6 +1,9 @@
 package com.example.mrxie.music.Toast;
 
 import android.content.Context;
+import android.util.Log;
+import android.view.Gravity;
+import android.widget.GridLayout;
 import android.widget.Toast;
 
 /**
@@ -8,11 +11,15 @@ import android.widget.Toast;
  */
 public class OnlyOneToast {
     private static Toast toast;
+    private String TAG="Music";
     public static void  makeText(Context context, String content){
         if(toast==null){
         toast=Toast.makeText(context,content,Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER,0,0);
         }else{
-            toast.setText(content);
+            toast.cancel();
+            toast=Toast.makeText(context,content,Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER,0,0);
         }
         toast.show();
     }

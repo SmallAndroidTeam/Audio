@@ -58,7 +58,7 @@ public class MusicUtils {
 	public static String getMusicDir() {
 		String musicDir = getAppLocalDir() + "music" + File.separator;
 		return mkdir(musicDir);
-	}
+}
 
 	/**
 	 * 获取歌词存放目录

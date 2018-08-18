@@ -9,7 +9,7 @@ import android.support.v4.util.LruCache;
  * 博文地址：http://blog.csdn.net/u010156024
  */
 public class MusicIconLoader {
-	private static MusicIconLoader sInstance;
+	public static MusicIconLoader sInstance;
 
 	private LruCache<String, Bitmap> mCache;
 

@@ -2,6 +2,8 @@ package com.example.mrxie.music.Service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,21 +11,28 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.example.mrxie.music.R;
 import com.example.mrxie.music.SongListInformation.Music;
+import com.example.mrxie.music.SongListInformation.MusicIconLoader;
+import com.example.mrxie.music.Toast.OnlyOneToast;
 import com.example.mrxie.music.fragment.localMusicFragment;
+import com.example.mrxie.music.ui.LrcView;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class MusicService extends Service {
     public  static MediaPlayer mediaPlayer=new MediaPlayer();
     public static ArrayList<Music> sMusicList = new ArrayList<Music>(); // 存放歌曲列表
-    public static int playingMusicIndex=0;//正在播放音乐的下标
+    public static int playingMusicIndex=-1;//正在播放音乐的下标
     public static enum playAction{start,pause,next,prev}
     public static TextView musicTitle;
     private String TAG="Music";
@@ -32,7 +41,9 @@ public class MusicService extends Service {
     public static  SeekBar mPlayMusicSeekBar;
     private static Handler handler=new Handler();
     private  static Runnable runnable;
-    public static  ImageButton mPlayMusicButton;
+    public static ImageView mPlayMusicButton;
+    public static ImageView MusicImage;//歌曲的专辑图片
+    public static LrcView showLrcView;
     @Override
     public void onCreate() {
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -52,29 +63,59 @@ public class MusicService extends Service {
      }
     }
     public  static void  initMusic(){
-        mediaPlayer.reset();
-        try {
-            mediaPlayer.setDataSource(sMusicList.get(playingMusicIndex).getUri());
-            mediaPlayer.prepare();
-            musicTitle.setText(sMusicList.get(playingMusicIndex).getTitle());
-            mPlayMusicSeekBar.setMax(mediaPlayer.getDuration());
-            mPlayMusicSeekBar.setProgress(mediaPlayer.getCurrentPosition());
-            mPlayMusicStartTimeTextView.setText(changeDigitsToTwoDigits(mediaPlayer.getCurrentPosition()/1000/60)+":"+changeDigitsToTwoDigits(mediaPlayer.getCurrentPosition()/1000%60));
-            mPlayMusicStopTimeTextView.setText(changeDigitsToTwoDigits((mediaPlayer.getDuration())/1000/60)+":"+changeDigitsToTwoDigits(mediaPlayer.getDuration()/1000%60));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        runnable=new Runnable() {
-            @Override
-            public void run() {
-               mPlayMusicSeekBar.setProgress(mediaPlayer.getCurrentPosition());
-                mPlayMusicStartTimeTextView.setText(changeDigitsToTwoDigits(mediaPlayer.getCurrentPosition()/1000/60)+":"+changeDigitsToTwoDigits(mediaPlayer.getCurrentPosition()/1000%60));
-                handler.postDelayed(this,500);
 
+        if(playingMusicIndex!=-1){
+            mediaPlayer.reset();
+            try {
+                mediaPlayer.setDataSource(sMusicList.get(playingMusicIndex).getUri());
+                mediaPlayer.prepare();
+                musicTitle.setText(sMusicList.get(playingMusicIndex).getTitle());
+                mPlayMusicSeekBar.setMax(mediaPlayer.getDuration());
+                if(sMusicList.get(MusicService.playingMusicIndex).getImage()!=null){//如果音乐专辑图片存在
+                  //  OnlyOneToast.makeText(localMusicFragment.activity,sMusicList.get(playingMusicIndex).getImage());
+                    Bitmap bitmap=MusicIconLoader.getInstance().load(sMusicList.get(MusicService.playingMusicIndex).getImage());
+                    MusicImage.setImageBitmap(bitmap);
+
+                }else{
+                    MusicImage.setImageResource(R.drawable.image);
+
+                    //OnlyOneToast.makeText(localMusicFragment.activity,"无图片");
+                }
+                setLrc();//设置歌词的路径
+                mPlayMusicSeekBar.setProgress(mediaPlayer.getCurrentPosition());
+                mPlayMusicStartTimeTextView.setText(changeDigitsToTwoDigits(mediaPlayer.getCurrentPosition()/1000/60)+":"+changeDigitsToTwoDigits(mediaPlayer.getCurrentPosition()/1000%60));
+                mPlayMusicStopTimeTextView.setText(changeDigitsToTwoDigits((mediaPlayer.getDuration())/1000/60)+":"+changeDigitsToTwoDigits(mediaPlayer.getDuration()/1000%60));
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        };
+            runnable=new Runnable() {
+                @Override
+                public void run() {
+                    mPlayMusicSeekBar.setProgress(mediaPlayer.getCurrentPosition());
+                    mPlayMusicStartTimeTextView.setText(changeDigitsToTwoDigits(mediaPlayer.getCurrentPosition()/1000/60)+":"+changeDigitsToTwoDigits(mediaPlayer.getCurrentPosition()/1000%60));
+                     if(showLrcView.hasLrc()){
+                         showLrcView.changeCurrent(mediaPlayer.getCurrentPosition());
+                     }
+                    handler.postDelayed(this,500);
+                }
+            };
+        }else{
+            OnlyOneToast.makeText(localMusicFragment.activity,"暂无歌曲");
+        }
+
     }
+    private static void setLrc(){//设置歌词的路径
+        String path=sMusicList.get(MusicService.playingMusicIndex).getLrcpath();
+        showLrcView.setLrcPath(path);
+    }
+
     public void startMusic(){
+        if(playingMusicIndex==-1){
+            OnlyOneToast.makeText(localMusicFragment.activity,"暂无歌曲");
+            return;
+        }
         if(mediaPlayer.isPlaying()){
             mediaPlayer.pause();
             handler.removeCallbacks(runnable);
@@ -86,6 +127,10 @@ public class MusicService extends Service {
         }
     }
     public void autoPlayMusic(){
+        if(playingMusicIndex==-1){
+            OnlyOneToast.makeText(localMusicFragment.activity,"暂无歌曲");
+            return;
+        }
         int i;
         for(i=0; i< localMusicFragment.playMode.length; i++){
             if(localMusicFragment.currentPlayMode.contentEquals(localMusicFragment.playMode[i])){
@@ -141,6 +186,10 @@ public class MusicService extends Service {
 
     }
     public void nextMusic(){
+        if(playingMusicIndex==-1){
+            OnlyOneToast.makeText(localMusicFragment.activity,"暂无歌曲");
+            return;
+        }
         int i;
         for(i=0;i<localMusicFragment.playMode.length;i++){
             if(localMusicFragment.currentPlayMode.contentEquals(localMusicFragment.playMode[i])){
@@ -176,6 +225,10 @@ public class MusicService extends Service {
     }
 
     public void prevMusic(){
+        if(playingMusicIndex==-1){
+            OnlyOneToast.makeText(localMusicFragment.activity,"暂无歌曲");
+            return;
+        }
         int i;
         for(i=0;i<localMusicFragment.playMode.length;i++){
             if(localMusicFragment.currentPlayMode.contentEquals(localMusicFragment.playMode[i])){
@@ -234,4 +287,9 @@ public class MusicService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
+    @Override
+    public void onDestroy() {//当关闭服务时
+        mediaPlayer.stop();
+        super.onDestroy();
+    }
 }

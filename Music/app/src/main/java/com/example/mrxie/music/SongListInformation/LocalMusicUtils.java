@@ -76,12 +76,12 @@ public class LocalMusicUtils {
 			// 如果不是音乐
 			String isMusic = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.IS_MUSIC));
 			if (isMusic != null && isMusic.equals("")) continue;
-			
 			String title = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
 			String artist = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
-			String path=MusicUtils.getLrcDir();
+           String name=cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME));
+           name=name.substring(0,name.indexOf('.'));
+			String path=MusicUtils.getLrcDir()+name+".lrc";
 			if(isRepeat(title, artist)) continue;
-			
 			music = new Music();
 			music.setId(cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)));
 			music.setTitle(title);
