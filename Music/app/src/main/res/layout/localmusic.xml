@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@+id/PlayBoundaryFragment"
+    >
 <LinearLayout
     android:layout_width="0dp"
     android:layout_weight="3"
     android:layout_height="match_parent"
-    android:layout_marginBottom="30dp"
-    android:layout_marginLeft="40dp"
    >
     <RelativeLayout
         android:layout_width="match_parent"
@@ -20,93 +20,90 @@
             android:src="@drawable/image"
             android:scaleType="fitXY"
             />
-       <LinearLayout
+       <RelativeLayout
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
            android:layout_alignParentBottom="true"
+           android:gravity="center"
            >
            <ImageView
                android:id="@+id/addLikeMusicButton"
-               android:layout_width="0dp"
-               android:layout_weight="1"
-               android:layout_height="50dp"
+               android:layout_width="1dp"
+               android:layout_height="1dp"
                android:src="@drawable/like_image"
-               android:layout_margin="15dp"
                android:clickable="true"
+               android:layout_alignParentLeft="true"
+               android:scaleType="fitXY"
                />
            <ImageView
                android:visibility="invisible"
                android:id="@+id/singleCycleMusicButton"
-               android:layout_width="0dp"
-               android:layout_weight="1"
-               android:layout_height="50dp"
+               android:layout_width="1dp"
+               android:layout_height="1dp"
                android:src="@drawable/singlecycle"
-               android:layout_margin="15dp"
                android:scaleType="fitXY"
+               android:layout_centerInParent="true"
                android:clickable="true"
                />
            <ImageView
                android:id="@+id/playModeButton"
-               android:layout_width="0dp"
-               android:layout_weight="1"
-               android:layout_height="50dp"
-               android:layout_margin="15dp"
+               android:layout_width="1dp"
+               android:layout_height="1dp"
                android:src="@drawable/randomplay"
                android:scaleType="fitXY"
+               android:layout_alignParentRight="true"
                android:clickable="true"
                />
-       </LinearLayout>
+       </RelativeLayout>
     </RelativeLayout>
 </LinearLayout>
     <RelativeLayout
-        android:layout_marginTop="20dp"
         android:layout_width="0dp"
         android:layout_weight="4"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="30dp"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:id="@+id/RightPalyBoundary">
         <include layout="@layout/show_lyric"></include>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-         android:layout_marginBottom="75dp">
+        android:id="@+id/controlMusicButtonLinearLayout"
+        >
         <ImageView
             android:id="@+id/prevMusicButton"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
           android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
+            android:scaleType="fitXY"
         android:src="@drawable/prev_music" />
         <ImageView
             android:id="@+id/playMusicButton"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
             android:src="@drawable/pause_image"/>
         <ImageView
             android:id="@+id/nextMusicButton"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
+            android:scaleType="fitXY"
             android:src="@drawable/next_music"/>
     </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="50dp"
+            android:layout_marginBottom="15dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp">
          <TextView
              android:id="@+id/playMusicStartTimeTextView"
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
-             android:text="04:45"
+             android:text="00:00"
             android:layout_alignParentLeft="true"
              android:textColor="@android:color/white"
              />
@@ -114,7 +111,7 @@
                 android:id="@+id/playMusicStopTimeTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="03:24"
+                android:text="00:00"
                  android:layout_alignParentRight="true"
                 android:textColor="@android:color/white"
                 />
@@ -124,7 +121,6 @@
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
            android:layout_alignParentBottom="true"
-           android:layout_marginBottom="35dp"
            />
     </RelativeLayout>
 </LinearLayout>

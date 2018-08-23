@@ -59,6 +59,8 @@ public class LrcView extends View {
 	private Bitmap mBackground;
 	
 	private Scroller mScroller;
+	public static float defaultTextSize=50.0f;
+	public static float defaultDividerHeight=20;
 
 	public LrcView(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
@@ -74,11 +76,11 @@ public class LrcView extends View {
 	private void inflateAttributes(AttributeSet attrs) {
 		// <begin>
 		// 解析自定义属性
-		TypedArray ta = getContext().obtainStyledAttributes(attrs,
-				R.styleable.Lrc);
-		mTextSize = ta.getDimension(R.styleable.Lrc_textSize, 50.0f);
+		TypedArray ta = getContext().obtainStyledAttributes(attrs, R.styleable.Lrc);
+
+		mTextSize = ta.getDimension(R.styleable.Lrc_textSize, defaultTextSize);
 		mRows = ta.getInteger(R.styleable.Lrc_rows, 5);
-		mDividerHeight = ta.getDimension(R.styleable.Lrc_dividerHeight, 0.0f);
+		mDividerHeight = ta.getDimension(R.styleable.Lrc_dividerHeight, defaultDividerHeight);
 
 		int normalTextColor = ta.getColor(R.styleable.Lrc_normalTextColor,
 				0xffffffff);

@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="120dp">
+    android:layout_height="120dp"
+    android:gravity="center"
+    android:id="@+id/lrcLinearLayout"
+    >
     <com.example.mrxie.music.ui.LrcView
         xmlns:lrc="http://schemas.android.com/apk/res/com.example.mrxie.music"
         android:layout_width="wrap_content"
@@ -9,10 +12,8 @@
         android:id="@+id/show_lyric"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="0dp"
-        lrc:textSize="18sp"
         lrc:normalTextColor="@android:color/white"
         lrc:currentTextColor="@color/main"
-        lrc:dividerHeight="20dp"
         lrc:rows="3"
         />
 </LinearLayout>

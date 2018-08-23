@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
@@ -21,22 +22,28 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.ViewGroup.LayoutParams;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.mrxie.music.R;
 import com.example.mrxie.music.Service.MusicService;
 import com.example.mrxie.music.Toast.OnlyOneToast;
+import com.example.mrxie.music.convertPXAndDP.DensityUtil;
 import com.example.mrxie.music.fragment.localMusicFragment;
 import com.example.mrxie.music.fragment.onlineMusicFragment;
 import com.example.mrxie.music.fragment.searchMusicFragment;
 import com.example.mrxie.music.fragment.settingFragment;
 import com.example.mrxie.music.fragment.songListFragment;
+import com.example.mrxie.music.ui.LrcView;
+
 
 public class MainActivity extends FragmentActivity implements View.OnClickListener {
     private String TAG="Music";
@@ -48,6 +55,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private TextView musicTitle;
     private ImageButton searchMusicButton;
     private long time=0;
+    private LinearLayout tabLinearLayout;
+    private LinearLayout TitleBarLinearLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +66,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
         initViews();
+        //根据屏幕的宽高来初始化控件的位置和大小
+        initImageIconPositionAndSize();
         initEvents();
         selectTab(0);//设置默认的主页
     }
@@ -96,10 +107,76 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if(hasFocus){
-           // initImageIconPositionAndSize();//根据屏幕的宽高来初始化控件的位置和大小
+            initImageIconPositionAndSize();//根据屏幕的宽高来初始化控件的位置和大小
         }
     }
+    //根据屏幕的宽高来初始化控件的位置和大小
+    private  void  initImageIconPositionAndSize(){
+        WindowManager windowManager=getWindowManager();
+        long screenHeigt=windowManager.getDefaultDisplay().getHeight();//屏幕的高度
+        long screenWidth=windowManager.getDefaultDisplay().getWidth();
+        int marginLeft=(int)(1.0*screenHeigt/10);
+        int TitleBarHeigt=(int)(2.0*screenHeigt/10);
+        LinearLayout.LayoutParams musicTitleLayoutParams= (LinearLayout.LayoutParams) musicTitle.getLayoutParams();
+        musicTitleLayoutParams.width=(int)(1.0*screenWidth*3/7)-marginLeft;
+        musicTitleLayoutParams.leftMargin=marginLeft;
+       // musicTitleLayoutParams.topMargin=marginLeft;
+        musicTitle.setLayoutParams(musicTitleLayoutParams);
 
+        LayoutParams TitleBarRelativeLayoutLayoutParams=TitleBarLinearLayout.getLayoutParams();
+        TitleBarRelativeLayoutLayoutParams.height=TitleBarHeigt;
+
+         LayoutParams tabLinearLayoutLayoutParams= (LayoutParams) tabLinearLayout.getLayoutParams();
+        tabLinearLayoutLayoutParams.width=(int) (1.0*screenWidth*4/7);
+
+
+        int IconWidth;
+        if(6*marginLeft>=screenWidth*4.0/7){
+            IconWidth=(int)((screenWidth*4.0/7-marginLeft)/6);
+        }else{
+            IconWidth=marginLeft;
+        }
+        int IconHeight=IconWidth;
+         int IconRightMarign=(int)(screenWidth*4.0/7-1.0*screenHeigt/10-5.0*IconWidth)/7;
+         if(IconRightMarign<0)
+             IconRightMarign=0;
+        Log.i(TAG, "initImageIconPositionAndSize: "+IconRightMarign);
+        LinearLayout.LayoutParams searchMusicButtonLayoutParams=(LinearLayout.LayoutParams)searchMusicButton.getLayoutParams();
+        searchMusicButtonLayoutParams.width=IconWidth;
+        searchMusicButtonLayoutParams.height=IconHeight;
+        searchMusicButtonLayoutParams.rightMargin=IconRightMarign;
+        searchMusicButton.setLayoutParams(searchMusicButtonLayoutParams);
+
+        LinearLayout.LayoutParams mLocalMusicButtonLayoutParams=(LinearLayout.LayoutParams)mLocalMusicButton.getLayoutParams();
+        mLocalMusicButtonLayoutParams.width=IconWidth;
+        mLocalMusicButtonLayoutParams.height=IconHeight;
+        mLocalMusicButtonLayoutParams.rightMargin=IconRightMarign;
+        mLocalMusicButton.setLayoutParams(mLocalMusicButtonLayoutParams);
+
+        LinearLayout.LayoutParams msongListButtonLayoutParams=(LinearLayout.LayoutParams)msongListButton.getLayoutParams();
+        msongListButtonLayoutParams.width=IconWidth;
+        msongListButtonLayoutParams.height=IconHeight;
+        msongListButtonLayoutParams.rightMargin=IconRightMarign;
+        msongListButton.setLayoutParams(msongListButtonLayoutParams);
+
+        LinearLayout.LayoutParams monlineMusicButtonLayoutParams=(LinearLayout.LayoutParams)monlineMusicButton.getLayoutParams();
+        monlineMusicButtonLayoutParams.width=IconWidth;
+        monlineMusicButtonLayoutParams.height=IconHeight;
+        monlineMusicButtonLayoutParams.rightMargin=IconRightMarign;
+        monlineMusicButton.setLayoutParams(monlineMusicButtonLayoutParams);
+
+        LinearLayout.LayoutParams msettingButtonLayoutParams=(LinearLayout.LayoutParams)msettingButton.getLayoutParams();
+        msettingButtonLayoutParams.width=IconWidth;
+        msettingButtonLayoutParams.height=IconHeight;
+        msettingButtonLayoutParams.rightMargin=marginLeft;
+        msettingButton.setLayoutParams(msettingButtonLayoutParams);
+        //设置标题字体大小
+        musicTitle.setTextSize(DensityUtil.px2sp(this,marginLeft/2));
+        LrcView.defaultTextSize=DensityUtil.px2sp(this,marginLeft);//设置默认的歌词大小
+        LrcView.defaultDividerHeight=marginLeft/2;
+        // Log.i(TAG, (musicTitle!=null)+"initImageIconPositionAndSize: "+"screentHeight:"+screenHeigt+"/screenWidth:"+screenWidth+"//"+(int)(1.0*screenWidth*3/7));
+
+    }
     private void initViews() {
         mLocalMusicButton = (ImageButton) this.findViewById(R.id.music);
         msongListButton = (ImageButton) this.findViewById(R.id.SongList);
@@ -107,6 +184,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         msettingButton = (ImageButton) this.findViewById(R.id.set);
         searchMusicButton = (ImageButton)this.findViewById(R.id.search);
         musicTitle = (TextView)this.findViewById(R.id.musicTitle);
+        tabLinearLayout = (LinearLayout)this.findViewById(R.id.tabLinearLayout);
+        TitleBarLinearLayout=(LinearLayout)this.findViewById(R.id.TitleBar);
         localMusicFragment.musicTitle=musicTitle;
         MusicService.musicTitle=musicTitle;
         localMusicFragment.activity=MainActivity.this;
@@ -237,9 +316,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     @Override
     protected void onDestroy() {
-//        //当应用关闭之后关闭服务
-//        Intent intent=new Intent(MainActivity.this,MusicService.class);
-//        stopService(intent);
+        //当应用关闭之后
         super.onDestroy();
     }
 }

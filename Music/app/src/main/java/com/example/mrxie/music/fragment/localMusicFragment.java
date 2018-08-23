@@ -2,7 +2,11 @@ package com.example.mrxie.music.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.os.Bundle;
+import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,8 +15,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -21,6 +27,7 @@ import com.example.mrxie.music.R;
 import com.example.mrxie.music.Service.MusicService;
 import com.example.mrxie.music.SongListInformation.App;
 import com.example.mrxie.music.SongListInformation.Music;
+import com.example.mrxie.music.SongListInformation.MusicIconLoader;
 import com.example.mrxie.music.SongListInformation.MusicUtils;
 import com.example.mrxie.music.Toast.OnlyOneToast;
 import com.example.mrxie.music.convertPXAndDP.DensityUtil;
@@ -33,15 +40,13 @@ public class localMusicFragment extends Fragment implements View.OnClickListener
     private ImageView mAddLikeMusicButton;
     private ImageView mSingleCycleMusicButton;
     private ImageView mPlayModeButton;
-    private ImageView mPrevMusicButton;
-    private ImageView mPlayMusicButton;
-    private ImageView mNextMusicButton;
+    private static ImageView mPrevMusicButton;
+    private static ImageView mPlayMusicButton;
+    private static ImageView mNextMusicButton;
     private TextView mPlayMusicStartTimeTextView;
     private TextView mPlayMusicStopTimeTextView;
     public ImageView MusicImage;
     private SeekBar mPlayMusicSeekBar;
-    public static boolean isPlay=false;
-    public static boolean isLike=false;
     public static String[] playMode=new String[]{"list_mode","circulate_mode","singlecycle_mode","randomplay_mode"};//播放模式
     public static String currentPlayMode=playMode[3];//当前的音乐播放模式
     public static Activity activity;
@@ -49,6 +54,11 @@ public class localMusicFragment extends Fragment implements View.OnClickListener
     public static ArrayList<Music> sMusicList = new ArrayList<Music>(); // 存放歌曲列表
     private LrcView showLrcView;
     private float marginleft=40;//歌单和专辑图片距离左边的距离(单位dp)
+    private LinearLayout PlayBoundaryFragment;
+    private RelativeLayout controlMusicButtonLinearLayout;
+    private LinearLayout lrcLinearLayout;
+    private RelativeLayout RightPalyBoundary;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -66,28 +76,129 @@ public class localMusicFragment extends Fragment implements View.OnClickListener
         super.onResume();
     }
 
+    public  static ImageView getmPlayMusicButton() {
+        return mPlayMusicButton;
+    }
+
+    public  static ImageView getmPrevMusicButton() {
+        return mPrevMusicButton;
+    }
+
+    public static ImageView getmNextMusicButton() {
+        return mNextMusicButton;
+    }
+
     //根据屏幕的宽高来初始化控件的位置和大小
     private  void  initImageIconPositionAndSize(){
         WindowManager windowManager=activity.getWindowManager();
         long screenHeigt=windowManager.getDefaultDisplay().getHeight();//屏幕的高度
         long screenWidth=windowManager.getDefaultDisplay().getWidth();
-        RelativeLayout.LayoutParams layoutParams= (RelativeLayout.LayoutParams) musicTitle.getLayoutParams();
-        layoutParams.width=(int)(1.0*screenWidth*3/7)- DensityUtil.dip2px(activity,marginleft);
-        musicTitle.setLayoutParams(layoutParams);
+        int marginLeft=(int)(1.0*screenHeigt/10);
 
-       // Log.i(TAG, (musicTitle!=null)+"initImageIconPositionAndSize: "+"screentHeight:"+screenHeigt+"/screenWidth:"+screenWidth+"//"+(int)(1.0*screenWidth*3/7));
+        FrameLayout.LayoutParams PlayBoundaryFragmentLayoutParams=new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,FrameLayout.LayoutParams.MATCH_PARENT);
+        PlayBoundaryFragmentLayoutParams.setMargins(marginLeft,0,marginLeft,marginLeft);
+        PlayBoundaryFragment.setLayoutParams(PlayBoundaryFragmentLayoutParams);
+
+        RelativeLayout.LayoutParams controlMusicButtonLinearLayoutLayoutParams=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
+       controlMusicButtonLinearLayoutLayoutParams.topMargin= (int) (7.0*5*screenHeigt/(10*7));
+        controlMusicButtonLinearLayoutLayoutParams.leftMargin=(int)((screenWidth*4/7-screenWidth*1/10)/13);
+        controlMusicButtonLinearLayoutLayoutParams.rightMargin=(int)((screenWidth*4/7-screenWidth*1/10)/13);
+        controlMusicButtonLinearLayout.setLayoutParams(controlMusicButtonLinearLayoutLayoutParams);
+
+       ViewGroup.LayoutParams lrcLinearLayoutLinearLayoutLayoutParams=(ViewGroup.LayoutParams)lrcLinearLayout.getLayoutParams();
+        lrcLinearLayoutLinearLayoutLayoutParams.height=(int) (7.0*5*screenHeigt/(10*7));
+
+        LinearLayout.LayoutParams PlayBoundaryFragmentLayoutParmas=new LinearLayout.LayoutParams((int)(screenWidth*4/7-screenWidth*1/10),LinearLayout.LayoutParams.MATCH_PARENT);
+        PlayBoundaryFragmentLayoutParmas.setMargins((int)(marginLeft/2),0,0,0);
+       RightPalyBoundary.setLayoutParams(PlayBoundaryFragmentLayoutParmas);
+
+        //设置播放按钮和其他按钮的大小和位置
+       RelativeLayout.LayoutParams mPrevMusicButtonLayoutParams=(RelativeLayout.LayoutParams)mPrevMusicButton.getLayoutParams();
+       mPrevMusicButtonLayoutParams.width=marginLeft;
+        mPrevMusicButtonLayoutParams.height=marginLeft;
+        mPrevMusicButton.setLayoutParams(mPrevMusicButtonLayoutParams);
+
+        RelativeLayout.LayoutParams mPlayMusicButtonLayoutParams=(RelativeLayout.LayoutParams)mPlayMusicButton.getLayoutParams();
+        mPlayMusicButtonLayoutParams.width=marginLeft;
+        mPlayMusicButtonLayoutParams.height=marginLeft;
+        mPlayMusicButton.setLayoutParams(mPlayMusicButtonLayoutParams);
+
+        RelativeLayout.LayoutParams mNextMusicButtonLayoutParams=(RelativeLayout.LayoutParams)mNextMusicButton.getLayoutParams();
+        mNextMusicButtonLayoutParams.width=marginLeft;
+        mNextMusicButtonLayoutParams.height=marginLeft;
+        mNextMusicButton.setLayoutParams(mNextMusicButtonLayoutParams);
+       //设置左边专辑图片上的按钮大小
+        RelativeLayout.LayoutParams like_imageLayoutParams=(RelativeLayout.LayoutParams)mAddLikeMusicButton.getLayoutParams();
+        like_imageLayoutParams.width=marginLeft;
+        like_imageLayoutParams.height=marginLeft;
+        like_imageLayoutParams.leftMargin=marginLeft/2;
+        like_imageLayoutParams.bottomMargin=marginLeft/3;
+        mAddLikeMusicButton.setLayoutParams(like_imageLayoutParams);
+
+        RelativeLayout.LayoutParams mSingleCycleMusicButtonLayoutParams=(RelativeLayout.LayoutParams)mSingleCycleMusicButton.getLayoutParams();
+        mSingleCycleMusicButtonLayoutParams.width=marginLeft;
+        mSingleCycleMusicButtonLayoutParams.height=marginLeft;
+        mSingleCycleMusicButtonLayoutParams.bottomMargin=marginLeft/3;
+        mSingleCycleMusicButton.setLayoutParams(mSingleCycleMusicButtonLayoutParams);
+
+        RelativeLayout.LayoutParams mPlayModeButtonLayoutParams=(RelativeLayout.LayoutParams)mPlayModeButton.getLayoutParams();
+        mPlayModeButtonLayoutParams.width=marginLeft;
+        mPlayModeButtonLayoutParams.height=marginLeft;
+        mPlayModeButtonLayoutParams.rightMargin=marginLeft/2;
+         mPlayModeButtonLayoutParams.bottomMargin=marginLeft/3;
+        mPlayModeButton.setLayoutParams(mPlayModeButtonLayoutParams);
+
+        // 设置歌词字体大小
+//         Paint paint=new Paint();
+//         paint.setTextSize(20);
+//        new Canvas().drawText();
+        //设置播放时间字体大小
+        mPlayMusicStartTimeTextView.setTextSize(DensityUtil.px2sp(activity,marginLeft/4));
+        mPlayMusicStopTimeTextView.setTextSize(DensityUtil.px2sp(activity,marginLeft/4));
 
     }
 
     private void initPlayMusic(View view) {
-        App.sContext=view.getContext();//设置上下文的环境
-        MusicUtils.initMusicList();
-       sMusicList=MusicUtils.sMusicList;
-        MusicService.sMusicList=sMusicList;
-        if(sMusicList.size()>0){
-            MusicService.playingMusicIndex=0;
+          //判断服务是否以正在运行
+        if(MusicService.playingMusicIndex!=-1){
+
+                musicTitle.setText(sMusicList.get(MusicService.playingMusicIndex).getTitle());
+
+                mPlayMusicSeekBar.setMax(MusicService.mediaPlayer.getDuration());
+            if (sMusicList.get(MusicService.playingMusicIndex).getImage() != null) {//如果音乐专辑图片存在
+                //  OnlyOneToast.makeText(localMusicFragment.activity,sMusicList.get(playingMusicIndex).getImage());
+                Bitmap bitmap = MusicIconLoader.getInstance().load(sMusicList.get(MusicService.playingMusicIndex).getImage());
+                if (MusicImage != null)
+                    MusicImage.setImageBitmap(bitmap);
+            } else {
+                if (MusicImage != null)
+                    MusicImage.setImageResource(R.drawable.image);
+                //OnlyOneToast.makeText(localMusicFragment.activity,"无图片");
+            }
+            if (showLrcView != null)
+                setLrc();//设置歌词的路径
+            if (mPlayMusicSeekBar != null)
+                mPlayMusicSeekBar.setProgress(MusicService.mediaPlayer.getCurrentPosition());
+            if (mPlayMusicStartTimeTextView != null)
+                mPlayMusicStartTimeTextView.setText(MusicService.changeDigitsToTwoDigits(MusicService.mediaPlayer.getCurrentPosition() / 1000 / 60) + ":" + MusicService.changeDigitsToTwoDigits(MusicService.mediaPlayer.getCurrentPosition() / 1000 % 60));
+            if (mPlayMusicStopTimeTextView != null)
+                mPlayMusicStopTimeTextView.setText(MusicService.changeDigitsToTwoDigits((MusicService.mediaPlayer.getDuration()) / 1000 / 60) + ":" + MusicService.changeDigitsToTwoDigits(MusicService.mediaPlayer.getDuration() / 1000 % 60));
+         if(MusicService.mediaPlayer.isPlaying()){
+            mPlayMusicButton.setImageResource(R.drawable.play_music);
+         }
+
+        }else{
+            App.sContext=view.getContext();//设置上下文的环境
+            MusicUtils.initMusicList();
+            sMusicList=MusicUtils.sMusicList;
+            MusicService.sMusicList=sMusicList;
+            if(sMusicList.size()>0){
+                MusicService.playingMusicIndex=0;
+            }
+            new MusicService().initMusic();
         }
-        MusicService.initMusic();
+
+
         Log.i(TAG, "Music数量"+sMusicList.size());
        for(Music music:sMusicList){
            Log.i(TAG, "initPlayMusic: "+music.getUri());
@@ -112,16 +223,20 @@ public class localMusicFragment extends Fragment implements View.OnClickListener
         mPlayMusicSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
+                if(sMusicList.size()==0){
+                    OnlyOneToast.makeText(activity,"暂无歌曲");
+                    mPlayMusicSeekBar.setProgress(0);
+                }
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+               mPlayMusicStartTimeTextView.setText(MusicService.changeDigitsToTwoDigits(seekBar.getProgress()/1000/60)+":"+MusicService.changeDigitsToTwoDigits(seekBar.getProgress()/1000%60));
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                mPlayMusicStartTimeTextView.setText(MusicService.changeDigitsToTwoDigits(seekBar.getProgress()/1000/60)+":"+MusicService.changeDigitsToTwoDigits(seekBar.getProgress()/1000%60));
              MusicService.mediaPlayer.seekTo(mPlayMusicSeekBar.getProgress());
              showLrcView.onDrag(mPlayMusicSeekBar.getProgress());//绘画
             }
@@ -144,6 +259,10 @@ public class localMusicFragment extends Fragment implements View.OnClickListener
         mPlayMusicSeekBar = (SeekBar)view.findViewById(R.id.playMusicSeekBar);
         MusicImage=(ImageView)view.findViewById(R.id.albumCover);
         showLrcView = (LrcView)view.findViewById(R.id.show_lyric);
+        PlayBoundaryFragment=(LinearLayout)view.findViewById(R.id.PlayBoundaryFragment);
+        controlMusicButtonLinearLayout = (RelativeLayout) view.findViewById(R.id.controlMusicButtonLinearLayout);
+        lrcLinearLayout = (LinearLayout) view.findViewById(R.id.lrcLinearLayout);
+        RightPalyBoundary=(RelativeLayout)view.findViewById(R.id.RightPalyBoundary);
         MusicService.showLrcView=showLrcView;
         MusicService.MusicImage=MusicImage;
         MusicService.mPlayMusicStartTimeTextView=mPlayMusicStartTimeTextView;
@@ -152,52 +271,50 @@ public class localMusicFragment extends Fragment implements View.OnClickListener
         MusicService.mPlayMusicButton=mPlayMusicButton;
     }
 
-
     @Override
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.playMusicButton:
-                if(isPlay){
-                mPlayMusicButton.setImageResource(R.drawable.pause_image);
-                isPlay=false;
-            }else{
-                mPlayMusicButton.setImageResource(R.drawable.play_music);
-                isPlay=true;
-            }
-                Bundle bundle=new Bundle();
-                bundle.putSerializable("key", MusicService.playAction.start);
-                Intent intent=new Intent(activity,MusicService.class);
-                intent.putExtras(bundle);
+                if(sMusicList.size()==0){
+                    OnlyOneToast.makeText(view.getContext(),"暂无歌曲");
+                    return;
+                }
+                Intent intent=new Intent(view.getContext(),MusicService.class);
+                intent.setAction(MusicService.TOGGLEPAUSE_ACTION);
                 view.getContext().startService(intent);
             break;
             case R.id.nextMusicButton:
-                mPlayMusicButton.setImageResource(R.drawable.play_music);
-                isPlay=true;
-                Bundle bundle1=new Bundle();
-                bundle1.putSerializable("key", MusicService.playAction.next);
+                if(sMusicList.size()==0){
+                    OnlyOneToast.makeText(view.getContext(),"暂无歌曲");
+                    return;
+                }
                 Intent intent1=new Intent(activity,MusicService.class);
-                intent1.putExtras(bundle1);
+                intent1.setAction(MusicService.NEXT_ACTION);
                 view.getContext().startService(intent1);
                 break;
             case R.id.prevMusicButton:
-                    mPlayMusicButton.setImageResource(R.drawable.play_music);
-                    isPlay=true;
-                Bundle bundle2=new Bundle();
-                bundle2.putSerializable("key", MusicService.playAction.prev);
+                if(sMusicList.size()==0){
+                    OnlyOneToast.makeText(view.getContext(),"暂无歌曲");
+                    return;
+                }
                 Intent intent2=new Intent(activity,MusicService.class);
-                intent2.putExtras(bundle2);
+                intent2.setAction(MusicService.PREVIOUS_ACTION);
                 view.getContext().startService(intent2);
                 break;
             case R.id.addLikeMusicButton:
-               if(isLike){
-                 mAddLikeMusicButton.setImageResource(R.drawable.like_image);
-                 OnlyOneToast.makeText(view.getContext(),"已取消喜欢");
-                 isLike=false;
-               }else{
-                  mAddLikeMusicButton.setImageResource(R.drawable.like_image_selected);
-                   OnlyOneToast.makeText(view.getContext(),"已添加到我喜欢的音乐");
-                  isLike=true;
-               }
+                if(sMusicList.size()==0){
+                    OnlyOneToast.makeText(view.getContext(),"暂无歌曲");
+                    return;
+                }
+//               if(isLike){
+//                 mAddLikeMusicButton.setImageResource(R.drawable.like_image);
+//                 OnlyOneToast.makeText(view.getContext(),"已取消喜欢");
+//                 isLike=false;
+//               }else{
+//                  mAddLikeMusicButton.setImageResource(R.drawable.like_image_selected);
+//                   OnlyOneToast.makeText(view.getContext(),"已添加到我喜欢的音乐");
+//                  isLike=true;
+//               }
                 break;
             case R.id.playModeButton:
                 int i;

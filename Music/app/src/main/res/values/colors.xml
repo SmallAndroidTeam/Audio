@@ -5,4 +5,5 @@
     <color name="colorAccent">#FF4081</color>
     <color name="colorPlayMusic">#fff</color>
     <color name="main">#FF31C27C</color>
+    <color name="widget_background_color">#a0000000</color>
 </resources>

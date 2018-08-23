@@ -22,5 +22,11 @@ public class DensityUtil {
     return (int)(deValue/scale+0.5f);
 
     }
-
+    /**
+     * 根据手机的分辨率从 px(像素) 的单位 转成为 sp
+     */
+    public static int px2sp(Context context, float pxValue) {
+        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
+        return (int) (pxValue / fontScale + 0.5f);
+    }
 }

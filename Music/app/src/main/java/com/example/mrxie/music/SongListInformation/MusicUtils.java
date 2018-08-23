@@ -12,7 +12,6 @@ import android.os.Environment;
 public class MusicUtils {
 	// 存放歌曲列表
 	public static ArrayList<Music> sMusicList = new ArrayList<Music>();
-
 	public static void initMusicList() {
 		// 获取歌曲列表
 		sMusicList.clear();

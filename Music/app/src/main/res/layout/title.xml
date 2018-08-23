@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/TitleBar"
    android:layout_width="match_parent"
-    android:layout_height="70dp">
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:layout_height="1dp">
     <com.example.mrxie.music.DefineView.AlwaysMarqueeTextView
         android:id="@+id/musicTitle"
         android:layout_width="20dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="40dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginLeft="0dp"
         android:text="音乐"
         android:singleLine="true"
         android:ellipsize="marquee"
@@ -16,63 +18,54 @@
         android:scrollHorizontally="true"
         android:marqueeRepeatLimit="marquee_forever"
         android:focusable="true"
-        android:textSize="25sp"
         android:textStyle="bold"
         android:textColor="@android:color/white"/>
     <LinearLayout
+        android:id="@+id/tabLinearLayout"
         android:layout_width="200dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="right"
         android:layout_alignParentRight="true"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="20dp">
+        android:layout_marginTop="0dp">
         <ImageButton
             android:id="@+id/search"
-            android:layout_width="0dp"
+            android:layout_width="1dp"
             android:layout_gravity="center"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="1dp"
             android:background="@drawable/search"
             android:scaleType="fitXY"
             android:layout_margin="10dp"
             />
         <ImageButton
             android:id="@+id/music"
-            android:layout_width="0dp"
+            android:layout_width="1dp"
             android:layout_gravity="center"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="1dp"
             android:background="@drawable/localmusic_selected"
             android:scaleType="fitXY"
-            android:layout_margin="10dp"
             />
         <ImageButton
             android:id="@+id/SongList"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="1dp"
             android:layout_gravity="center"
-            android:layout_height="wrap_content"
+            android:layout_height="1dp"
             android:scaleType="fitXY"
-            android:layout_margin="10dp"
             android:background="@drawable/songlist"/>
         <ImageButton
             android:id="@+id/onlineMusic"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="1dp"
             android:layout_gravity="center"
-            android:layout_height="wrap_content"
+            android:layout_height="1dp"
             android:scaleType="fitXY"
-            android:layout_margin="10dp"
             android:background="@drawable/onlinemusic"/>
         <ImageButton
             android:id="@+id/set"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="1dp"
             android:layout_gravity="center"
-            android:layout_height="wrap_content"
+            android:layout_height="1dp"
             android:scaleType="fitXY"
-            android:layout_margin="10dp"
             android:background="@drawable/set"
             />
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>
