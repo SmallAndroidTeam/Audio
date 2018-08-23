@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import com.example.mrxie.music.R;
 
 public class ThreeFragment extends Fragment {
+
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {

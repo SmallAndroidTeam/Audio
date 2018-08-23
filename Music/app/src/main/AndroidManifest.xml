@@ -41,10 +41,6 @@
             android:name=".activity.MainActivity"
             android:screenOrientation="landscape" />
 
-        <activity android:name=".fragment.OnlineActivity"
-            android:screenOrientation="landscape">
-        </activity>
-
         <service
             android:name=".Service.MusicService"
 

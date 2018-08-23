@@ -1,4 +1,5 @@
 package com.example.mrxie.music.activity;
+<<<<<<< HEAD
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -11,10 +12,18 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
+=======
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Intent;
+import android.os.Build;
+import android.support.annotation.DrawableRes;
+>>>>>>> 491eba33a38655a2da26d883a10a717a624d3292
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+<<<<<<< HEAD
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -24,28 +33,54 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.ViewGroup.LayoutParams;
 import android.util.Log;
+=======
+import android.support.v4.widget.DrawerLayout;
+import android.os.Bundle;
+import android.view.Gravity;
+>>>>>>> 491eba33a38655a2da26d883a10a717a624d3292
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+<<<<<<< HEAD
 import android.widget.RelativeLayout;
+=======
+import android.widget.ListView;
+>>>>>>> 491eba33a38655a2da26d883a10a717a624d3292
 import android.widget.TextView;
 
 import com.example.mrxie.music.R;
 import com.example.mrxie.music.Service.MusicService;
 import com.example.mrxie.music.Toast.OnlyOneToast;
+<<<<<<< HEAD
 import com.example.mrxie.music.convertPXAndDP.DensityUtil;
+=======
+import com.example.mrxie.music.adapter.ContentAdapter;
+import com.example.mrxie.music.adapter.ContentModel;
+
+import com.example.mrxie.music.dialog.CardPickerDialog;
+import com.example.mrxie.music.fragment.TimingFragment;
+>>>>>>> 491eba33a38655a2da26d883a10a717a624d3292
 import com.example.mrxie.music.fragment.localMusicFragment;
 import com.example.mrxie.music.fragment.onlineMusicFragment;
 import com.example.mrxie.music.fragment.searchMusicFragment;
 import com.example.mrxie.music.fragment.settingFragment;
 import com.example.mrxie.music.fragment.songListFragment;
+<<<<<<< HEAD
 import com.example.mrxie.music.ui.LrcView;
 
+=======
+import com.example.mrxie.music.ui.ThemeHelper;
 
-public class MainActivity extends FragmentActivity implements View.OnClickListener {
+import java.util.ArrayList;
+import java.util.List;
+>>>>>>> 491eba33a38655a2da26d883a10a717a624d3292
+
+public class MainActivity extends FragmentActivity implements View.OnClickListener, CardPickerDialog.ClickListener {
     private String TAG="Music";
     private ImageButton msongListButton;
     private ImageButton monlineMusicButton;
@@ -54,9 +89,17 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private Fragment mlocalMusicFragment,msongListFragment,monlineMusicFragment,msettingFragment,searchMusicFragment;
     private TextView musicTitle;
     private ImageButton searchMusicButton;
+    private DrawerLayout drawerLayout;
+    private ListView mLvLeftMenu;
     private long time=0;
+<<<<<<< HEAD
     private LinearLayout tabLinearLayout;
     private LinearLayout TitleBarLinearLayout;
+=======
+    private ContentAdapter adapter;
+    private List<ContentModel> list;
+
+>>>>>>> 491eba33a38655a2da26d883a10a717a624d3292
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -184,11 +227,64 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         msettingButton = (ImageButton) this.findViewById(R.id.set);
         searchMusicButton = (ImageButton)this.findViewById(R.id.search);
         musicTitle = (TextView)this.findViewById(R.id.musicTitle);
+<<<<<<< HEAD
         tabLinearLayout = (LinearLayout)this.findViewById(R.id.tabLinearLayout);
         TitleBarLinearLayout=(LinearLayout)this.findViewById(R.id.TitleBar);
+=======
+        drawerLayout = (DrawerLayout) findViewById(R.id.fd);
+        mLvLeftMenu = (ListView) findViewById(R.id.id_lv_left_menu);
+
+        setUpDrawer();
+>>>>>>> 491eba33a38655a2da26d883a10a717a624d3292
         localMusicFragment.musicTitle=musicTitle;
         MusicService.musicTitle=musicTitle;
         localMusicFragment.activity=MainActivity.this;
+
+    }
+    private void setUpDrawer() {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        mLvLeftMenu.addHeaderView(inflater.inflate(R.layout.nav_header_main, mLvLeftMenu, false));
+        initData();
+        adapter = new ContentAdapter(this, list);
+        mLvLeftMenu.setAdapter(adapter);
+       mLvLeftMenu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                switch (position) {
+                    case 1:
+                        drawerLayout.closeDrawers();
+                        break;
+                    case 2:
+                        CardPickerDialog dialog = new CardPickerDialog();
+                        dialog.setClickListener(MainActivity.this);
+                        dialog.show(getSupportFragmentManager(), "theme");
+                        drawerLayout.closeDrawers();
+
+                        break;
+                    case 3:
+                        TimingFragment fragment3 = new TimingFragment();
+                        fragment3.show(getSupportFragmentManager(), "timing");
+                        drawerLayout.closeDrawers();
+
+                        break;
+                    case 4:
+
+                    case 5:
+                        break;
+
+
+                }
+            }
+        });
+    }
+    private void initData() {
+        list = new ArrayList<ContentModel>();
+
+        list.add(new ContentModel(R.mipmap.topmenu_icn_night, "夜间模式", 1));
+        list.add(new ContentModel(R.mipmap.topmenu_icn_skin, "主题换肤", 2));
+        list.add(new ContentModel(R.mipmap.topmenu_icn_time, "定时关闭音乐", 3));
+        list.add(new ContentModel(R.mipmap.topmenu_icn_vip, "下载歌曲品质", 4));
+        list.add(new ContentModel(R.mipmap.topmenu_icn_exit, "退出", 5));
 
     }
     private void initEvents() {
@@ -225,7 +321,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
               if(musicTitle.getVisibility()==View.VISIBLE){
                   musicTitle.setVisibility(View.INVISIBLE);
               }
-              selectTab(3);
+              drawerLayout.openDrawer(Gravity.START);
               break;
           case R.id.search:
               if(musicTitle.getVisibility()==View.VISIBLE){
@@ -261,6 +357,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 break;
             case 2:
                 monlineMusicButton.setBackgroundResource(R.drawable.onlinemusic_selected);
+
                 if(monlineMusicFragment==null){
                     monlineMusicFragment=new onlineMusicFragment();
                     fragmentTransaction.add(R.id.IndexContent,monlineMusicFragment);
@@ -319,4 +416,14 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         //当应用关闭之后
         super.onDestroy();
     }
+    @Override
+    public void onConfirm(int currentTheme) {
+        if (ThemeHelper.getTheme(MainActivity.this) != currentTheme) {
+            ThemeHelper.setTheme(MainActivity.this, currentTheme);
+
+
+        }
+
+    }
+
 }

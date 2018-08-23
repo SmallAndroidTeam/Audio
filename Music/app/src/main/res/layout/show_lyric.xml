@@ -13,7 +13,12 @@
         android:layout_marginTop="5dp"
         android:layout_marginBottom="0dp"
         lrc:normalTextColor="@android:color/white"
+<<<<<<< HEAD
         lrc:currentTextColor="@color/main"
+=======
+
+        lrc:dividerHeight="20dp"
+>>>>>>> 491eba33a38655a2da26d883a10a717a624d3292
         lrc:rows="3"
         />
 </LinearLayout>

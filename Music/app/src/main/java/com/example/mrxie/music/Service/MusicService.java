@@ -71,6 +71,7 @@ public final class MusicService extends Service {
     public static ImageView mPlayMusicButton;
     public static ImageView MusicImage;//歌曲的专辑图片
     public static LrcView showLrcView;
+<<<<<<< HEAD
     private Timer timer;
     public static boolean isPlay=false;
     public static boolean isLike=false;
@@ -94,6 +95,9 @@ public final class MusicService extends Service {
           handleCommandIntent(intent);
         }
     };
+=======
+
+>>>>>>> 491eba33a38655a2da26d883a10a717a624d3292
     @Override
     public void onCreate() {
         //注册广播
@@ -354,6 +358,16 @@ public final class MusicService extends Service {
             mediaPlayer.start();
             handler.post(runnable);
         }
+    }
+
+    public static void timing(int time){
+        Timer nTimer = new Timer();
+        nTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+           mediaPlayer.pause();
+            }
+        },time);
     }
     @Nullable
     @Override

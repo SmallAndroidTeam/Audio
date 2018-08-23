@@ -2,9 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/TitleBar"
    android:layout_width="match_parent"
+<<<<<<< HEAD
     android:gravity="center"
     android:orientation="horizontal"
     android:layout_height="1dp">
+=======
+
+    android:layout_height="70dp">
+>>>>>>> 491eba33a38655a2da26d883a10a717a624d3292
     <com.example.mrxie.music.DefineView.AlwaysMarqueeTextView
         android:id="@+id/musicTitle"
         android:layout_width="20dp"
@@ -17,6 +22,7 @@
         android:focusableInTouchMode="true"
         android:scrollHorizontally="true"
         android:marqueeRepeatLimit="marquee_forever"
+
         android:focusable="true"
         android:textStyle="bold"
         android:textColor="@android:color/white"/>
