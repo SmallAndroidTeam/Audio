@@ -11,7 +11,7 @@
         android:layout_marginBottom="0dp"
         lrc:textSize="18sp"
         lrc:normalTextColor="@android:color/white"
-        lrc:currentTextColor="@color/main"
+
         lrc:dividerHeight="20dp"
         lrc:rows="3"
         />

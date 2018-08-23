@@ -1,118 +1,91 @@
 package com.example.mrxie.music.fragment;
-
-import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
 
-import com.example.mrxie.music.Adapter.TabFragmentPagerAdapter;
-import com.example.mrxie.music.R;
+import  com.example.mrxie.music.R;
+import com.example.mrxie.music.Service.MusicService;
+import com.example.mrxie.music.adapter.MusicListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class songListFragment extends Fragment implements View.OnClickListener {
-    private TextView tv_item_one;
-    private TextView tv_item_two;
-    private TextView tv_item_three;
-    private ViewPager myViewPager;
-    private List<Fragment> list;
-    private TabFragmentPagerAdapter adapter;
+
+public class songListFragment extends Fragment {
 
 
-    @Nullable
+    private MusicListAdapter mMusicListAdapter = new MusicListAdapter();
+    ListView lv;
+
+    SwipeRefreshLayout mSwipeRefreshLayout;
+
+    private List<String> stringList;
+    private ArrayAdapter lvAdapter;
+
+
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view=inflater.inflate(R.layout.songlist,container,false);
-        tv_item_one = (TextView) view.findViewById(R.id.tv_item_one);
-        tv_item_two = (TextView) view.findViewById(R.id.tv_item_two);
-        tv_item_three = (TextView) view.findViewById(R.id.tv_item_three);
-        myViewPager = (ViewPager) view.findViewById(R.id.myViewPager);
-        tv_item_one.setOnClickListener(this);
-        tv_item_two.setOnClickListener(this);
-        tv_item_three.setOnClickListener(this);
-        myViewPager.setOnPageChangeListener(new MyPagerChangeListener());
-        list = new ArrayList<>();
-        list.add(new OneFragment());
-        list.add(new TwoFragment());
-        list.add(new ThreeFragment());
-        adapter = new TabFragmentPagerAdapter(getFragmentManager(), list);
-        myViewPager.setAdapter(adapter);
-        myViewPager.setCurrentItem(0);  //初始化显示第一个页面
-        tv_item_one.setBackgroundColor(Color.RED);//被选中就为红色
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.songlist, container, false);
+        mSwipeRefreshLayout=(SwipeRefreshLayout)view.findViewById(R.id.srl1);
+        lv=(ListView)view.findViewById(R.id.lv2)  ;
+        initData();
         return view;
     }
 
+    private void initData() {
 
+        lv.setAdapter(mMusicListAdapter);
 
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//            onplay(i);
 
-
-    /**
-     * 点击事件
-     */
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.tv_item_one:
-                myViewPager.setCurrentItem(0);
-                tv_item_one.setBackgroundColor(Color.RED);
-                tv_item_two.setBackgroundColor(Color.WHITE);
-                tv_item_three.setBackgroundColor(Color.WHITE);
-                break;
-            case R.id.tv_item_two:
-                myViewPager.setCurrentItem(1);
-                tv_item_one.setBackgroundColor(Color.WHITE);
-                tv_item_two.setBackgroundColor(Color.RED);
-                tv_item_three.setBackgroundColor(Color.WHITE);
-                break;
-            case R.id.tv_item_three:
-                myViewPager.setCurrentItem(2);
-                tv_item_one.setBackgroundColor(Color.WHITE);
-                tv_item_two.setBackgroundColor(Color.WHITE);
-                tv_item_three.setBackgroundColor(Color.RED);
-                break;
-        }
-    }
-
-    /**
-     * 设置一个ViewPager的侦听事件，当左右滑动ViewPager时菜单栏被选中状态跟着改变
-     *
-     */
-    public class MyPagerChangeListener implements ViewPager.OnPageChangeListener {
-
-        @Override
-        public void onPageScrollStateChanged(int arg0) {
-        }
-
-        @Override
-        public void onPageScrolled(int arg0, float arg1, int arg2) {
-        }
-
-        @Override
-        public void onPageSelected(int arg0) {
-            switch (arg0) {
-                case 0:
-                    tv_item_one.setBackgroundColor(Color.RED);
-                    tv_item_two.setBackgroundColor(Color.WHITE);
-                    tv_item_three.setBackgroundColor(Color.WHITE);
-                    break;
-                case 1:
-                    tv_item_one.setBackgroundColor(Color.WHITE);
-                    tv_item_two.setBackgroundColor(Color.RED);
-                    tv_item_three.setBackgroundColor(Color.WHITE);
-                    break;
-                case 2:
-                    tv_item_one.setBackgroundColor(Color.WHITE);
-                    tv_item_two.setBackgroundColor(Color.WHITE);
-                    tv_item_three.setBackgroundColor(Color.RED);
-                    break;
             }
-        }
+        });
+
+
+        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Toast.makeText(getActivity(), "long click:" + stringList.get(i).toString(), Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+
+
+        //初始化下拉控件颜色
+        mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright, android.R.color.holo_green_light,
+                android.R.color.holo_orange_light, android.R.color.holo_red_light);
+
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new AsyncTask<Void, Void, Void>() {
+
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        SystemClock.sleep(2000);
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        Toast.makeText(getActivity(), "下拉刷新成功", Toast.LENGTH_SHORT).show();
+                        mSwipeRefreshLayout.setRefreshing(false);
+                    }
+                }.execute();
+            }
+        });
     }
 }

@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MusicService extends Service {
     public  static MediaPlayer mediaPlayer=new MediaPlayer();
@@ -44,6 +46,7 @@ public class MusicService extends Service {
     public static ImageView mPlayMusicButton;
     public static ImageView MusicImage;//歌曲的专辑图片
     public static LrcView showLrcView;
+
     @Override
     public void onCreate() {
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -261,6 +264,16 @@ public class MusicService extends Service {
         initMusic();
         mediaPlayer.start();
         handler.post(runnable);
+    }
+
+    public static void timing(int time){
+        Timer nTimer = new Timer();
+        nTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+           mediaPlayer.pause();
+            }
+        },time);
     }
     @Nullable
     @Override

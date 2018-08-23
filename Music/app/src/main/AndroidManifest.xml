@@ -33,10 +33,6 @@
             android:screenOrientation="landscape">
         </activity>
 
-        <activity android:name=".fragment.OnlineActivity"
-            android:screenOrientation="landscape">
-        </activity>
-
         <service
             android:name=".Service.MusicService"
             android:enabled="true"

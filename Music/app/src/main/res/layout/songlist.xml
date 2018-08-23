@@ -1,41 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <LinearLayout
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.mrxie.music.fragment.songListFragment">
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/srl1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/tv_item_one"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:text="歌手" />
+        <ListView
+            android:id="@+id/lv2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"></ListView>
 
-        <TextView
-            android:id="@+id/tv_item_two"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:text="专辑" />
+    </android.support.v4.widget.SwipeRefreshLayout>
 
-        <TextView
-            android:id="@+id/tv_item_three"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:text="收藏" />
-    </LinearLayout>
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/myViewPager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1" />
-
-</LinearLayout>
+</FrameLayout>
