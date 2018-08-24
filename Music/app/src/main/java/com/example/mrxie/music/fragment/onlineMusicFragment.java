@@ -1,5 +1,6 @@
 package com.example.mrxie.music.fragment;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.mrxie.music.R;
+import com.example.mrxie.music.activity.SongRankingListActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,6 +102,8 @@ public class onlineMusicFragment extends Fragment implements View.OnClickListene
                 break;
             case R.id.item_faxian:
                 vp.setCurrentItem(2, true);
+                Intent intent = new Intent(getActivity(), SongRankingListActivity.class);
+                startActivity(intent);
                 break;
             case R.id.item_me:
                 vp.setCurrentItem(3, true);
