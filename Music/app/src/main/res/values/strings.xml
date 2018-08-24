@@ -1,11 +1,9 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">Music</string>
     <string name="noLyric">暂无歌词</string>
-<<<<<<< HEAD
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
     <string name="widget_image_tip">无法打开Audio</string>
-=======
     <string name="duration_format" translatable="false"><xliff:g id="hours">%1$s</xliff:g> <xliff:g id="minutes">%2$s</xliff:g></string>
     <string name="durationformatshort" translatable="false"><xliff:g id="format">%2$d:%3$02d</xliff:g></string>
     <string name="durationformatlong" translatable="false"><xliff:g id="format">%1$d:%2$02d:%3$02d</xliff:g></string>
@@ -59,6 +57,4 @@
     <string name="textview_click_before">Unlock it to open the door of the new world !</string>
     <string name="textview_click_after">Go to : https://github.com/Bilibili/MagicaSakura</string>
 
-
->>>>>>> 491eba33a38655a2da26d883a10a717a624d3292
 </resources>

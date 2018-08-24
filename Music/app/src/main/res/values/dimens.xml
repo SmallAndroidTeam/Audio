@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
@@ -8,9 +7,6 @@ http://developer.android.com/guide/topics/appwidgets/index.html#CreatingLayout
     -->
     <dimen name="widget_margin">8dp</dimen>
 
-</resources>
-=======
-<resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="drawer_icon_size">32dp</dimen>
     <dimen name="activity_horizontal_margin">16dp</dimen>
@@ -19,4 +15,4 @@ http://developer.android.com/guide/topics/appwidgets/index.html#CreatingLayout
     <dimen name="artist_image">230dp</dimen>
 
 </resources>
->>>>>>> 491eba33a38655a2da26d883a10a717a624d3292
+

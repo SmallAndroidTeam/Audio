@@ -70,14 +70,8 @@
         >
         <ImageView
             android:id="@+id/prevMusicButton"
-<<<<<<< HEAD
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-=======
             android:layout_width="70dp"
             android:layout_height="70dp"
-
->>>>>>> 491eba33a38655a2da26d883a10a717a624d3292
           android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:scaleType="fitXY"
@@ -91,14 +85,8 @@
             android:src="@drawable/pause_image"/>
         <ImageView
             android:id="@+id/nextMusicButton"
-<<<<<<< HEAD
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-=======
             android:layout_width="70dp"
             android:layout_height="70dp"
-
->>>>>>> 491eba33a38655a2da26d883a10a717a624d3292
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:scaleType="fitXY"

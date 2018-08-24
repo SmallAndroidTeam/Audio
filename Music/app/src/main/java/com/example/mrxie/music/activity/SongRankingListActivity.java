@@ -49,15 +49,15 @@ public class SongRankingListActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_three);
-        rankingsonglist = (ListView) findViewById(R.id.Ranking_song_list);
+       // rankingsonglist = (ListView) findViewById(R.id.Ranking_song_list);
         myAdapter = new MyAdapter(this);
         myHandle=new MyHandler(this);
         rankingsonglist.setAdapter(myAdapter);
         songRankingBean = new SongRankingBean();
         Intent intent=getIntent();
         rankingnum = intent.getIntExtra("RankingType",1);
-        rankingimage = (ImageView) findViewById(R.id.rankingimage);
-        rankingname = (TextView) findViewById(R.id.rankingname);
+       // rankingimage = (ImageView) findViewById(R.id.rankingimage);
+       //rankingname = (TextView) findViewById(R.id.rankingname);
         net();
         getRankingInfo(rankingnum);
     }
