@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="18dp"
+        android:gravity="center"
+        >
+       <CheckBox
+           android:id="@+id/checkbox"
+           android:layout_marginLeft="20dp"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="不在提醒"
+            android:textColor="@color/dialog_available"
+            android:layout_toRightOf="@+id/checkbox"/>
+        <TextView
+            android:id="@+id/OK"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="OK"
+            android:textColor="@color/dialog_available"
+            android:layout_marginRight="20dp"
+            android:clickable="true"
+            android:layout_toLeftOf="@+id/CANCEL"/>
+        <TextView
+            android:id="@+id/CANCEL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CANCEL"
+            android:clickable="true"
+            android:textColor="@color/dialog_available"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"/>
+
+    </RelativeLayout>
+</LinearLayout>

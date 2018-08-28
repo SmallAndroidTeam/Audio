@@ -1,14 +1,30 @@
 package com.example.mrxie.music.activity;
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Application;
 import android.app.Dialog;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbDeviceConnection;
+import android.hardware.usb.UsbEndpoint;
+import android.hardware.usb.UsbInterface;
+import android.hardware.usb.UsbManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
+import android.os.StatFs;
+import android.os.storage.StorageManager;
+import android.os.storage.StorageVolume;
+import android.provider.DocumentsContract;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.app.Activity;
@@ -59,11 +75,26 @@ import com.example.mrxie.music.fragment.searchMusicFragment;
 import com.example.mrxie.music.fragment.settingFragment;
 import com.example.mrxie.music.fragment.songListFragment;
 import com.example.mrxie.music.ui.LrcView;
-
+import com.github.mjdev.libaums.UsbMassStorageDevice;
+import com.github.mjdev.libaums.fs.UsbFile;
+import com.github.mjdev.libaums.partition.Partition;
 import com.example.mrxie.music.ui.ThemeHelper;
-
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.nio.file.FileSystem;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.http.HEAD;
 
@@ -81,6 +112,17 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private long time=0;
     private LinearLayout tabLinearLayout;
     private LinearLayout TitleBarLinearLayout;
+    private static UsbBroadcastReceiver usbBroadcastReceiver;//检测USB的广播
+    public final  static String  USB_DEVICE_ATTACHED="android.hardware.usb.action.USB_DEVICE_ATTACHED";
+    public final  static String USB_DEVICE_DETACHED="android.hardware.usb.action.USB_DEVICE_DETACHED";
+    public final static String ACTION_USB_PERMISSION="com.android.example.USB_PERMISSION";
+    public static final String ACTION_VOLUME_STATE_CHANGED = "android.os.storage.action.VOLUME_STATE_CHANGED";
+    public static final String EXTRA_VOLUME_ID = "android.os.storage.extra.VOLUME_ID";
+    public static final String EXTRA_VOLUME_STATE = "android.os.storage.extra.VOLUME_STATE";
+    private   UsbManager usbManager;
+	private  static AlertDialog alertDialog;
+    private static boolean isLoadComplete=false;//判断MainActivity是否加载完成了一次
+    public static  UsbMassStorageDevice[] storageDevices;//当前U盘列表
     private ContentAdapter adapter;
     private List<ContentModel> list;
 
@@ -97,12 +139,258 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
        // initImageIconPositionAndSize();
         initEvents();
         selectTab(0);//设置默认的主页
+  usbBroadcastReceiver = new UsbBroadcastReceiver();
+        usbManager = (UsbManager) this.getSystemService(Context.USB_SERVICE);
+        //动态注册事件
+        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_MEDIA_MOUNTED);
+                intentFilter.addAction(USB_DEVICE_ATTACHED);
+                intentFilter.addAction(USB_DEVICE_DETACHED);
+                intentFilter.addAction(ACTION_USB_PERMISSION);
+                registerReceiver(usbBroadcastReceiver,intentFilter);
+    }
+  @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if(hasFocus){
+            initImageIconPositionAndSize();//根据屏幕的宽高来初始化控件的位置和大小
+            if(!isLoadComplete){
+              usbBroadcastReceiver.showUsbList(this);
+                isLoadComplete=true;
+            }
+        }
     }
 
      //加载完
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+    /**
+     * 检测usb的广播
+     */
+     class UsbBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // TODO: This method is called when the BroadcastReceiver is receiving
+            String action=intent.getAction();
+            Log.i(TAG, "onReceive: /////"+action);
+            if(action.equals(USB_DEVICE_ATTACHED)){
+                OnlyOneToast.makeText(context,"设备插入");
+                showUsbList(context);
+            }else if(action.equals(USB_DEVICE_DETACHED)) {
+                OnlyOneToast.makeText(context, "设备拔出");
+                if (alertDialog != null && alertDialog.isShowing()) {
+                    alertDialog.cancel();
+                }
+            }
+            else if(action.equals(ACTION_USB_PERMISSION)){//获取usb的权限的广播
+               synchronized (this){
+                   UsbDevice usbDevice=intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                   if(usbDevice!=null){
+                       if(intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED,false)){
+                           //OnlyOneToast.makeText(context,usbDevice.getDeviceName()+":获取权限成功");
+                           Intent intent1=new Intent();
+                           intent1.setAction(Intent.ACTION_MAIN);
+                           intent1.addCategory(Intent.CATEGORY_LAUNCHER);
+                           intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                           intent1.setComponent(new ComponentName(getPackageName(),"com.example.mrxie.music.activity.MainActivity"));
+                           startActivity(intent1);
+                           readDevice(usbDevice);
+                           Log.i(TAG, "onReceive:获取权限成功 ");
+                       }else{
+                           //OnlyOneToast.makeText(context,usbDevice.getDeviceName()+":获取权限失败");
+                           Log.i(TAG, "onReceive:获取权限失败");
+                       }
+                   }
+               }
+            }
+        }
+
+
+//        //读取设备列表
+//        public void readDeviceList(Context context){
+//            storageDevices = UsbMassStorageDevice.getMassStorageDevices(MainActivity.this);
+//            Log.i(TAG, "readDeviceList: "+storageDevices.length);
+//            String[] result=null;
+//            if(storageDevices.length==0){
+//                return;
+//            }
+//
+//             for(UsbMassStorageDevice device:storageDevices){
+//                //读取该设备是否有权限
+//                if(usbManager.hasPermission(device.getUsbDevice())){
+//                    //设备可以还没有挂载上，延迟一秒
+//                    try {
+//                        Thread.sleep(1000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                     readDevice(device);
+//                }else{
+//                   getPermission(context,device.getUsbDevice());//没有权限进行申请
+//                }
+//            }
+//            for (UsbMassStorageDevice s:storageDevices) {
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                    s.getPartitions().stream().close();
+//                }
+//            }
+//        }
+//
+//        private void readDevice(UsbMassStorageDevice device){
+//                if(device==null)
+//                {
+//                    return;
+//                }
+//            try {
+//                device.init();//初始化
+//              //获取分区
+//                List<Partition> partitions=device.getPartitions();
+//                if(partitions.size()==0){
+//                   // OnlyOneToast.makeText(MainActivity.this,"错误:读取分区失败");
+//                    Log.i(TAG, "readDevice:错误:读取分区失败 ");
+//                    return;
+//                }
+//                //仅使用第一分区
+//                com.github.mjdev.libaums.fs.FileSystem fileSystem=partitions.get(0).getFileSystem();
+//                UsbFile root=fileSystem.getRootDirectory();//设置当前文件对象为根目录
+//                readFile(root);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        private void readFile(UsbFile root) {
+//            ArrayList<UsbFile> usbFiles=new ArrayList<>();
+//            try{
+//                for(UsbFile file: root.listFiles()){
+//                    usbFiles.add(file);
+//                }
+//                Log.i(TAG, "readFile: "+usbFiles.size());
+//            }catch (Exception e){
+//                e.printStackTrace();
+//            }
+//        }
+//        private UsbMassStorageDevice getUsbMass(UsbDevice usbDevice){
+//            for(UsbMassStorageDevice device:storageDevices){
+//                if(device.getUsbDevice().equals(usbDevice)){
+//                    return device;
+//                }
+//            }
+//            return null;
+//        }
+        //获取U盘信息
+        public void showUsbList(Context context){
+            HashMap<String,UsbDevice> deviceHashMap= usbManager.getDeviceList();//获取设备列表
+            if(deviceHashMap==null||deviceHashMap.size()==0){
+                return;
+            }
+            Iterator<UsbDevice> deviceIterator=deviceHashMap.values().iterator();
+            StringBuilder stringBuilder=new StringBuilder();
+            while (deviceIterator.hasNext()){
+                UsbDevice usbDevice=deviceIterator.next();
+                stringBuilder.append("DeviceName="+usbDevice.getDeviceName()+"\n");
+                stringBuilder.append("DeviceId="+usbDevice.getDeviceId()+"\n");
+                stringBuilder.append("VendorId="+usbDevice.getVendorId()+"\n");
+                stringBuilder.append("ProductId="+usbDevice.getProductId()+"\n");
+                stringBuilder.append("DeviceClass="+usbDevice.getDeviceClass()+"\n");
+                int deviceClass=usbDevice.getDeviceClass();
+                if(deviceClass==0){
+                    UsbInterface usbInterface=usbDevice.getInterface(0);
+                    int InterfaceClass=usbInterface.getInterfaceClass();
+                    stringBuilder.append("device Class 为0-------------\n");
+                    stringBuilder.append("Interface.describeContents()="+usbInterface.describeContents()+"\n");
+                    stringBuilder.append("Interface.getEndpointCount()="+usbInterface.getEndpointCount()+"\n");
+                    stringBuilder.append("Interface.getId()="+usbInterface.getId()+"\n");
+                    stringBuilder.append("Interface.getInterfaceClass()="+usbInterface.getInterfaceClass()+"\n");
+
+                    if(usbInterface.getInterfaceClass()==8){
+                        stringBuilder.append("此设备是U盘\n");
+                        //OnlyOneToast.makeText(context,"此设备是U盘,");
+                        getPermission(context,usbDevice);//获取权限
+                    }else if(usbInterface.getInterfaceClass()==255){
+                        stringBuilder.append("此设备是手机\n");
+                       // OnlyOneToast.makeText(context,"此设备是手机");
+                    }else if(usbInterface.getInterfaceClass()==3){
+                        stringBuilder.append("此设备是鼠标或者键盘\n");
+                       // OnlyOneToast.makeText(context,"此设备是鼠标或者键盘");
+                    }else{
+                        stringBuilder.append("其他设备\n");
+                       // OnlyOneToast.makeText(context,"此设备是其他设备");
+                    }
+
+                }
+            }
+            Log.i(TAG, "showUsbList: "+stringBuilder);
+        }
+
+        //读取U盘信息
+        public void readDevice(final UsbDevice usbdevice) {
+            synchronized (this){
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        UsbInterface usbInterface=usbdevice.getInterface(0);
+                        UsbEndpoint inEndpoint=usbInterface.getEndpoint(0);//输人端
+                        UsbEndpoint outEndpoint=usbInterface.getEndpoint(1);//输出端
+                        UsbDeviceConnection connection=usbManager.openDevice(usbdevice);
+                        connection.claimInterface(usbInterface,true);//建立连接与接口之间的关系
+
+                        String sendStringMsg="0x88";
+                        byte[] sendBytes=sendStringMsg.getBytes();
+                        int out=connection.bulkTransfer(outEndpoint,sendBytes,sendBytes.length,3000);
+                         Log.i(TAG, "发送:"+out+"#"+sendStringMsg+"#"+sendBytes);
+                        byte[] receiveMsgBytes=new byte[32];
+                        int in=connection.bulkTransfer(inEndpoint,receiveMsgBytes,receiveMsgBytes.length,3000);
+                        String receiveMsgString=receiveMsgBytes.toString();
+                        Log.i(TAG, "应答:"+in+"#"+receiveMsgString+"#"+receiveMsgBytes);
+
+                    }
+                }).start();
+            }
+        }
+        public  void  getPermission(final Context context, final UsbDevice usbDevice)//获取权限
+        {
+            if(usbManager.hasPermission(usbDevice)){//如果有读取权限就不执行
+                Log.i(TAG, "getPermission: 有读取权限");
+                readDevice(usbDevice);
+                return;
+            }
+            Log.i(TAG, "getPermission: 没有读取权限");
+            synchronized (this){
+                if(alertDialog==null){
+                    AlertDialog.Builder dialoguilder=new AlertDialog.Builder(context).setTitle("U盘读取权限不可用").setMessage("由于Audio需要读取U盘信息;\n否则，无法加载U盘里面的歌曲")
+                            .setCancelable(false).setPositiveButton("立即开启", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    PendingIntent permissionIntent=PendingIntent.getBroadcast(context,1,new Intent(ACTION_USB_PERMISSION),0);
+                                    usbManager.requestPermission(usbDevice,permissionIntent);
+                                }
+                            }).setNegativeButton("拒绝", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    OnlyOneToast.makeText(context,"获取权限失败");
+                                    if(alertDialog!=null&&alertDialog.isShowing()){
+                                        alertDialog.cancel();
+                                    }
+                                }
+                            });
+                    alertDialog=dialoguilder.create();
+                }
+            if(Build.VERSION.SDK_INT>=23){
+                if(!Settings.canDrawOverlays(context)){
+                    alertDialog.show();
+                }else{
+                   // alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);//设置系统级别的弹出框
+                    alertDialog.show();
+                }
+            }else{
+                //alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);//设置系统级别的弹出框
+                alertDialog.show();
+            }
+        }
+        }
     }
     //重写了单点事件
     @Override
@@ -130,13 +418,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         super.onBackPressed();
     }
 
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if(hasFocus){
-            initImageIconPositionAndSize();//根据屏幕的宽高来初始化控件的位置和大小
-        }
-    }
+
     //根据屏幕的宽高来初始化控件的位置和大小
     private  void  initImageIconPositionAndSize(){
         WindowManager windowManager=getWindowManager();
@@ -395,6 +677,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     @Override
     protected void onDestroy() {
         //当应用关闭之后
+unregisterReceiver(usbBroadcastReceiver);
         super.onDestroy();
     }
     @Override

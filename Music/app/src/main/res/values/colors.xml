@@ -359,5 +359,8 @@
     <color name="colorAccent">#FF4081</color>
     <color name="colorPlayMusic">#fff</color>
     <color name="main">#FF31C27C</color>
+
+    <color name="dialog_available">@android:color/holo_red_light</color>
+    <color name="dialog_unavailable">#a29e9e</color>
 </resources>
 
