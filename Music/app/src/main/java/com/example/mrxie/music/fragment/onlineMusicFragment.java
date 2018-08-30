@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.mrxie.music.R;
-import com.example.mrxie.music.activity.SongRankingListActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +59,7 @@ public class onlineMusicFragment extends Fragment implements View.OnClickListene
 
         mFragmentAdapter = new FragmentAdapter(getFragmentManager(), mFragmentList);
         vp.setOffscreenPageLimit(4);//ViewPager的缓存为4帧
+ mFragmentAdapter.notifyDataSetChanged();
         vp.setAdapter(mFragmentAdapter);
         vp.setCurrentItem(0);//初始设置ViewPager选中第一帧
         item_weixin.setTextColor(Color.parseColor("#66CDAA"));
@@ -102,8 +102,7 @@ public class onlineMusicFragment extends Fragment implements View.OnClickListene
                 break;
             case R.id.item_faxian:
                 vp.setCurrentItem(2, true);
-                Intent intent = new Intent(getActivity(), SongRankingListActivity.class);
-                startActivity(intent);
+
                 break;
             case R.id.item_me:
                 vp.setCurrentItem(3, true);

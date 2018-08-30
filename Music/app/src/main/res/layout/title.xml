@@ -4,8 +4,8 @@
    android:layout_width="match_parent"
     android:gravity="center"
     android:orientation="horizontal"
-    android:layout_height="1dp">
-    android:layout_height="70dp">
+  
+    android:layout_height="20dp">
     <com.example.mrxie.music.DefineView.AlwaysMarqueeTextView
         android:id="@+id/musicTitle"
         android:layout_width="20dp"

@@ -15,9 +15,10 @@
 
     <ImageView
         android:id="@+id/music_list_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
         android:paddingLeft="10dp"
+        android:visibility="visible"
         android:src="@mipmap/ic_launcher" />
 
     <LinearLayout
@@ -30,15 +31,17 @@
             android:id="@+id/tv_music_list_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+      android:textColor="@android:color/darker_gray"
+            android:textSize="20sp"
            />
 
         <TextView
             android:id="@+id/tv_music_list_artist"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="10dp"
             android:textColor="@android:color/darker_gray"
-            android:textSize="12sp" />
+            android:textSize="20sp" />
     </LinearLayout>
 
 </LinearLayout>

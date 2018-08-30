@@ -10,7 +10,7 @@
     <ImageView
         android:id="@+id/top_bac"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="160dp"
         android:scaleType="centerCrop"
         android:src="@mipmap/topinfo_ban_bg" />
 

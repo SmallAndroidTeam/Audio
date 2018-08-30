@@ -13,7 +13,7 @@
     <color name="small_font">#FF757575</color>
     <color name="text_color">#FF000000</color>
     <color name="widget_background_color">#a0000000</color>
-
+ <color name="main_dark">#FF535353</color>
     <!-- Menu Item Color -->
     <color name="menu_transparent">#00FFFFFF</color>
     <color name="menu_item_blue">#3487f4</color>

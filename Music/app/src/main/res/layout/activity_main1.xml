@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".fragment.SearchFragment">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/local_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="本地搜索"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:gravity="center_horizontal"/>
+
+        <TextView
+            android:id="@+id/net_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="网络搜索"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"/>
+    </LinearLayout>
+    <android.support.v4.view.ViewPager
+        android:id="@+id/myViewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1" >
+
+    </android.support.v4.view.ViewPager>
+
+    <View
+        android:id="@+id/view_pop_show"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#88666666"
+        android:visibility="gone" />
+
+</LinearLayout>

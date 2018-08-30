@@ -1,9 +1,5 @@
 package com.example.mrxie.music.activity;
-import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Application;
-import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -11,42 +7,21 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ActivityInfo;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
-import android.os.StatFs;
-import android.os.storage.StorageManager;
-import android.os.storage.StorageVolume;
-import android.provider.DocumentsContract;
 import android.provider.Settings;
-import android.support.annotation.Nullable;
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.Intent;
-import android.os.Build;
-import android.support.annotation.DrawableRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.ViewGroup.LayoutParams;
 import android.util.Log;
 import android.support.v4.widget.DrawerLayout;
-import android.os.Bundle;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -56,7 +31,6 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -66,44 +40,26 @@ import com.example.mrxie.music.Toast.OnlyOneToast;
 import com.example.mrxie.music.convertPXAndDP.DensityUtil;
 import com.example.mrxie.music.adapter.ContentAdapter;
 import com.example.mrxie.music.adapter.ContentModel;
-
-import com.example.mrxie.music.dialog.CardPickerDialog;
+import com.example.mrxie.music.fragment.SearchFragment;
 import com.example.mrxie.music.fragment.TimingFragment;
 import com.example.mrxie.music.fragment.localMusicFragment;
 import com.example.mrxie.music.fragment.onlineMusicFragment;
-import com.example.mrxie.music.fragment.searchMusicFragment;
 import com.example.mrxie.music.fragment.settingFragment;
 import com.example.mrxie.music.fragment.songListFragment;
 import com.example.mrxie.music.ui.LrcView;
 import com.github.mjdev.libaums.UsbMassStorageDevice;
-import com.github.mjdev.libaums.fs.UsbFile;
-import com.github.mjdev.libaums.partition.Partition;
-import com.example.mrxie.music.ui.ThemeHelper;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.nio.file.FileSystem;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 
-import retrofit2.http.HEAD;
-
-public class MainActivity extends FragmentActivity implements View.OnClickListener, CardPickerDialog.ClickListener {
+public class MainActivity extends FragmentActivity implements View.OnClickListener{
     private String TAG="Music";
     private ImageButton msongListButton;
     private ImageButton monlineMusicButton;
     private ImageButton msettingButton;
-    private ImageButton mLocalMusicButton;
+    private static ImageButton mLocalMusicButton;
     private Fragment mlocalMusicFragment,msongListFragment,monlineMusicFragment,msettingFragment,searchMusicFragment;
     private TextView musicTitle;
     private ImageButton searchMusicButton;
@@ -125,7 +81,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     public static  UsbMassStorageDevice[] storageDevices;//当前U盘列表
     private ContentAdapter adapter;
     private List<ContentModel> list;
-
+    private static int Selection_Theme=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -148,7 +104,12 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 intentFilter.addAction(ACTION_USB_PERMISSION);
                 registerReceiver(usbBroadcastReceiver,intentFilter);
     }
-  @Override
+
+    public static ImageButton getmLocalMusicButton() {
+        return mLocalMusicButton;
+    }
+
+    @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if(hasFocus){
@@ -515,13 +476,15 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 switch (position) {
                     case 1:
+                        Selection_Theme++;
+                        if(Selection_Theme%2==1) {
+                            drawerLayout.setBackgroundResource(R.drawable.black);
+                        }else{
+                            drawerLayout.setBackgroundResource(R.drawable.playindex_background_image);
+                        }
                         drawerLayout.closeDrawers();
                         break;
                     case 2:
-                        CardPickerDialog dialog = new CardPickerDialog();
-                        dialog.setClickListener(MainActivity.this);
-                        dialog.show(getSupportFragmentManager(), "theme");
-                        drawerLayout.closeDrawers();
 
                         break;
                     case 3:
@@ -640,7 +603,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             case 4:
                 searchMusicButton.setBackgroundResource(R.drawable.search_selected);
                 if(searchMusicFragment==null){
-                    searchMusicFragment=new searchMusicFragment();
+                    searchMusicFragment=new SearchFragment();
                     fragmentTransaction.add(R.id.IndexContent,searchMusicFragment);
                 }
                 else{
@@ -680,14 +643,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 unregisterReceiver(usbBroadcastReceiver);
         super.onDestroy();
     }
-    @Override
-    public void onConfirm(int currentTheme) {
-        if (ThemeHelper.getTheme(MainActivity.this) != currentTheme) {
-            ThemeHelper.setTheme(MainActivity.this, currentTheme);
 
-
-        }
-
-    }
 
 }

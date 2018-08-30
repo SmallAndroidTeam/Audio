@@ -21,6 +21,7 @@ import com.example.mrxie.music.R;
 import com.example.mrxie.music.Service.MusicService;
 import com.example.mrxie.music.SongListInformation.MusicIconLoader;
 import com.example.mrxie.music.Toast.OnlyOneToast;
+import com.example.mrxie.music.fragment.localMusicFragment;
 
 import java.io.PushbackInputStream;
 
@@ -32,6 +33,7 @@ public class appwidget_provider extends AppWidgetProvider {
     private static int position,duration;
     private static String MusicTitle,albumuri;
     public static boolean isInUse=false;
+    public static boolean isLove=false;
     private static boolean isFav ,isPlaying=false;
     private String TAG="Music";
     private final  static int updateWidet=0x10;
@@ -65,10 +67,17 @@ public class appwidget_provider extends AppWidgetProvider {
                 remoteViews.setOnClickPendingIntent(R.id.widget_image,pendingIntent_go);
                 remoteViews.setTextViewText(R.id.widget_content,MusicTitle);
                 remoteViews.setProgressBar(R.id.widget_progress,(int)duration,(int)position,false);
+
                 if(isPlaying){
                     remoteViews.setImageViewResource(R.id.widget_play, R.drawable.widget_pause_selector);
                 }else{
                     remoteViews.setImageViewResource(R.id.widget_play, R.drawable.widget_play_selector);
+                }
+
+                if(isLove){
+                 remoteViews.setImageViewResource(R.id.widget_love,R.drawable.like_image_selected);
+                }else{
+                   remoteViews.setImageViewResource(R.id.widget_love,R.drawable.like_image);
                 }
                 if(albumuri!=null){
                     Bitmap bitmap = MusicIconLoader.getInstance().load(albumuri);
@@ -146,6 +155,7 @@ public class appwidget_provider extends AppWidgetProvider {
                   pushAction(context,MusicService.NEXT_ACTION);
                   break;
                   case R.id.widget_love:
+                      pushAction(context,MusicService.WIDGET_LOVE_ACTION);
                       break;
                       default:break;
           }
@@ -161,6 +171,7 @@ public class appwidget_provider extends AppWidgetProvider {
             MusicTitle = intent.getStringExtra("MusicTitle");
             albumuri = intent.getStringExtra("albumuri");
             isPlaying = intent.getBooleanExtra("playing",false);
+            isLove=intent.getBooleanExtra("love",false);
             updateAppWidget(context,AppWidgetManager.getInstance(context) ,false);
         }else if(action.equals(MusicService.STOP_ACTION)){
             isPlaying = intent.getBooleanExtra("playing",false);
@@ -168,7 +179,11 @@ public class appwidget_provider extends AppWidgetProvider {
             position = intent.getIntExtra("position",0);
             updateAppWidget(context,AppWidgetManager.getInstance(context) ,false);
         }
-
+        else if(action.equals(MusicService.LOVE_ACTION)){
+            isLove=intent.getBooleanExtra("love",false);
+            Log.i(TAG, "onReceive: //////////////"+isLove);
+            updateAppWidget(context,AppWidgetManager.getInstance(context) ,false);
+        }
         super.onReceive(context, intent);
     }
 }

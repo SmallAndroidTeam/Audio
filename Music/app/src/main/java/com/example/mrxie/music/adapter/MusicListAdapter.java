@@ -56,7 +56,7 @@ public class MusicListAdapter extends BaseAdapter {
 			holder = new ViewHolder();
 			holder.title = (TextView) convertView.findViewById(R.id.tv_music_list_title);
 			holder.artist = (TextView) convertView.findViewById(R.id.tv_music_list_artist);
-	//	holder.icon = (ImageView) convertView.findViewById(R.id.music_list_icon);
+		    holder.icon = (ImageView) convertView.findViewById(R.id.music_list_icon);
 			holder.mark = convertView.findViewById(R.id.music_list_selected);
 			convertView.setTag(holder);
 		}else {
@@ -68,9 +68,12 @@ public class MusicListAdapter extends BaseAdapter {
 		}else {
 			holder.mark.setVisibility(View.INVISIBLE);
 		}
-//
-//		Bitmap icon = MusicIconLoader.getInstance().load(MusicUtils.sMusicList.get(position).getImage());
-//	    holder.icon.setImageBitmap(icon == null ? ImageTools.scaleBitmap(R.mipmap.ic_launcher) : ImageTools.scaleBitmap(icon));
+    //if(MusicUtils.sMusicList.get(position).getImage()!=null) {
+				   Bitmap icon = MusicIconLoader.getInstance().load(MusicUtils.sMusicList.get(position).getImage());
+				   holder.icon.setImageBitmap(icon);
+//			   }
+//			   else
+//			   	holder.icon.setImageResource(R.mipmap.ic_launcher);
 
 		holder.title.setText(MusicUtils.sMusicList.get(position).getTitle());
 		holder.artist.setText(MusicUtils.sMusicList.get(position).getArtist());

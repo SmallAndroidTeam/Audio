@@ -1,22 +1,20 @@
 package com.example.mrxie.music.fragment;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.os.Bundle;
-import android.support.annotation.FloatRange;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -30,14 +28,19 @@ import com.example.mrxie.music.SongListInformation.Music;
 import com.example.mrxie.music.SongListInformation.MusicIconLoader;
 import com.example.mrxie.music.SongListInformation.MusicUtils;
 import com.example.mrxie.music.Toast.OnlyOneToast;
+import com.example.mrxie.music.activity.MainActivity;
 import com.example.mrxie.music.convertPXAndDP.DensityUtil;
+import com.example.mrxie.music.db.MusicOperator;
+import com.example.mrxie.music.db.MusicOperator;
+import com.example.mrxie.music.info.MusicName;
 import com.example.mrxie.music.ui.LrcView;
+import  com.example.mrxie.music.fragment.OneFragment;
 
 import java.util.ArrayList;
 
 public class localMusicFragment extends Fragment implements View.OnClickListener {
     private String TAG="Music";
-    private ImageView mAddLikeMusicButton;
+    public static  ImageView mAddLikeMusicButton;
     private ImageView mSingleCycleMusicButton;
     private ImageView mPlayModeButton;
     private static ImageView mPrevMusicButton;
@@ -47,6 +50,7 @@ public class localMusicFragment extends Fragment implements View.OnClickListener
     private TextView mPlayMusicStopTimeTextView;
     public ImageView MusicImage;
     private SeekBar mPlayMusicSeekBar;
+    public  boolean isLike=false;
     public static String[] playMode=new String[]{"list_mode","circulate_mode","singlecycle_mode","randomplay_mode"};//播放模式
     public static String currentPlayMode=playMode[3];//当前的音乐播放模式
     public static Activity activity;
@@ -58,17 +62,35 @@ public class localMusicFragment extends Fragment implements View.OnClickListener
     private RelativeLayout controlMusicButtonLinearLayout;
     private LinearLayout lrcLinearLayout;
     private RelativeLayout RightPalyBoundary;
-
+    public static MusicOperator lxrOperator;
+    private static final int SET_RANKINGBEAN = 123;
+    private OneFragment oneFragment=new OneFragment();
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-       View view=inflater.inflate(R.layout.localmusic,container,false);
-       initViews(view);
+        View view=inflater.inflate(R.layout.localmusic,container,false);
+        initViews(view);
         //根据屏幕的宽高来初始化控件的位置和大小
         initImageIconPositionAndSize();
-       initEvents();
-       initPlayMusic(view);
-       return view;
+
+        initEvents();
+        initPlayMusic(view);
+        lxrOperator=new MusicOperator(getActivity());
+         initLovebutton();//初始化喜欢的图标
+        return view;
+    }
+
+    private void initLovebutton() {
+        boolean isLike=false;
+        if(localMusicFragment.lxrOperator!=null) {
+            isLike = localMusicFragment.lxrOperator.CheckIsDataAlreadyInDBorNot(musicTitle.getText().toString());
+            if (isLike == true) {
+                mAddLikeMusicButton.setImageResource(R.drawable.like_image_selected);
+
+            } else {
+                mAddLikeMusicButton.setImageResource(R.drawable.like_image);
+            }
+        }
     }
 
     @Override
@@ -100,21 +122,21 @@ public class localMusicFragment extends Fragment implements View.OnClickListener
         PlayBoundaryFragment.setLayoutParams(PlayBoundaryFragmentLayoutParams);
 
         RelativeLayout.LayoutParams controlMusicButtonLinearLayoutLayoutParams=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
-       controlMusicButtonLinearLayoutLayoutParams.topMargin= (int) (7.0*5*screenHeigt/(10*7));
+        controlMusicButtonLinearLayoutLayoutParams.topMargin= (int) (7.0*5*screenHeigt/(10*7));
         controlMusicButtonLinearLayoutLayoutParams.leftMargin=(int)((screenWidth*4/7-screenWidth*1/10)/13);
         controlMusicButtonLinearLayoutLayoutParams.rightMargin=(int)((screenWidth*4/7-screenWidth*1/10)/13);
         controlMusicButtonLinearLayout.setLayoutParams(controlMusicButtonLinearLayoutLayoutParams);
 
-       ViewGroup.LayoutParams lrcLinearLayoutLinearLayoutLayoutParams=(ViewGroup.LayoutParams)lrcLinearLayout.getLayoutParams();
+        ViewGroup.LayoutParams lrcLinearLayoutLinearLayoutLayoutParams=(ViewGroup.LayoutParams)lrcLinearLayout.getLayoutParams();
         lrcLinearLayoutLinearLayoutLayoutParams.height=(int) (7.0*5*screenHeigt/(10*7));
 
         LinearLayout.LayoutParams PlayBoundaryFragmentLayoutParmas=new LinearLayout.LayoutParams((int)(screenWidth*4/7-screenWidth*1/10),LinearLayout.LayoutParams.MATCH_PARENT);
         PlayBoundaryFragmentLayoutParmas.setMargins((int)(marginLeft/2),0,0,0);
-       RightPalyBoundary.setLayoutParams(PlayBoundaryFragmentLayoutParmas);
+        RightPalyBoundary.setLayoutParams(PlayBoundaryFragmentLayoutParmas);
 
         //设置播放按钮和其他按钮的大小和位置
-       RelativeLayout.LayoutParams mPrevMusicButtonLayoutParams=(RelativeLayout.LayoutParams)mPrevMusicButton.getLayoutParams();
-       mPrevMusicButtonLayoutParams.width=marginLeft;
+        RelativeLayout.LayoutParams mPrevMusicButtonLayoutParams=(RelativeLayout.LayoutParams)mPrevMusicButton.getLayoutParams();
+        mPrevMusicButtonLayoutParams.width=marginLeft;
         mPrevMusicButtonLayoutParams.height=marginLeft;
         mPrevMusicButton.setLayoutParams(mPrevMusicButtonLayoutParams);
 
@@ -127,7 +149,7 @@ public class localMusicFragment extends Fragment implements View.OnClickListener
         mNextMusicButtonLayoutParams.width=marginLeft;
         mNextMusicButtonLayoutParams.height=marginLeft;
         mNextMusicButton.setLayoutParams(mNextMusicButtonLayoutParams);
-       //设置左边专辑图片上的按钮大小
+        //设置左边专辑图片上的按钮大小
         RelativeLayout.LayoutParams like_imageLayoutParams=(RelativeLayout.LayoutParams)mAddLikeMusicButton.getLayoutParams();
         like_imageLayoutParams.width=marginLeft;
         like_imageLayoutParams.height=marginLeft;
@@ -145,7 +167,7 @@ public class localMusicFragment extends Fragment implements View.OnClickListener
         mPlayModeButtonLayoutParams.width=marginLeft;
         mPlayModeButtonLayoutParams.height=marginLeft;
         mPlayModeButtonLayoutParams.rightMargin=marginLeft/2;
-         mPlayModeButtonLayoutParams.bottomMargin=marginLeft/3;
+        mPlayModeButtonLayoutParams.bottomMargin=marginLeft/3;
         mPlayModeButton.setLayoutParams(mPlayModeButtonLayoutParams);
 
         // 设置歌词字体大小
@@ -159,12 +181,12 @@ public class localMusicFragment extends Fragment implements View.OnClickListener
     }
 
     private void initPlayMusic(View view) {
-          //判断服务是否以正在运行
+        //判断服务是否以正在运行
         if(MusicService.playingMusicIndex!=-1){
 
-                musicTitle.setText(sMusicList.get(MusicService.playingMusicIndex).getTitle());
+            musicTitle.setText(sMusicList.get(MusicService.playingMusicIndex).getTitle());
 
-                mPlayMusicSeekBar.setMax(MusicService.mediaPlayer.getDuration());
+            mPlayMusicSeekBar.setMax(MusicService.mediaPlayer.getDuration());
             if (sMusicList.get(MusicService.playingMusicIndex).getImage() != null) {//如果音乐专辑图片存在
                 //  OnlyOneToast.makeText(localMusicFragment.activity,sMusicList.get(playingMusicIndex).getImage());
                 Bitmap bitmap = MusicIconLoader.getInstance().load(sMusicList.get(MusicService.playingMusicIndex).getImage());
@@ -183,15 +205,14 @@ public class localMusicFragment extends Fragment implements View.OnClickListener
                 mPlayMusicStartTimeTextView.setText(MusicService.changeDigitsToTwoDigits(MusicService.mediaPlayer.getCurrentPosition() / 1000 / 60) + ":" + MusicService.changeDigitsToTwoDigits(MusicService.mediaPlayer.getCurrentPosition() / 1000 % 60));
             if (mPlayMusicStopTimeTextView != null)
                 mPlayMusicStopTimeTextView.setText(MusicService.changeDigitsToTwoDigits((MusicService.mediaPlayer.getDuration()) / 1000 / 60) + ":" + MusicService.changeDigitsToTwoDigits(MusicService.mediaPlayer.getDuration() / 1000 % 60));
-         if(MusicService.mediaPlayer.isPlaying()){
-            mPlayMusicButton.setImageResource(R.drawable.play_music);
-         }
+            if(MusicService.mediaPlayer.isPlaying()){
+                mPlayMusicButton.setImageResource(R.drawable.play_music);
+            }
 
         }else{
             App.sContext=view.getContext();//设置上下文的环境
             MusicUtils.initMusicList();
             sMusicList=MusicUtils.sMusicList;
-            MusicService.sMusicList=sMusicList;
             if(sMusicList.size()>0){
                 MusicService.playingMusicIndex=0;
             }
@@ -200,16 +221,16 @@ public class localMusicFragment extends Fragment implements View.OnClickListener
 
 
         Log.i(TAG, "Music数量"+sMusicList.size());
-       for(Music music:sMusicList){
-           Log.i(TAG, "initPlayMusic: "+music.getUri());
-       }
+        for(Music music:sMusicList){
+            Log.i(TAG, "initPlayMusic: "+music.getUri());
+        }
 
     }
 
-     private void setLrc(){
-         String path=sMusicList.get(MusicService.playingMusicIndex).getLrcpath();
-         showLrcView.setLrcPath(path);
-     }
+    private void setLrc(){
+        String path=sMusicList.get(MusicService.playingMusicIndex).getLrcpath();
+        showLrcView.setLrcPath(path);
+    }
     private void initEvents() {
         mPlayMusicButton.setOnClickListener(this);//设置点击播放按钮事件
         mAddLikeMusicButton.setOnClickListener(this);//设置添加喜欢音乐的按钮单击事件
@@ -231,20 +252,18 @@ public class localMusicFragment extends Fragment implements View.OnClickListener
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-               mPlayMusicStartTimeTextView.setText(MusicService.changeDigitsToTwoDigits(seekBar.getProgress()/1000/60)+":"+MusicService.changeDigitsToTwoDigits(seekBar.getProgress()/1000%60));
+                mPlayMusicStartTimeTextView.setText(MusicService.changeDigitsToTwoDigits(seekBar.getProgress()/1000/60)+":"+MusicService.changeDigitsToTwoDigits(seekBar.getProgress()/1000%60));
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 mPlayMusicStartTimeTextView.setText(MusicService.changeDigitsToTwoDigits(seekBar.getProgress()/1000/60)+":"+MusicService.changeDigitsToTwoDigits(seekBar.getProgress()/1000%60));
-             MusicService.mediaPlayer.seekTo(mPlayMusicSeekBar.getProgress());
-             showLrcView.onDrag(mPlayMusicSeekBar.getProgress());//绘画
+                MusicService.mediaPlayer.seekTo(mPlayMusicSeekBar.getProgress());
+                showLrcView.onDrag(mPlayMusicSeekBar.getProgress());//绘画
             }
         });
-        mPlayMusicButton.setOnClickListener(this);//设置点击播放按钮事件
-        mAddLikeMusicButton.setOnClickListener(this);//设置添加喜欢音乐的按钮单击事件
-        mPlayModeButton.setOnClickListener(this);
-        mSingleCycleMusicButton.setOnClickListener(this);
+
+
     }
 
     private void initViews(View view) {
@@ -273,6 +292,7 @@ public class localMusicFragment extends Fragment implements View.OnClickListener
 
     @Override
     public void onClick(View view) {
+
         switch (view.getId()){
             case R.id.playMusicButton:
                 if(sMusicList.size()==0){
@@ -282,10 +302,12 @@ public class localMusicFragment extends Fragment implements View.OnClickListener
                 Intent intent=new Intent(view.getContext(),MusicService.class);
                 intent.setAction(MusicService.TOGGLEPAUSE_ACTION);
                 view.getContext().startService(intent);
-            break;
+                break;
             case R.id.nextMusicButton:
+
                 if(sMusicList.size()==0){
                     OnlyOneToast.makeText(view.getContext(),"暂无歌曲");
+
                     return;
                 }
                 Intent intent1=new Intent(activity,MusicService.class);
@@ -302,19 +324,9 @@ public class localMusicFragment extends Fragment implements View.OnClickListener
                 view.getContext().startService(intent2);
                 break;
             case R.id.addLikeMusicButton:
-                if(sMusicList.size()==0){
-                    OnlyOneToast.makeText(view.getContext(),"暂无歌曲");
-                    return;
-                }
-//               if(isLike){
-//                 mAddLikeMusicButton.setImageResource(R.drawable.like_image);
-//                 OnlyOneToast.makeText(view.getContext(),"已取消喜欢");
-//                 isLike=false;
-//               }else{
-//                  mAddLikeMusicButton.setImageResource(R.drawable.like_image_selected);
-//                   OnlyOneToast.makeText(view.getContext(),"已添加到我喜欢的音乐");
-//                  isLike=true;
-//               }
+                final  Intent loveIntent=new Intent(view.getContext(),MusicService.class);
+                loveIntent.setAction(MusicService.WIDGET_LOVE_ACTION);
+                view.getContext().startService(loveIntent);
                 break;
             case R.id.playModeButton:
                 int i;
@@ -342,12 +354,12 @@ public class localMusicFragment extends Fragment implements View.OnClickListener
                         mPlayModeButton.setImageResource(R.drawable.singlecycle_mode);
                         OnlyOneToast.makeText(view.getContext(),"单曲循环");
                         break;
-                        case 3:
-                            mPlayModeButton.setImageResource(R.drawable.randomplay);
-                            OnlyOneToast.makeText(view.getContext(),"随机播放");
+                    case 3:
+                        mPlayModeButton.setImageResource(R.drawable.randomplay);
+                        OnlyOneToast.makeText(view.getContext(),"随机播放");
                         break;
-                        default:
-                            break;
+                    default:
+                        break;
                 }
                 break;
             case R.id.singleCycleMusicButton:

@@ -1,9 +1,13 @@
 package com.example.mrxie.music.fragment;
+import android.app.PendingIntent;
+import android.content.ComponentName;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +18,10 @@ import android.widget.Toast;
 
 import  com.example.mrxie.music.R;
 import com.example.mrxie.music.Service.MusicService;
+import com.example.mrxie.music.SongListInformation.Music;
+import com.example.mrxie.music.SongListInformation.MusicUtils;
+import com.example.mrxie.music.Toast.OnlyOneToast;
+import com.example.mrxie.music.activity.MainActivity;
 import com.example.mrxie.music.adapter.MusicListAdapter;
 
 import java.util.ArrayList;
@@ -30,7 +38,7 @@ public class songListFragment extends Fragment {
 
     private List<String> stringList;
     private ArrayAdapter lvAdapter;
-
+    private static int oldMusicIndex=-1;//上次点击歌单的下标，开始设置为-1，则没有点击过歌单
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -49,8 +57,26 @@ public class songListFragment extends Fragment {
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//            onplay(i);
+                if(!(localMusicFragment.sMusicList).equals(MusicUtils.sMusicList))//点击之后变化歌单，如果当前歌单和此歌单不一致，则把当前的歌词设置为此歌单
+                {
+                    localMusicFragment.sMusicList=MusicUtils.sMusicList;
+                }
 
+                 //设置当前播放的音乐下标
+                if(oldMusicIndex==i){//如果点击的相同的歌曲,就会进入播放界面
+                  MainActivity.getmLocalMusicButton().callOnClick();
+                }else{
+                    MusicService.playingMusicIndex=i;
+                    new MusicService().initMusic();//初始化当前播放的歌曲
+                    //发送服务给MusicSerice播放歌曲
+                    Intent intent=new Intent(view.getContext(),MusicService.class);
+                    intent.setAction(MusicService.TOGGLEPAUSE_ACTION);
+                    view.getContext().startService(intent);
+                    oldMusicIndex=i;
+                }
+                Log.i("Music", "onItemClick: "+oldMusicIndex+"//"+i);
+
+                // OnlyOneToast.makeText(view.getContext(), String.valueOf(i));
             }
         });
 

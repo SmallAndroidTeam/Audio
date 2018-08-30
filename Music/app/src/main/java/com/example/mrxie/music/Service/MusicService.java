@@ -41,7 +41,10 @@ import com.example.mrxie.music.SongListInformation.MusicIconLoader;
 import com.example.mrxie.music.SongListInformation.MusicUtils;
 import com.example.mrxie.music.Toast.OnlyOneToast;
 import com.example.mrxie.music.activity.MainActivity;
+import com.example.mrxie.music.db.MusicOperator;
+import com.example.mrxie.music.fragment.OneFragment;
 import com.example.mrxie.music.fragment.localMusicFragment;
+import com.example.mrxie.music.info.MusicName;
 import com.example.mrxie.music.ui.LrcView;
 import com.example.mrxie.music.widget.appwidget_provider;
 
@@ -56,7 +59,6 @@ import java.util.TimerTask;
 
 public final class MusicService extends Service {
     public final static MediaPlayer mediaPlayer=new MediaPlayer();
-    public   static ArrayList<Music> sMusicList = new ArrayList<Music>(); // 存放歌曲列表
     public static int playingMusicIndex=-1;//正在播放音乐的下标
     private NotificationManager notificationManager;
     private RemoteViews widgetRemoteViews;
@@ -73,7 +75,11 @@ public final class MusicService extends Service {
     public static LrcView showLrcView;
     private Timer timer;
     public static boolean isPlay=false;
-    public static boolean isLike=false;
+
+  public static String s;
+    public static String ss;
+    public static String sss;
+    public static  String ssss;
     public static  final String SEND_PROGRESS="com.example.mrxie.music.progress";
     public static final String TOGGLEPAUSE_ACTION = "com.example.mrxie.music.togglepause";
     public static final String PREVIOUS_ACTION = "com.example.mrxie.music.previous";
@@ -81,6 +87,12 @@ public final class MusicService extends Service {
     public static final String STOP_ACTION = "com.example.mrxie.music.STOP_ACTION";
     public static final String META_CHANGED = "com.example.mrxie.music.metachanged";
     public static final String MUSIC_CHANGED = "com.example.mrxie.music.change_music";
+    public static final String MY_BROCAST = "com.example.mrxie.music.MY_BROADCAST";
+    public static final  String WIDGET_LOVE_ACTION="com.example.mrxie.music.WIDGET_LOVE_BROADCAST";
+    public static final  String LOVE_ACTION="com.example.mrxie.music.LOVE_BROADCAST";
+    public static final  String NOTIFICATION_LOVE_ACTION="com.example.mrxie.music.NOTIFICATION_LOVE_BROADCAST";
+    public static final String PLAYVIEW_LOVE_ACTION="ADD_LOVE_ACTION";
+    public static final String UPDATE_ACTION="update";
     private static final int NotificationId=1000;
     private static  Notification mNotification;
     private final static int UpdateForeground=0x1;
@@ -103,6 +115,8 @@ public final class MusicService extends Service {
      intentFilter.addAction(SEND_PROGRESS);
      intentFilter.addAction(NEXT_ACTION);
      intentFilter.addAction(STOP_ACTION);
+     intentFilter.addAction(WIDGET_LOVE_ACTION);
+     intentFilter.addAction(NOTIFICATION_LOVE_ACTION);
      registerReceiver(mIntentReceiver,intentFilter);
       widgetRemoteViews =new RemoteViews(this.getPackageName(),R.layout.notification);
         notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -148,15 +162,22 @@ public final class MusicService extends Service {
             if (playingMusicIndex != -1) {
                 mediaPlayer.reset();
                 try {
-                    mediaPlayer.setDataSource(sMusicList.get(playingMusicIndex).getUri());
+                    mediaPlayer.setDataSource(localMusicFragment.sMusicList.get(playingMusicIndex).getUri());
                     mediaPlayer.prepare();
-                    if (musicTitle != null)
-                        musicTitle.setText(sMusicList.get(playingMusicIndex).getTitle());
+                    if (musicTitle != null) {
+                        musicTitle.setText(localMusicFragment.sMusicList.get(playingMusicIndex).getTitle());
+                    }
+                    s=localMusicFragment.sMusicList.get(playingMusicIndex).getArtist();                        //获取歌曲信息
+                    ss=localMusicFragment.sMusicList.get(playingMusicIndex).getImage();
+                    sss=localMusicFragment.sMusicList.get(playingMusicIndex).getUri();
+                    ssss=localMusicFragment.sMusicList.get(playingMusicIndex).getLrcpath();
+                   Intent UpdateIntent=new Intent(UPDATE_ACTION);
+                     handleCommandIntent(UpdateIntent);
                     if (mPlayMusicSeekBar != null)
                         mPlayMusicSeekBar.setMax(mediaPlayer.getDuration());
-                    if (sMusicList.get(MusicService.playingMusicIndex).getImage() != null) {//如果音乐专辑图片存在
+                    if (localMusicFragment.sMusicList.get(MusicService.playingMusicIndex).getImage() != null) {//如果音乐专辑图片存在
                         //  OnlyOneToast.makeText(localMusicFragment.activity,sMusicList.get(playingMusicIndex).getImage());
-                        Bitmap bitmap = MusicIconLoader.getInstance().load(sMusicList.get(MusicService.playingMusicIndex).getImage());
+                        Bitmap bitmap = MusicIconLoader.getInstance().load(localMusicFragment.sMusicList.get(MusicService.playingMusicIndex).getImage());
                         if (MusicImage != null)
                             MusicImage.setImageBitmap(bitmap);
 
@@ -184,7 +205,7 @@ public final class MusicService extends Service {
     }
 
     private static void setLrc(){//设置歌词的路径
-        String path=sMusicList.get(MusicService.playingMusicIndex).getLrcpath();
+        String path=localMusicFragment.sMusicList.get(MusicService.playingMusicIndex).getLrcpath();
         showLrcView.setLrcPath(path);
     }
 
@@ -249,9 +270,9 @@ public final class MusicService extends Service {
                     handler.post(runnable);
                     break;
                 case 3://随机播放
-                    int MusicIndex = new Random().nextInt(sMusicList.size() - 1);
-                    while (MusicIndex == playingMusicIndex) {
-                        MusicIndex = new Random().nextInt(sMusicList.size() - 1);
+                    int MusicIndex =new Random().nextInt(localMusicFragment.sMusicList.size());
+                    while (MusicIndex == playingMusicIndex&&localMusicFragment.sMusicList.size()>1) {
+                        MusicIndex = new Random().nextInt(localMusicFragment.sMusicList.size());
                     }
                     playingMusicIndex = MusicIndex;
                     initMusic();
@@ -298,12 +319,12 @@ public final class MusicService extends Service {
                 case 0://顺序播放
                 case 1://列表循环
                 case 2://单曲循环
-                    playingMusicIndex = (playingMusicIndex == sMusicList.size() - 1) ? 0 : (playingMusicIndex + 1);
+                    playingMusicIndex = (playingMusicIndex == localMusicFragment.sMusicList.size() - 1) ? 0 : (playingMusicIndex + 1);
                     break;
                 case 3://随机播放
-                    int MusicIndex = new Random().nextInt(sMusicList.size() - 1);
-                    while (MusicIndex == playingMusicIndex) {
-                        MusicIndex = new Random().nextInt(sMusicList.size() - 1);
+                    int MusicIndex =new Random().nextInt(localMusicFragment.sMusicList.size());
+                    while (MusicIndex == playingMusicIndex&&localMusicFragment.sMusicList.size()>1) {
+                        MusicIndex = new Random().nextInt(localMusicFragment.sMusicList.size());
                     }
                     playingMusicIndex = MusicIndex;
                     break;
@@ -338,12 +359,12 @@ public final class MusicService extends Service {
                 case 0://顺序播放
                 case 1://列表循环
                 case 2://单曲循环
-                    playingMusicIndex = (playingMusicIndex == 0) ? (sMusicList.size() - 1) : (playingMusicIndex - 1);
+                    playingMusicIndex = (playingMusicIndex == 0) ? (localMusicFragment.sMusicList.size() - 1) : (playingMusicIndex - 1);
                     break;
                 case 3://随机播放
-                    int MusicIndex = new Random().nextInt(sMusicList.size() - 1);
-                    while (MusicIndex == playingMusicIndex) {
-                        MusicIndex = new Random().nextInt(sMusicList.size() - 1);
+                    int MusicIndex =new Random().nextInt(localMusicFragment.sMusicList.size());
+                    while (MusicIndex == playingMusicIndex&&localMusicFragment.sMusicList.size()>1) {
+                        MusicIndex = new Random().nextInt(localMusicFragment.sMusicList.size());
                     }
                     playingMusicIndex = MusicIndex;
                     break;
@@ -374,13 +395,13 @@ public final class MusicService extends Service {
     private void handleCommandIntent(Intent intent) {
       String action=intent.getAction();
         //可能已经在桌面建立了widget，一启动后没初始化歌单列表
-        if(sMusicList.size()==0)
+        if(localMusicFragment.sMusicList.size()==0)
         {
             App.sContext=getApplicationContext();
             MusicUtils.initMusicList();
             if(MusicUtils.sMusicList.size()>0)
             {
-              sMusicList=MusicUtils.sMusicList;
+              localMusicFragment.sMusicList=MusicUtils.sMusicList;
                 playingMusicIndex=0;
                 initMusic();
             }
@@ -410,7 +431,6 @@ public final class MusicService extends Service {
           }
           notifyChange(META_CHANGED);
           NotificationChange(TOGGLEPAUSE_ACTION);
-
       }else if(PREVIOUS_ACTION.equals(action)){//按下widget上一首按钮
           prevMusic();
           notifyChange(MUSIC_CHANGED);
@@ -440,6 +460,50 @@ public final class MusicService extends Service {
           stopForeground(true);
           notifyChange(STOP_ACTION);
       }
+      else if(WIDGET_LOVE_ACTION.equals(action)||NOTIFICATION_LOVE_ACTION.equals(action)){
+          notifyChange(action);
+          NotificationChange(action);
+          boolean isLike=false;
+          String song=MusicService.musicTitle.getText().toString();
+          String artist=MusicService.s;
+          String song_Image=MusicService.ss;
+          String uri=MusicService.sss;
+          String Lrc_uri=MusicService.ssss;
+          isLike= localMusicFragment.lxrOperator.CheckIsDataAlreadyInDBorNot(song);
+          Log.i(TAG, "onClick: "+isLike);
+          if(localMusicFragment.sMusicList.size()==0){
+              OnlyOneToast.makeText(getApplicationContext(),song);
+              return;
+          }
+          if(isLike==true){
+              localMusicFragment.lxrOperator.delete(song);
+              localMusicFragment.mAddLikeMusicButton.setImageResource(R.drawable.like_image);
+              OnlyOneToast.makeText(getApplicationContext(),"已取消喜欢");
+          }else{
+              MusicName lxr = new MusicName(song,artist,song_Image,uri,Lrc_uri);
+              localMusicFragment. lxrOperator.add(lxr);
+              localMusicFragment.mAddLikeMusicButton.setImageResource(R.drawable.like_image_selected);
+              OnlyOneToast.makeText(getApplicationContext(),"已添加到我喜欢的音乐");
+          }
+
+          //修改数据库中的数据
+          final Intent loveIntent = new Intent(MusicService.MY_BROCAST);
+          sendBroadcast(loveIntent);
+      }else if(UPDATE_ACTION.equals(action)){
+          boolean isLike=false;
+          if(localMusicFragment.lxrOperator!=null) {
+              isLike = localMusicFragment.lxrOperator.CheckIsDataAlreadyInDBorNot(musicTitle.getText().toString());
+              if (isLike == true) {
+                  localMusicFragment.mAddLikeMusicButton.setImageResource(R.drawable.like_image_selected);
+              } else {
+                  localMusicFragment.mAddLikeMusicButton.setImageResource(R.drawable.like_image);
+              }
+          }
+          notifyChange(UPDATE_ACTION);
+          NotificationChange(UPDATE_ACTION);
+
+      }
+
     }
 
     private   void NotificationChange(final String what){
@@ -471,12 +535,12 @@ public final class MusicService extends Service {
                         mNotification.contentView.setImageViewResource(R.id.widget_play,R.drawable.widget_play_selector);
                     }
                 }else if(PREVIOUS_ACTION.equals(what)||NEXT_ACTION.equals(what))
-                {  String widget_title = sMusicList.get(playingMusicIndex).getTitle();
+                {  String widget_title = localMusicFragment.sMusicList.get(playingMusicIndex).getTitle();
                     mNotification.contentView.setTextViewText(R.id.widget_content, widget_title);//设置歌曲名
                     mNotification.contentView.setProgressBar(R.id.widget_progress, mediaPlayer.getDuration(), mediaPlayer.getCurrentPosition(), false);
 
-                    if (sMusicList.get(MusicService.playingMusicIndex).getImage() != null) {//如果音乐专辑图片存在
-                        Bitmap bitmap = MusicIconLoader.getInstance().load(sMusicList.get(MusicService.playingMusicIndex).getImage());
+                    if (localMusicFragment.sMusicList.get(MusicService.playingMusicIndex).getImage() != null) {//如果音乐专辑图片存在
+                        Bitmap bitmap = MusicIconLoader.getInstance().load(localMusicFragment.sMusicList.get(MusicService.playingMusicIndex).getImage());
                         mNotification.contentView.setImageViewBitmap(R.id.widget_image, bitmap);
                     } else {
                         mNotification.contentView.setImageViewResource(R.id.widget_image, R.drawable.image);
@@ -489,7 +553,32 @@ public final class MusicService extends Service {
                     } else {
                         mNotification.contentView.setImageViewResource(R.id.widget_play, R.drawable.widget_play_selector);
                     }
+                }else if(WIDGET_LOVE_ACTION.equals(what)||NOTIFICATION_LOVE_ACTION.equals(what)){
+
+                    boolean isLike=false;
+                    if(localMusicFragment.lxrOperator!=null) {
+                        isLike = localMusicFragment.lxrOperator.CheckIsDataAlreadyInDBorNot(musicTitle.getText().toString());
+
+                        if (isLike) {   //修改前台服务的的喜欢图标
+                            mNotification.contentView.setImageViewResource(R.id.widget_love,R.drawable.like_image);
+                        } else {
+                            mNotification.contentView.setImageViewResource(R.id.widget_love,R.drawable.like_image_selected);
+                        }
+                    }
                 }
+                 else if(UPDATE_ACTION.equals(what)){//更新喜欢的图标的状态
+                    boolean isLike=false;
+                    if(localMusicFragment.lxrOperator!=null) {
+                        isLike = localMusicFragment.lxrOperator.CheckIsDataAlreadyInDBorNot(musicTitle.getText().toString());
+                        if (isLike) {   //设置前台服务的的喜欢图标
+                            mNotification.contentView.setImageViewResource(R.id.widget_love,R.drawable.like_image_selected);
+                        } else {
+                            mNotification.contentView.setImageViewResource(R.id.widget_love,R.drawable.like_image);
+
+                        }
+                    }
+                }
+
                 notificationManager.notify(NotificationId,mNotification);
             }
         }).start();
@@ -510,8 +599,13 @@ public final class MusicService extends Service {
             final Intent intent1 = new Intent();
             intent1.setAction(MUSIC_CHANGED);
             intent1.putExtra("playing", mediaPlayer.isPlaying());
-            intent1.putExtra("albumuri",  sMusicList.get(MusicService.playingMusicIndex).getImage());
-            intent1.putExtra("MusicTitle",sMusicList.get(playingMusicIndex).getTitle());
+            intent1.putExtra("albumuri",  localMusicFragment.sMusicList.get(MusicService.playingMusicIndex).getImage());
+            intent1.putExtra("MusicTitle",localMusicFragment.sMusicList.get(playingMusicIndex).getTitle());
+            boolean isLike=false;
+            if(localMusicFragment.lxrOperator!=null) {
+                isLike = localMusicFragment.lxrOperator.CheckIsDataAlreadyInDBorNot(musicTitle.getText().toString());
+            }
+            intent1.putExtra("love",isLike);
             intent1.setComponent(new ComponentName(getApplicationContext(),appwidget_provider.class));
             sendBroadcast(intent1);
         }else if(META_CHANGED.equals(what)){
@@ -528,19 +622,49 @@ public final class MusicService extends Service {
             intent.setComponent(new ComponentName(getApplicationContext(),appwidget_provider.class));
             sendBroadcast(intent);
         }
+        else if(WIDGET_LOVE_ACTION.equals(what)||NOTIFICATION_LOVE_ACTION.equals(what)){
+            boolean isLike=false;
+            if(localMusicFragment.lxrOperator!=null) {
+                isLike = localMusicFragment.lxrOperator.CheckIsDataAlreadyInDBorNot(musicTitle.getText().toString());
+              Intent loveIntet=new Intent(LOVE_ACTION);
+              loveIntet.putExtra("love",!isLike);
+                loveIntet.setComponent(new ComponentName(getApplicationContext(),appwidget_provider.class));
+              sendBroadcast(loveIntet);
+            }
+        }
+        else if(UPDATE_ACTION.equals(what)){
+            boolean isLike=false;
+            if(localMusicFragment.lxrOperator!=null) {
+                isLike = localMusicFragment.lxrOperator.CheckIsDataAlreadyInDBorNot(musicTitle.getText().toString());
+                Intent loveIntet=new Intent(LOVE_ACTION);
+                loveIntet.putExtra("love",isLike);
+                loveIntet.setComponent(new ComponentName(getApplicationContext(),appwidget_provider.class));
+                sendBroadcast(loveIntet);
+            }
+        }
     }
     //初始前台服务
     private void initNotification(){
-            String widget_title = sMusicList.get(playingMusicIndex).getTitle();
+            String widget_title = localMusicFragment.sMusicList.get(playingMusicIndex).getTitle();
             widgetRemoteViews.setTextViewText(R.id.widget_content, widget_title);//设置歌曲名
            // widgetRemoteViews.setProgressBar(R.id.widget_progress, mediaPlayer.getDuration(), mediaPlayer.getCurrentPosition(), false);
 
-            if (sMusicList.get(MusicService.playingMusicIndex).getImage() != null) {//如果音乐专辑图片存在
-                Bitmap bitmap = MusicIconLoader.getInstance().load(sMusicList.get(MusicService.playingMusicIndex).getImage());
+            if (localMusicFragment.sMusicList.get(MusicService.playingMusicIndex).getImage() != null) {//如果音乐专辑图片存在
+                Bitmap bitmap = MusicIconLoader.getInstance().load(localMusicFragment.sMusicList.get(MusicService.playingMusicIndex).getImage());
                 widgetRemoteViews.setImageViewBitmap(R.id.widget_image, bitmap);
             } else {
                 widgetRemoteViews.setImageViewResource(R.id.widget_image, R.drawable.image);
             }
+        boolean isLike=false;
+        if(localMusicFragment.lxrOperator!=null) {
+            isLike = localMusicFragment.lxrOperator.CheckIsDataAlreadyInDBorNot(musicTitle.getText().toString());
+            if (isLike == true) {
+                widgetRemoteViews.setImageViewResource(R.id.widget_love,R.drawable.like_image_selected);
+
+            } else {
+                widgetRemoteViews.setImageViewResource(R.id.widget_love,R.drawable.like_image);
+            }
+        }
             //进度
             //执行更新精度条的线程
             handler.post(runnable);
@@ -575,6 +699,11 @@ public final class MusicService extends Service {
                 Intent stopIntent=new Intent(STOP_ACTION);
                 PendingIntent stopPIntent=PendingIntent.getBroadcast(ForegroundContext,0,stopIntent,0);
                 widgetRemoteViews.setOnClickPendingIntent(R.id.audio_stop,stopPIntent);
+
+                Intent loveIntent=new Intent(NOTIFICATION_LOVE_ACTION);
+                PendingIntent lovePIntent=PendingIntent.getBroadcast(ForegroundContext,0,loveIntent,0);
+                widgetRemoteViews.setOnClickPendingIntent(R.id.widget_love,lovePIntent);
+
 
                 final Intent nowPlayingIntent=new Intent(Intent.ACTION_MAIN);
                 nowPlayingIntent.setAction(Intent.ACTION_MAIN);
@@ -627,6 +756,7 @@ public final class MusicService extends Service {
                     {
                         handleCommandIntent(intent);
                     }
+
         return super.onStartCommand(intent, flags, startId);
     }
 
