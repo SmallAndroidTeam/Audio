@@ -471,6 +471,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         initData();
         adapter = new ContentAdapter(this, list);
         mLvLeftMenu.setAdapter(adapter);
+
        mLvLeftMenu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

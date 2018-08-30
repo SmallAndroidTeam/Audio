@@ -2,7 +2,7 @@
 <resources>
 
     <color name="white_text">#fafafa</color>
-
+   <color name="red_line">#ff0000</color>
     <!-- notification text -->
     <color name="bottom_text">#c1c0c0</color>
     <color name="notification_bak">#47fafafa</color>

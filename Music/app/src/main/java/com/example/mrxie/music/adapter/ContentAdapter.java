@@ -62,6 +62,10 @@ public class ContentAdapter extends BaseAdapter {
 
 		hold.imageView.setImageResource(list.get(position).getImageView());
 		hold.textView.setText(list.get(position).getText());
+            if(position==1||position==3){
+            	hold.imageView.setEnabled(false);
+            	hold.textView.setEnabled(false);
+			}
 		return convertView;
 	}
 

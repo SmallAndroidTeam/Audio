@@ -60,7 +60,7 @@ import java.util.TimerTask;
 public final class MusicService extends Service {
     public final static MediaPlayer mediaPlayer=new MediaPlayer();
     public static int playingMusicIndex=-1;//正在播放音乐的下标
-    private NotificationManager notificationManager;
+    private static NotificationManager notificationManager;
     private RemoteViews widgetRemoteViews;
     public static enum playAction{start,pause,next,prev,widet}
     public static TextView musicTitle;
