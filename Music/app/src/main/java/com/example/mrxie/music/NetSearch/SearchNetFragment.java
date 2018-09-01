@@ -82,22 +82,35 @@ public class SearchNetFragment extends Fragment implements View.OnClickListener 
         listView_net_music.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                musicList.clear();
-                Log.i("music", "aaaaaaaaa "+mSearchResult.size());
+//                musicList.clear();
+//                for(int j=0;j<mSearchResult.size();j++)
+//                {    Music music =new Music();
+//                    music.setImage(mSearchResult.get(j).getAlbum());
+//                    music.setTitle(mSearchResult.get(j).getMusicName());
+//                    music.setArtist(mSearchResult.get(j).getArtist());
+//                    music.setUri("https://music.taihe.com"+mSearchResult.get(j).getUrl());
+//
+//                    musicList.add(music);
+//                }
 
-                for(int j=0;j<mSearchResult.size();j++)
-                {    Music music =new Music();
-                    music.setImage(mSearchResult.get(j).getAlbum());
-                    music.setTitle(mSearchResult.get(j).getMusicName());
-                    music.setArtist(mSearchResult.get(j).getArtist());
-                    music.setUri("https://music.taihe.com"+mSearchResult.get(j).getUrl());
-
-                    musicList.add(music);
-                }
-
-               Intent intent=new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse(musicList.get(i).getUri()));
+//                if(!(localMusicFragment.sMusicList).equals(musicList))//点击之后变化歌单，如果当前歌单和此歌单不一致，则把当前的歌词设置为此歌单
+//                {
+//                    localMusicFragment.sMusicList=musicList;
+//                }
+//                Log.i("music", "aaaaaaaaa "+localMusicFragment.sMusicList.get(i).getTitle());
+//                Log.i("music", "aaaaaaaaa "+localMusicFragment.sMusicList.get(i).getUri());
+//                //设置当前播放的音乐下标
+//                if(oldMusicIndex1==i){//如果点击的相同的歌曲,就会进入播放界面
+//                    new  MainActivity().getmLocalMusicButton().callOnClick();
+//                }else {
+//                    MusicService.playingMusicIndex = i;
+//                    new MusicService().initHttpMusic();//初始化当前播放的歌曲
+////                    //发送服务给MusicSerice播放歌曲
+                   Intent intent = new Intent(Intent.ACTION_VIEW);
+                   intent.setData(Uri.parse("https://music.taihe.com"+mSearchResult.get(i).getUrl()));
                 startActivity(intent);
+//                    oldMusicIndex1 = i;
+//                }
 
             }
         });

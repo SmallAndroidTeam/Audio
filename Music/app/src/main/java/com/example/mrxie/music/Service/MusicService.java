@@ -17,6 +17,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -49,6 +50,7 @@ import com.example.mrxie.music.ui.LrcView;
 import com.example.mrxie.music.widget.appwidget_provider;
 
 import java.io.IOException;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -58,7 +60,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public final class MusicService extends Service {
-    public final static MediaPlayer mediaPlayer=new MediaPlayer();
+    public static MediaPlayer mediaPlayer=new MediaPlayer();
     public static int playingMusicIndex=-1;//正在播放音乐的下标
     private static NotificationManager notificationManager;
     private RemoteViews widgetRemoteViews;

@@ -81,7 +81,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     public static final String EXTRA_VOLUME_ID = "android.os.storage.extra.VOLUME_ID";
     public static final String EXTRA_VOLUME_STATE = "android.os.storage.extra.VOLUME_STATE";
     private   UsbManager usbManager;
-	private  static AlertDialog alertDialog;
+    private  static AlertDialog alertDialog;
     private static boolean isLoadComplete=false;//判断MainActivity是否加载完成了一次
     public static  UsbMassStorageDevice[] storageDevices;//当前U盘列表
     private ContentAdapter adapter;
@@ -97,17 +97,17 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         setContentView(R.layout.activity_main);
         initViews();
         //根据屏幕的宽高来初始化控件的位置和大小
-       // initImageIconPositionAndSize();
+        // initImageIconPositionAndSize();
         initEvents();
         selectTab(0);//设置默认的主页
-  usbBroadcastReceiver = new UsbBroadcastReceiver();
+        usbBroadcastReceiver = new UsbBroadcastReceiver();
         usbManager = (UsbManager) this.getSystemService(Context.USB_SERVICE);
         //动态注册事件
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_MEDIA_MOUNTED);
-                intentFilter.addAction(USB_DEVICE_ATTACHED);
-                intentFilter.addAction(USB_DEVICE_DETACHED);
-                intentFilter.addAction(ACTION_USB_PERMISSION);
-                registerReceiver(usbBroadcastReceiver,intentFilter);
+        intentFilter.addAction(USB_DEVICE_ATTACHED);
+        intentFilter.addAction(USB_DEVICE_DETACHED);
+        intentFilter.addAction(ACTION_USB_PERMISSION);
+        registerReceiver(usbBroadcastReceiver,intentFilter);
     }
 
     public static ImageButton getmLocalMusicButton() {
@@ -120,13 +120,13 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         if(hasFocus){
             initImageIconPositionAndSize();//根据屏幕的宽高来初始化控件的位置和大小
             if(!isLoadComplete){
-              usbBroadcastReceiver.showUsbList(this);
+                usbBroadcastReceiver.showUsbList(this);
                 isLoadComplete=true;
             }
         }
     }
 
-     //加载完
+    //加载完
     @Override
     protected void onResume() {
         super.onResume();
@@ -135,7 +135,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     /**
      * 检测usb的广播
      */
-     class UsbBroadcastReceiver extends BroadcastReceiver {
+    class UsbBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             // TODO: This method is called when the BroadcastReceiver is receiving
@@ -151,30 +151,30 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 }
             }
             else if(action.equals(ACTION_USB_PERMISSION)){//获取usb的权限的广播
-               synchronized (this){
-                   UsbDevice usbDevice=intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                   if(usbDevice!=null){
-                       if(intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED,false)){
-                           //OnlyOneToast.makeText(context,usbDevice.getDeviceName()+":获取权限成功");
-                           Intent intent1=new Intent();
-                           intent1.setAction(Intent.ACTION_MAIN);
-                           intent1.addCategory(Intent.CATEGORY_LAUNCHER);
-                           intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-                           intent1.setComponent(new ComponentName(getPackageName(),"com.example.mrxie.music.activity.MainActivity"));
-                           startActivity(intent1);
-                           readDevice(usbDevice);
-                           Log.i(TAG, "onReceive:获取权限成功 ");
-                       }else{
-                           //OnlyOneToast.makeText(context,usbDevice.getDeviceName()+":获取权限失败");
-                           Log.i(TAG, "onReceive:获取权限失败");
-                       }
-                   }
-               }
+                synchronized (this){
+                    UsbDevice usbDevice=intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                    if(usbDevice!=null){
+                        if(intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED,false)){
+                            //OnlyOneToast.makeText(context,usbDevice.getDeviceName()+":获取权限成功");
+                            Intent intent1=new Intent();
+                            intent1.setAction(Intent.ACTION_MAIN);
+                            intent1.addCategory(Intent.CATEGORY_LAUNCHER);
+                            intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                            intent1.setComponent(new ComponentName(getPackageName(),"com.example.mrxie.music.activity.MainActivity"));
+                            startActivity(intent1);
+                            readDevice(usbDevice);
+                            Log.i(TAG, "onReceive:获取权限成功 ");
+                        }else{
+                            //OnlyOneToast.makeText(context,usbDevice.getDeviceName()+":获取权限失败");
+                            Log.i(TAG, "onReceive:获取权限失败");
+                        }
+                    }
+                }
             }
         }
 
 
-//        //读取设备列表
+        //        //读取设备列表
 //        public void readDeviceList(Context context){
 //            storageDevices = UsbMassStorageDevice.getMassStorageDevices(MainActivity.this);
 //            Log.i(TAG, "readDeviceList: "+storageDevices.length);
@@ -277,13 +277,13 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                         getPermission(context,usbDevice);//获取权限
                     }else if(usbInterface.getInterfaceClass()==255){
                         stringBuilder.append("此设备是手机\n");
-                       // OnlyOneToast.makeText(context,"此设备是手机");
+                        // OnlyOneToast.makeText(context,"此设备是手机");
                     }else if(usbInterface.getInterfaceClass()==3){
                         stringBuilder.append("此设备是鼠标或者键盘\n");
-                       // OnlyOneToast.makeText(context,"此设备是鼠标或者键盘");
+                        // OnlyOneToast.makeText(context,"此设备是鼠标或者键盘");
                     }else{
                         stringBuilder.append("其他设备\n");
-                       // OnlyOneToast.makeText(context,"此设备是其他设备");
+                        // OnlyOneToast.makeText(context,"此设备是其他设备");
                     }
 
                 }
@@ -306,7 +306,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                         String sendStringMsg="0x88";
                         byte[] sendBytes=sendStringMsg.getBytes();
                         int out=connection.bulkTransfer(outEndpoint,sendBytes,sendBytes.length,3000);
-                         Log.i(TAG, "发送:"+out+"#"+sendStringMsg+"#"+sendBytes);
+                        Log.i(TAG, "发送:"+out+"#"+sendStringMsg+"#"+sendBytes);
                         byte[] receiveMsgBytes=new byte[32];
                         int in=connection.bulkTransfer(inEndpoint,receiveMsgBytes,receiveMsgBytes.length,3000);
                         String receiveMsgString=receiveMsgBytes.toString();
@@ -344,18 +344,18 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                             });
                     alertDialog=dialoguilder.create();
                 }
-            if(Build.VERSION.SDK_INT>=23){
-                if(!Settings.canDrawOverlays(context)){
-                    alertDialog.show();
+                if(Build.VERSION.SDK_INT>=23){
+                    if(!Settings.canDrawOverlays(context)){
+                        alertDialog.show();
+                    }else{
+                        // alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);//设置系统级别的弹出框
+                        alertDialog.show();
+                    }
                 }else{
-                   // alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);//设置系统级别的弹出框
+                    //alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);//设置系统级别的弹出框
                     alertDialog.show();
                 }
-            }else{
-                //alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);//设置系统级别的弹出框
-                alertDialog.show();
             }
-        }
         }
     }
     //重写了单点事件
@@ -395,13 +395,13 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         LinearLayout.LayoutParams musicTitleLayoutParams= (LinearLayout.LayoutParams) musicTitle.getLayoutParams();
         musicTitleLayoutParams.width=(int)(1.0*screenWidth*3/7)-marginLeft;
         musicTitleLayoutParams.leftMargin=marginLeft;
-       // musicTitleLayoutParams.topMargin=marginLeft;
+        // musicTitleLayoutParams.topMargin=marginLeft;
         musicTitle.setLayoutParams(musicTitleLayoutParams);
 
         LayoutParams TitleBarRelativeLayoutLayoutParams=TitleBarLinearLayout.getLayoutParams();
         TitleBarRelativeLayoutLayoutParams.height=TitleBarHeigt;
 
-         LayoutParams tabLinearLayoutLayoutParams= (LayoutParams) tabLinearLayout.getLayoutParams();
+        LayoutParams tabLinearLayoutLayoutParams= (LayoutParams) tabLinearLayout.getLayoutParams();
         tabLinearLayoutLayoutParams.width=(int) (1.0*screenWidth*4/7);
 
 
@@ -412,9 +412,9 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             IconWidth=marginLeft;
         }
         int IconHeight=IconWidth;
-         int IconRightMarign=(int)(screenWidth*4.0/7-1.0*screenHeigt/10-5.0*IconWidth)/7;
-         if(IconRightMarign<0)
-             IconRightMarign=0;
+        int IconRightMarign=(int)(screenWidth*4.0/7-1.0*screenHeigt/10-5.0*IconWidth)/7;
+        if(IconRightMarign<0)
+            IconRightMarign=0;
         Log.i(TAG, "initImageIconPositionAndSize: "+IconRightMarign);
         LinearLayout.LayoutParams searchMusicButtonLayoutParams=(LinearLayout.LayoutParams)searchMusicButton.getLayoutParams();
         searchMusicButtonLayoutParams.width=IconWidth;
@@ -477,7 +477,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         adapter = new ContentAdapter(this, list);
         mLvLeftMenu.setAdapter(adapter);
 
-       mLvLeftMenu.setOnItemClickListener(new AdapterView.OnItemClickListener() {//设置左侧菜单栏点击事件
+        mLvLeftMenu.setOnItemClickListener(new AdapterView.OnItemClickListener() {//设置左侧菜单栏点击事件
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 switch (position) {
@@ -535,39 +535,39 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     @Override
     public void onClick(View view) {
-      switch (view.getId()){
-          case R.id.music:
-             if(musicTitle.getVisibility()==View.INVISIBLE){//如果标题没显示就显示
-                 musicTitle.setVisibility(View.VISIBLE);
-             }
-              selectTab(0);
-              break;
-          case R.id.SongList:
-              if(musicTitle.getVisibility()==View.VISIBLE){//如果标题显示就没显示
-                  musicTitle.setVisibility(View.INVISIBLE);
-              }
-              selectTab(1);
-              break;
-          case R.id.onlineMusic:
-              if(musicTitle.getVisibility()==View.VISIBLE){
-                  musicTitle.setVisibility(View.INVISIBLE);
-              }
-              selectTab(2);
-              break;
-          case R.id.set:
-              if(musicTitle.getVisibility()==View.VISIBLE){
-                  musicTitle.setVisibility(View.INVISIBLE);
-              }
-              drawerLayout.openDrawer(Gravity.START);
-              break;
-          case R.id.search:
-              if(musicTitle.getVisibility()==View.VISIBLE){
-                  musicTitle.setVisibility(View.INVISIBLE);
-              }
-              selectTab(4);break;
-          default:
-              break;
-      }
+        switch (view.getId()){
+            case R.id.music:
+                if(musicTitle.getVisibility()==View.INVISIBLE){//如果标题没显示就显示
+                    musicTitle.setVisibility(View.VISIBLE);
+                }
+                selectTab(0);
+                break;
+            case R.id.SongList:
+                if(musicTitle.getVisibility()==View.VISIBLE){//如果标题显示就没显示
+                    musicTitle.setVisibility(View.INVISIBLE);
+                }
+                selectTab(1);
+                break;
+            case R.id.onlineMusic:
+                if(musicTitle.getVisibility()==View.VISIBLE){
+                    musicTitle.setVisibility(View.INVISIBLE);
+                }
+                selectTab(2);
+                break;
+            case R.id.set:
+                if(musicTitle.getVisibility()==View.VISIBLE){
+                    musicTitle.setVisibility(View.INVISIBLE);
+                }
+                drawerLayout.openDrawer(Gravity.START);
+                break;
+            case R.id.search:
+                if(musicTitle.getVisibility()==View.VISIBLE){
+                    musicTitle.setVisibility(View.INVISIBLE);
+                }
+                selectTab(4);break;
+            default:
+                break;
+        }
     }
     private void selectTab(int i){
         FragmentManager fragmentManager=getSupportFragmentManager();
@@ -576,12 +576,12 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         switch (i){
             case 0://选中本地音乐
                 mLocalMusicButton.setBackgroundResource(R.drawable.localmusic_selected);//图标改变
-                 if(mlocalMusicFragment==null){//初始化本地音乐页面localMusicFragment()
-                     mlocalMusicFragment=new localMusicFragment();
-                     fragmentTransaction.add(R.id.IndexContent,mlocalMusicFragment);
-                 }else{
-                     fragmentTransaction.show(mlocalMusicFragment);
-                 }
+                if(mlocalMusicFragment==null){//初始化本地音乐页面localMusicFragment()
+                    mlocalMusicFragment=new localMusicFragment();
+                    fragmentTransaction.add(R.id.IndexContent,mlocalMusicFragment);
+                }else{
+                    fragmentTransaction.show(mlocalMusicFragment);
+                }
                 break;
             case 1://选中歌曲列表的
                 msongListButton.setBackgroundResource(R.drawable.songlist_selected);//图标改变
@@ -626,9 +626,9 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         fragmentTransaction.commit();
     }
     private void hideFragments(FragmentTransaction fragmentTransaction){
-      if(mlocalMusicFragment!=null){
-          fragmentTransaction.hide(mlocalMusicFragment);
-      }
+        if(mlocalMusicFragment!=null){
+            fragmentTransaction.hide(mlocalMusicFragment);
+        }
         if(msongListFragment!=null){
             fragmentTransaction.hide(msongListFragment);
         }
@@ -639,7 +639,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             fragmentTransaction.hide(msettingFragment);
         }
         if(searchMusicFragment!=null){
-          fragmentTransaction.hide(searchMusicFragment);
+            fragmentTransaction.hide(searchMusicFragment);
         }
         mLocalMusicButton.setBackgroundResource(R.drawable.localmusic);
         msongListButton.setBackgroundResource(R.drawable.songlist);
@@ -651,7 +651,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     @Override
     protected void onDestroy() {
         //当应用关闭之后
-unregisterReceiver(usbBroadcastReceiver);
+        unregisterReceiver(usbBroadcastReceiver);
         super.onDestroy();
     }
 
