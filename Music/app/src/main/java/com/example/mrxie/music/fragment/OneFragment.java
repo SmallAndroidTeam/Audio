@@ -108,7 +108,7 @@ public class OneFragment extends Fragment {
                     music.setLrcpath(stringList.get(j).getLrc_uri());
                     musicList.add(music);
                 }
-                 Log.i(TAG, "aaaaaaaaa "+musicList.size());
+
                 if(!(localMusicFragment.sMusicList).equals(musicList))//点击之后变化歌单，如果当前歌单和此歌单不一致，则把当前的歌词设置为此歌单
                 {
                     localMusicFragment.sMusicList=musicList;

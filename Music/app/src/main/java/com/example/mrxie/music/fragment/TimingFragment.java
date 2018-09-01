@@ -1,6 +1,7 @@
 package com.example.mrxie.music.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,12 +84,20 @@ public class TimingFragment extends AttachDialogFragment implements View.OnClick
                 break;
             case R.id.sure:
                 String s=et.getText().toString();
-                int m=Integer.parseInt(s);
-                if(m>0&&m<1000)
-                {
-                    MusicService.timing(m * 60 * 1000);
-                    Toast.makeText(mContext, "将在"+m+"分钟后停止播放", Toast.LENGTH_SHORT).show();
-                    dismiss();
+                String s1="q";
+                String s2;
+                s2=s+s1;
+                if(s2.equals(s1)){
+                    Toast.makeText(mContext, "自定义时间不能为空", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    int m=Integer.parseInt(s);
+                    if(m>0&&m<1000)
+                    {
+                        MusicService.timing(m * 60 * 1000);
+                        Toast.makeText(mContext, "将在"+m+"分钟后停止播放", Toast.LENGTH_SHORT).show();
+                        dismiss();
+                    }
                 }
                 break;
         }

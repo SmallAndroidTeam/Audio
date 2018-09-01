@@ -1,14 +1,19 @@
 package com.example.mrxie.music.NetSearch;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -16,6 +21,11 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.mrxie.music.R;
+import com.example.mrxie.music.Service.MusicService;
+import com.example.mrxie.music.SongListInformation.Music;
+import com.example.mrxie.music.activity.MainActivity;
+import com.example.mrxie.music.adapter.UserAdapter;
+import com.example.mrxie.music.fragment.localMusicFragment;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -37,7 +47,8 @@ public class SearchNetFragment extends Fragment implements View.OnClickListener 
     public   static String s;
     private int mPage = 0;//搜索音乐的页码
    private ListView listView_net_music;
-
+    private static int oldMusicIndex1=-1;
+    private  ArrayList<Music> musicList = new ArrayList<Music>();
    private   boolean hasMoreData  = false;//歌曲播放中的暂停状态
 
    // private int position = 0;//当前播放的位置,提供给PlayActivity
@@ -68,7 +79,45 @@ public class SearchNetFragment extends Fragment implements View.OnClickListener 
         ll_search_container = (LinearLayout) view.findViewById(R.id.ll_search_container);
         ib_search_btn = (ImageButton) view.findViewById(R.id.ib_search_btn);
         et_search_content = (EditText) view.findViewById(R.id.et_search_content);
+        listView_net_music.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                musicList.clear();
+                Log.i("music", "aaaaaaaaa "+mSearchResult.size());
 
+                for(int j=0;j<mSearchResult.size();j++)
+                {    Music music =new Music();
+                    music.setImage(mSearchResult.get(j).getAlbum());
+                    music.setTitle(mSearchResult.get(j).getMusicName());
+                    music.setArtist(mSearchResult.get(j).getArtist());
+                    music.setUri("https://music.taihe.com"+mSearchResult.get(j).getUrl());
+
+                    musicList.add(music);
+                }
+
+               Intent intent=new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(musicList.get(i).getUri()));
+                startActivity(intent);
+
+            }
+        });
+        et_search_content.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                mAdapter.getFilter().filter(s);
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 //        //Item点击事件监听
 //        listView.setOnItemClickListener(this);
         //按钮点击事件监听

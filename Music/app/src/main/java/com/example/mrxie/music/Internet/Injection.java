@@ -13,8 +13,10 @@ public class Injection {
 
     public static OkHttpClient provideOkHttpClient() {
 
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();//HttpLoggingInterceptor()该拦截器用于记录应用中的网络请求的信息
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);//BODY 请求/响应行 + 头 + 体
+                                                            //共包含四个级别：NONE、BASIC、HEADER、BODY
+                                                            //NONE 不记录;BASIC 请求/响应行;HEADER 请求/响应行 + 头
 
         return new OkHttpClient.Builder()
                 .addInterceptor(logging)

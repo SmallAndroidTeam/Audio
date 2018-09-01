@@ -66,9 +66,13 @@ return view;
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
 //                mAdapter.getFilter().filter(s);
-     MobileUtils.hideInputMethod(et_search);
+
+   //  MobileUtils.hideInputMethod(et_search);
       UserAdapter.key=et_search.getText().toString();
      mUserAdapter.getFilter().filter(s);
+                    if(UserAdapter.key==null){
+                     MobileUtils.hideInputMethod(et_search);
+                    }
     }
 
     @Override

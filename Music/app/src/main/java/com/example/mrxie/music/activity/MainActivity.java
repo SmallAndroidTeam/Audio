@@ -33,6 +33,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.mrxie.music.R;
 import com.example.mrxie.music.Service.MusicService;
@@ -53,6 +54,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.security.auth.login.LoginException;
+
+import static java.lang.System.exit;
 
 public class MainActivity extends FragmentActivity implements View.OnClickListener{
     private String TAG="Music";
@@ -471,7 +476,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         initData();
         adapter = new ContentAdapter(this, list);
         mLvLeftMenu.setAdapter(adapter);
-       mLvLeftMenu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+       mLvLeftMenu.setOnItemClickListener(new AdapterView.OnItemClickListener() {//设置左侧菜单栏点击事件
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 switch (position) {
@@ -479,9 +485,13 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                         Selection_Theme++;
                         if(Selection_Theme%2==1) {
                             drawerLayout.setBackgroundResource(R.drawable.black);
+                            list.get(0).setText("日间模式");
                         }else{
                             drawerLayout.setBackgroundResource(R.drawable.playindex_background_image);
+                            list.get(0).setText("夜间模式");
                         }
+                        adapter = new ContentAdapter(getBaseContext(), list);
+                        mLvLeftMenu.setAdapter(adapter);
                         drawerLayout.closeDrawers();
                         break;
                     case 2:
@@ -496,6 +506,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     case 4:
 
                     case 5:
+                        exit(0);
                         break;
 
 
@@ -563,37 +574,37 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         FragmentTransaction fragmentTransaction=fragmentManager.beginTransaction();
         hideFragments(fragmentTransaction);
         switch (i){
-            case 0:
-                mLocalMusicButton.setBackgroundResource(R.drawable.localmusic_selected);
-                 if(mlocalMusicFragment==null){
+            case 0://选中本地音乐
+                mLocalMusicButton.setBackgroundResource(R.drawable.localmusic_selected);//图标改变
+                 if(mlocalMusicFragment==null){//初始化本地音乐页面localMusicFragment()
                      mlocalMusicFragment=new localMusicFragment();
                      fragmentTransaction.add(R.id.IndexContent,mlocalMusicFragment);
                  }else{
                      fragmentTransaction.show(mlocalMusicFragment);
                  }
                 break;
-            case 1:
-                msongListButton.setBackgroundResource(R.drawable.songlist_selected);
-                if(msongListFragment==null){
+            case 1://选中歌曲列表的
+                msongListButton.setBackgroundResource(R.drawable.songlist_selected);//图标改变
+                if(msongListFragment==null){//初始化歌曲页面songListFragment()
                     msongListFragment=new songListFragment();
                     fragmentTransaction.add(R.id.IndexContent,msongListFragment);
                 }else{
                     fragmentTransaction.show(msongListFragment);
                 }
                 break;
-            case 2:
-                monlineMusicButton.setBackgroundResource(R.drawable.onlinemusic_selected);
+            case 2://选中在线音乐
+                monlineMusicButton.setBackgroundResource(R.drawable.onlinemusic_selected);//图标改变
 
-                if(monlineMusicFragment==null){
+                if(monlineMusicFragment==null){//初始化在线音乐页面onlineMusicFragment()
                     monlineMusicFragment=new onlineMusicFragment();
                     fragmentTransaction.add(R.id.IndexContent,monlineMusicFragment);
                 }else{
                     fragmentTransaction.show(monlineMusicFragment);
                 }
                 break;
-            case 3:
-                msettingButton.setBackgroundResource(R.drawable.setting_selected);
-                if(msettingFragment==null){
+            case 3://选中设置按钮
+                msettingButton.setBackgroundResource(R.drawable.setting_selected);//图标改变
+                if(msettingFragment==null){//初始化设置页面settingFragment()
                     msettingFragment=new settingFragment();
                     fragmentTransaction.add(R.id.IndexContent,msettingFragment);
                 }else{

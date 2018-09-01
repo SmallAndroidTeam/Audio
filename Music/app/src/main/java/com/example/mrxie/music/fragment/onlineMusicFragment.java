@@ -29,7 +29,7 @@ public class onlineMusicFragment extends Fragment implements View.OnClickListene
     private List<Fragment> mFragmentList = new ArrayList<Fragment>();
     private FragmentAdapter mFragmentAdapter;
 
-    String[] titles = new String[]{"收藏列表", "通讯录", "发现", "我"};
+    String[] titles = new String[]{"收藏列表", "通讯录", "发现", "待开发"};
 
     @Nullable
     @Override
@@ -156,10 +156,10 @@ public class onlineMusicFragment extends Fragment implements View.OnClickListene
 //            item_weixin.setTextColor(Color.parseColor("#000000"));
 //            item_tongxunlu.setTextColor(Color.parseColor("#000000"));
 //            item_faxian.setTextColor(Color.parseColor("#000000"));
-            item_me.setTextColor(Color.RED);
-            item_weixin.setTextColor(Color.BLUE);
-            item_tongxunlu.setTextColor(Color.BLUE);
-            item_faxian.setTextColor(Color.BLUE);
+            item_me.setTextColor(Color.parseColor("#66CDAA"));
+            item_weixin.setTextColor(Color.parseColor("#000000"));
+            item_tongxunlu.setTextColor(Color.parseColor("#000000"));
+            item_faxian.setTextColor(Color.parseColor("#000000"));
         }
     }
 }
