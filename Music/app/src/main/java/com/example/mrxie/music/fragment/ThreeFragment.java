@@ -2,11 +2,13 @@ package com.example.mrxie.music.fragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,16 +20,24 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.mrxie.music.Internet.Injection;
+import com.example.mrxie.music.Intent.ImageLoaderUtil;
+import com.example.mrxie.music.Intent.MusicAdapter;
+import com.example.mrxie.music.Intent.MusicNeteaseVo;
+import com.example.mrxie.music.Intent.NetworkUtil;
+import com.example.mrxie.music.Intent.RequestHelper;
 import com.example.mrxie.music.R;
 import com.example.mrxie.music.SongListInformation.App;
 
-import com.example.mrxie.music.Internet.Injection;
-import com.example.mrxie.music.Internet.PlayBean;
-import com.example.mrxie.music.Internet.SongRankingBean;
+
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,168 +45,334 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ThreeFragment extends Fragment {
-    private ListView rankingsonglist;
-    private MyAdapter myAdapter;
-    private String rankingimageUrl;
-    private String rankingnamestr;
-    private MyHandler myHandle;
-    public AdapterView.OnItemClickListener listener;
-    private SongRankingBean songRankingBean;
-    private List<String> songidlist = new ArrayList<>();
-    private Context context;
-    private String url;
-    private List<SongRankingBean.SongListBean> rankingsongbeanlist = new ArrayList<>();
-    @Override
-    public View onCreateView(LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_three, null);
-        context=App.sContext;
-        myAdapter = new MyAdapter(context);
-        myHandle=new MyHandler(context);
-        rankingsonglist=(ListView) view.findViewById(R.id.ranking_song_list);
-        rankingsonglist.setAdapter(myAdapter);
-        songRankingBean = new SongRankingBean();
+public class ThreeFragment extends Fragment implements View.OnClickListener
+        , AdapterView.OnItemClickListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
+    /**
+     * 请求音乐数据标志码
+     */
+    private static final int REQUEST_MUSIC_DATA = 0x000;
+    /**
+     * 添加数据标志码
+     */
+    private static final int ADD_MUSIC_DATA = 0x001;
+    /**
+     * 更新界面
+     */
+    private static final int UPDATE_UI = 0x002;
+    /**
+     * 播放音乐
+     */
+    private static final int PLAY_MUSIC = 0x003;
+    /**
+     * 音乐数据
+     */
+//    private List<MusicVo> musics;
+    private List<MusicNeteaseVo> musics;
+    /**
+     * 列表的Item内容和样式适配器
+     */
+    private MusicAdapter adapter;
+    /**
+     * 音乐播放工具
+     */
+    private MediaPlayer mediaPlayer;
+    /**
+     * 专辑封面
+     */
+    private ImageView albumIv;
+    /**
+     * 歌名
+     */
+    private TextView musicNameTv;
+    /**
+     * 歌手名
+     */
+    private TextView authorTv;
+    /**
+     * 播放/暂停按钮
+     */
+    private ImageView playerIv;
+    /**
+     * 歌曲列表
+     */
+    private ListView musicLv;
+    /**
+     * 播放标志，为true则为播放，否则为暂停
+     */
+    private boolean isPlaying;
+    /**
+     * 网络请求工具
+     */
+    private RequestHelper requestHelper;
+    /**
+     * 消息句柄（可以直接实力化内部类）
+     */
+    private Handler handler;
+    /**
+     * 当前播放歌曲的位置索引
+     */
+    private int nowPlayingIndex;
+    /**
+     * 消息处理回调
+     */
+    private Handler.Callback callback = new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            switch (msg.what) {
+                case REQUEST_MUSIC_DATA://启动线程获取音乐列表
+                    startThreadRequestMusicData();
+                    break;
+                case ADD_MUSIC_DATA://添加所有音乐
+                    getMusicDataFromJsonStr((String) msg.obj);//对于类型强转的，要注意判空，在发消息时已经做了
+                    break;
+                case UPDATE_UI://更新列表
+                    adapter.notifyDataSetChanged();
+                    break;
+                case PLAY_MUSIC://播放音乐
+                    getMusicPathFromJsonStr((String) msg.obj);
+            }
+            return false;
+        }
+    };
 
-        // rankingimage = (ImageView) findViewById(R.id.rankingimage);
-        //rankingname = (TextView) findViewById(R.id.rankingname);
-        net();
-        getRankingInfo(1);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_three, null);
+
+        albumIv = view.findViewById(R.id.album_pic_iv);
+        musicNameTv = view.findViewById(R.id.music_name_tv);
+        authorTv = view.findViewById(R.id.author_name_tv);
+        playerIv = view.findViewById(R.id.player_tv);
+        musicLv = view.findViewById(R.id.musics_lv);
+        initData();
+        initAdapter();
+        setListener();
         return view;
     }
-    public static String getUserAgent(Context context){
-        WebView webView = new WebView(context);
-        webView.layout(0, 0, 0, 0);
-        WebSettings settings = webView.getSettings();
-        String userAgent = settings.getUserAgentString();
-        Log.d("User-Agent","User-Agent: "+ userAgent);
-        return  userAgent;
 
+    /**
+     * 初始化
+     */
+    private void initData() {
+        requestHelper = new RequestHelper();
+        musics = new ArrayList<>();
+        handler = new Handler(callback);
+        mediaPlayer = new MediaPlayer();
     }
 
-    private void getRankingInfo(int num){
-        String ua= getUserAgent(context);
+    /**
+     * 初始化适配器
+     */
+    private void initAdapter() {
+        adapter = new MusicAdapter(App.sContext, musics);
+        musicLv.setAdapter(adapter);
+    }
+
+    /**
+     * 设置监听
+     */
+    private void setListener() {
+        playerIv.setOnClickListener(this);
+        musicLv.setOnItemClickListener(this);
+        mediaPlayer.setOnPreparedListener(this);
+        mediaPlayer.setOnCompletionListener(this);
+    }
+
+    public void onStart() {
+        super.onStart();
+        if (NetworkUtil.isNetworkConnected(App.sContext)) {
+            toast("正在请求数据，请稍等...");
+            handler.sendEmptyMessage(REQUEST_MUSIC_DATA);
+        } else
+            toast("未连接网络或连接的网络不可用！");
+    }
+
+    private void toast(String toast) {
+        Toast.makeText(getActivity(), toast, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+        mediaPlayer.start();//开始播放
+    }
+
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        int nextPlayIndex = (++nowPlayingIndex) % musics.size();//获取下一首歌的位置索引，最后一首歌的下一首是第一首
+        showSelectedMusicInfo(musics.get(nextPlayIndex));//显示音乐信息
+        playSelectedMusic(musics.get(nextPlayIndex).url);//播放音乐
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        if (position < 0 || position + 1 > musics.size())
+            return;
+        showSelectedMusicInfo(musics.get(position));
+        playSelectedMusic(musics.get(position).url);
+//        startThreadRequestMusicPath(musics.get(position).song_id);
+        nowPlayingIndex = position;
+    }
+
+    private void showSelectedMusicInfo(MusicNeteaseVo music) {
+        ImageLoaderUtil.loadPicByUrl(albumIv, music.pic);//加载图片
+        musicNameTv.setText(music.title);//显示歌名
+        authorTv.setText(music.author);//显示歌手
+    }
+
+    /**
+     * 播放选中的音乐
+     *
+     * @param musicPath 音乐文件路径
+     */
+    private void playSelectedMusic(String musicPath) {
+        if (!mediaPlayer.isPlaying())
+            try {
+                mediaPlayer.reset();
+                mediaPlayer.setDataSource(musicPath);
+                mediaPlayer.prepareAsync();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (isPlaying) {
+            toast("即将暂停播放");
+            mediaPlayer.pause();
+        } else {
+            toast("即将开始播放");
+            mediaPlayer.start();
+        }
+        isPlaying = !isPlaying;//更新播放状态
+    }
+
+    private void startThreadRequestMusicData() {
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+//                String musicData = requestHelper.getMusics("https://tingapi.ting.baidu.com/v1/restserver/ting",2,66,0);//百度的
+//                String musicData = requestHelper.getMusics("https://s.music.163.com/search/get/","2","66","0","周杰伦");//网易云音乐的
+                String musicData = requestHelper.getNeteaseMusics("https://api.hibai.cn/api/index/index");//网易云音乐用户的
+                if (!TextUtils.isEmpty(musicData))//有数据
+                    sendMusicDataMessage(musicData);//发送已获取到音乐数据消息
+            }
+        }.start();
+    }
+
+    /**
+     * 发送获取到音乐数据消息
+     *
+     * @param musicData 返回的音乐数据json格式字符串
+     */
+    private void sendMusicDataMessage(String musicData) {
+        if (null != handler) {//有消息句柄
+            Message msg = handler.obtainMessage();//从消息队列里获取一个消息实例，注意避免自己创建一个消息实例，这样会造成不必要的资源浪费，每天一杯奶就够了，不要贪多哈
+            msg.what = ADD_MUSIC_DATA;//设置消息区分标志
+            msg.obj = musicData;//设置消息内容
+            handler.sendMessage(msg);//立即发送
+        }
+    }
+
+    /**
+     * 启动线程获取指定音乐的详细信息（注释参考获取音乐列表方法）
+     *
+     * @param songId 音乐id
+     */
+    private void startThreadRequestMusicPath(final String songId) {
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                String musicPath = requestHelper.getMusicPath("https://tingapi.ting.baidu.com/v1/restserver/ting", songId);
+                if (!TextUtils.isEmpty(musicPath))
+                    sendMusicPathMessage(musicPath);
+
+            }
+        }.start();
+    }
+
+    /**
+     * 发送获取到音乐详细信息消息（注释参考发送获取到音乐数据消息方法）
+     */
+    private void sendMusicPathMessage(String musicPath) {
+        if (null != handler) {
+            Message msg = handler.obtainMessage();
+            msg.what = PLAY_MUSIC;
+            msg.obj = musicPath;
+            handler.sendMessage(msg);
+        }
+    }
+
+    /**
+     * 发送更新界面消息
+     */
+    private void sendUpdateUIMessage() {
+        if (null != handler)
+            handler.sendEmptyMessage(UPDATE_UI);//不需要消息内容的
+    }
+
+    /**
+     * 将json字符串转为音乐描述数据模型（实体）
+     *
+     * @param jsonStr 返回的json字符串
+     */
+    private void getMusicDataFromJsonStr(String jsonStr) {
         try {
-            Call<SongRankingBean> call = Injection.provideSongAPI()
-                    .getSongRanking("json", "", "webapp_music", "baidu.ting.billboard.billList", num, 50, 0);
-            call.enqueue(new Callback<SongRankingBean>() {
-                @Override
-                public void onResponse(Call<SongRankingBean> call, Response<SongRankingBean> response) {
-                    SongRankingBean bean = response.body();
-                    setRankingsongbeanlist(bean);
-                    Message message= new Message();
-                    message.what= SET_RANKINGBEAN;
-                    myHandle.sendMessage(message);
-                }
-
-                @Override
-                public void onFailure(Call<SongRankingBean> call, Throwable t) {
-
-                }
-            });
-        }catch(Exception e){
+            JSONObject jsonObject = new JSONObject(jsonStr);//根据json字符串实例化json对象
+//            JSONArray array=jsonObject.optJSONArray("song_list");
+            //注意，从json数据（类似于map）中获取内容时，如果不确定对应的key（键）是否有的，请使用opt前缀方法操作，如果确定有的话，使用get也可以，opt还可以设置默认值
+            JSONArray array = jsonObject.optJSONArray("Body");//获取json对象中的json数组
+//            MusicVo item;
+            MusicNeteaseVo item;//声明音乐
+            JSONObject json;//声明json对象
+            for (int i = 0, size = array.length(); i < size; i++) {//依次获取json数组中的每个json对象
+//                item=new MusicVo();
+//                json= (JSONObject) array.get(i);
+//                item.album_title=json.optString("album_title");
+//                item.author=json.optString("author");
+//                item.lrclink=json.optString("lrclink");
+//                item.pic_small=json.optString("pic_small");
+//                item.song_id=json.optString("song_id");
+//                item.title=json.optString("title");
+                //以下是数据封装
+                item = new MusicNeteaseVo();
+                json = (JSONObject) array.get(i);
+                item.title = json.optString("title");
+                item.author = json.optString("author");
+                item.lrc = json.optString("lrc");
+                item.pic = json.optString("pic");
+                item.url = json.optString("url");
+                musics.add(item);//添加到音乐列表中
+            }
+            item = null;
+            sendUpdateUIMessage();//发送更新界面消息
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }
-    private void setRankingsongbeanlist(SongRankingBean bean){
-        songRankingBean = bean;
-    }
-    public void net(){
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                .detectDiskReads()
-                .detectDiskWrites()
-                .detectNetwork()
-                .penaltyLog()
-                .build());
-        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                .detectLeakedSqlLiteObjects()
-                .detectLeakedClosableObjects()
-                .penaltyLog()
-                .penaltyDeath()
-                .build());
-    }
-    private void getRankingSongInfo(){
-        rankingimageUrl = songRankingBean.getBillboard().getPic_s210();
-        rankingnamestr = songRankingBean.getBillboard().getName();
-        int i;
-        for(i=0; i < songRankingBean.getSong_list().size()&&i< 50;i++){
-            rankingsongbeanlist.add(songRankingBean.getSong_list().get(i));
-        }
-        int j;
-        songidlist.clear();
-        for(j= 0;j<rankingsongbeanlist.size();j++){
-            songidlist.add(rankingsongbeanlist.get(j).getSong_id());
-        }
-    }
-    private void refreshListView(){
-        myAdapter.notifyDataSetChanged();
-//              listener.resetLickListener();
-//              rankingsonglist.setOnItemClickListener(listener);
-//              myposition=-1;
-    }
-    public class MyAdapter extends BaseAdapter {
-        LayoutInflater inflater;
-        private Context context;
-        public MyAdapter(Context c){
-            this.inflater = LayoutInflater.from(c);
-            context = c;
-        }
-        @Override
-        public long getItemId(int i) {
-            return 0;
-        }
 
-        @Override
-        public Object getItem(int i) {
-            return null;
-        }
-
-        @Override
-        public int getCount() {
-            return rankingsongbeanlist.size();
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            ViewHolder viewHolder;
-            if(view == null){
-                view = inflater.inflate(R.layout.song_ranking_list_item,null);
-                viewHolder= new ViewHolder();
-                viewHolder.song_Image = (ImageView) view.findViewById(R.id.song_image);
-                viewHolder.song_name = (TextView) view.findViewById(R.id.ranking_song_name);
-                viewHolder.siner_name = (TextView) view.findViewById(R.id.ranking_singer_name);
-                view.setTag(viewHolder);
-            }else{
-                viewHolder = (ViewHolder) view.getTag();
-            }
-            Picasso.with(context).load(rankingsongbeanlist.get(i).getPic_small()).into(viewHolder.song_Image);
-            viewHolder.song_name.setText(rankingsongbeanlist.get(i).getTitle());
-            viewHolder.siner_name.setText(rankingsongbeanlist.get(i).getArtist_name());
-            return view;
+    /**
+     * 获取音乐文件路径（注释参考将json字符串转为音乐描述数据模型）
+     *
+     * @param jsonStr 返回的json字符串
+     */
+    private void getMusicPathFromJsonStr(String jsonStr) {
+        try {
+            JSONObject jsonObject = new JSONObject(jsonStr);
+            JSONObject json = jsonObject.optJSONObject("bitrate");
+            String musicUrl = json.optString("file_link");
+//            int index=musicUrl.indexOf("?xcode");
+//            if (index>-1){
+//                musicUrl=musicUrl.substring(0,index);
+////                musicUrl=musicUrl.replaceFirst("http","https");
+//            }
+            playSelectedMusic(musicUrl);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
-    class ViewHolder{
-        ImageView song_Image;
-        TextView song_name;
-        TextView siner_name;
 
-    }
-    private static final int SET_RANKINGBEAN = 123;
-    public class MyHandler extends Handler {
-        private Context context;
-        public MyHandler(Context context ){ this.context= context;}
-
-        @Override
-        public void handleMessage(Message msg) {
-            switch(msg.what){
-                case SET_RANKINGBEAN:
-                    getRankingSongInfo();
-//                    Picasso.with(context).load(songRankingBean.getBillboard().getPic_s210()).into(rankingimage);
-//                    rankingname.setText(songRankingBean.getBillboard().getName()+"Top 50");
-                    refreshListView();
-                    break;
-            }
-        }
-    }
 
 }

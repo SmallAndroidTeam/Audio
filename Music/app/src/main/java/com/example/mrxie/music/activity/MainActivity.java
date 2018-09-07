@@ -365,6 +365,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         {
             if((System.currentTimeMillis()-time)>1000)
             {
+
                 OnlyOneToast.makeText(MainActivity.this,"再按一次返回桌面");
                 time=System.currentTimeMillis();
             }else{
@@ -373,9 +374,13 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 startActivity(intent);
             }
             return true;
+        }else if(keyCode == KeyEvent.KEYCODE_HOME){
+
+                        return true;
         }else{
             return super.onKeyDown(keyCode, event);
         }
+
 
     }
 

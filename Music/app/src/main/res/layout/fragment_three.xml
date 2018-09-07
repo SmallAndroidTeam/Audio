@@ -1,12 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
+
+   <View
+       android:id="@+id/bgView"
+       android:layout_width="match_parent"
+       android:layout_height="60dp"
+       app:layout_constraintBottom_toBottomOf="parent" />
+
+   <ImageView
+       android:id="@+id/album_pic_iv"
+       android:layout_width="40dp"
+       android:layout_height="40dp"
+       android:layout_marginLeft="16dp"
+       app:layout_constraintBottom_toBottomOf="@id/bgView"
+       app:layout_constraintLeft_toLeftOf="parent"
+       app:layout_constraintTop_toTopOf="@id/bgView"
+       tools:src="@mipmap/ic_launcher" />
+
+   <ImageView
+       android:id="@+id/player_tv"
+       android:layout_width="30dp"
+       android:layout_height="30dp"
+       android:layout_marginRight="16dp"
+       android:src="@drawable/widget_play_selector"
+       app:layout_constraintBottom_toBottomOf="@id/bgView"
+       app:layout_constraintRight_toRightOf="parent"
+       app:layout_constraintTop_toTopOf="@id/bgView"
+       tools:src="@mipmap/ic_launcher" />
+
+   <TextView
+       android:id="@+id/music_name_tv"
+       android:layout_width="0dp"
+       android:layout_height="wrap_content"
+       android:layout_marginLeft="10dp"
+       android:layout_marginRight="10dp"
+       android:ellipsize="marquee"
+       android:singleLine="true"
+       android:textColor="@android:color/white"
+       android:textSize="16sp"
+       app:layout_constraintLeft_toRightOf="@id/album_pic_iv"
+       app:layout_constraintRight_toLeftOf="@id/player_tv"
+       app:layout_constraintTop_toTopOf="@id/album_pic_iv"
+       tools:text="带你去旅行" />
+
+   <TextView
+       android:id="@+id/author_name_tv"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginLeft="10dp"
+       android:textColor="@android:color/white"
+       android:textSize="14sp"
+       app:layout_constraintBottom_toBottomOf="@id/album_pic_iv"
+       app:layout_constraintLeft_toRightOf="@id/album_pic_iv"
+       tools:text="张弛" />
+
    <ListView
-        android:id="@+id/ranking_song_list"
-
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        />
-
-</RelativeLayout>
+       android:id="@+id/musics_lv"
+       android:layout_width="match_parent"
+       android:layout_height="0dp"
+       android:layout_marginLeft="16dp"
+       app:layout_constraintBottom_toTopOf="@id/bgView"
+       app:layout_constraintTop_toTopOf="parent" />
+</android.support.constraint.ConstraintLayout>
