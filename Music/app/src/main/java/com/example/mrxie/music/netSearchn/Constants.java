@@ -1,4 +1,4 @@
-package com.example.mrxie.music.NetSearch;
+package com.example.mrxie.music.netSearchn;
 
 public class Constants {
 //    public static final String SP_NAME = "DRMPlayer";//保存状态值的名字

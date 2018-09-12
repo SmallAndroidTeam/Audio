@@ -1,8 +1,7 @@
-package com.example.mrxie.music.SongListInformation;
+package com.example.mrxie.music.songListInformation;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;

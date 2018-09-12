@@ -1,4 +1,4 @@
-package com.example.mrxie.music.Intent;
+package com.example.mrxie.music.intent;
 
 /**网易云音乐音乐描述实体*/
 public class MusicNeteaseVo {

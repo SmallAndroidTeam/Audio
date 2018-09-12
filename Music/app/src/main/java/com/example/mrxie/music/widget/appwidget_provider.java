@@ -7,23 +7,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.example.mrxie.music.R;
-import com.example.mrxie.music.Service.MusicService;
-import com.example.mrxie.music.SongListInformation.MusicIconLoader;
-import com.example.mrxie.music.Toast.OnlyOneToast;
-import com.example.mrxie.music.fragment.localMusicFragment;
-
-import java.io.PushbackInputStream;
+import com.example.mrxie.music.services.MusicService;
+import com.example.mrxie.music.songListInformation.MusicIconLoader;
 
 /**
  * Implementation of App Widget functionality.

@@ -1,4 +1,4 @@
-package com.example.mrxie.music.NetSearch;
+package com.example.mrxie.music.netSearchn;
 
 import java.io.Serializable;
 

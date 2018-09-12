@@ -1,6 +1,5 @@
 package com.example.mrxie.music.fragment;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -19,13 +18,13 @@ import com.example.mrxie.music.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class onlineMusicFragment extends Fragment implements View.OnClickListener{
+public class OnlineMusicFragment extends Fragment implements View.OnClickListener{
     private TextView title, item_weixin, item_tongxunlu, item_faxian, item_me;
     private ViewPager vp;
-    private OneFragment oneFragment;
-    private TwoFragment twoFragment;
-    private ThreeFragment threeFragment;
-    private FouthFragment fouthFragmen;
+    private LovingListFragment oneFragment;
+    private SingerListFragment twoFragment;
+    private NewSongFragment threeFragment;
+    private WaitDevelopFragment fouthFragmen;
     private List<Fragment> mFragmentList = new ArrayList<Fragment>();
     private FragmentAdapter mFragmentAdapter;
 
@@ -47,10 +46,10 @@ public class onlineMusicFragment extends Fragment implements View.OnClickListene
         item_me.setOnClickListener(this);
 
         vp = (ViewPager) view.findViewById(R.id.mainViewPager);
-        oneFragment = new OneFragment();
-        twoFragment = new TwoFragment();
-        threeFragment = new ThreeFragment();
-        fouthFragmen = new FouthFragment();
+        oneFragment = new LovingListFragment();
+        twoFragment = new SingerListFragment();
+        threeFragment = new NewSongFragment();
+        fouthFragmen = new WaitDevelopFragment();
         //给FragmentList添加数据
         mFragmentList.add(oneFragment);
         mFragmentList.add(twoFragment);

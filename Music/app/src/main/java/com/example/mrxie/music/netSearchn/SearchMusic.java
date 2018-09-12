@@ -1,4 +1,4 @@
-package com.example.mrxie.music.NetSearch;
+package com.example.mrxie.music.netSearchn;
 
 import android.os.Handler;
 import android.os.Message;

@@ -1,4 +1,4 @@
-package com.example.mrxie.music.Intent;
+package com.example.mrxie.music.intent;
 
 import android.util.Log;
 

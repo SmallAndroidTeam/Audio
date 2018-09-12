@@ -6,40 +6,31 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.text.StaticLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.example.mrxie.music.R;
-import com.example.mrxie.music.Service.MusicService;
-import com.example.mrxie.music.SongListInformation.Music;
-import com.example.mrxie.music.SongListInformation.MusicUtils;
-import com.example.mrxie.music.activity.LoadingActivity;
+import com.example.mrxie.music.services.MusicService;
+import com.example.mrxie.music.songListInformation.Music;
 import com.example.mrxie.music.activity.MainActivity;
-import com.example.mrxie.music.adapter.MusicListAdapter;
 import com.example.mrxie.music.adapter.SongNameAdapt;
 import com.example.mrxie.music.db.MusicOperator;
 import com.example.mrxie.music.info.MusicName;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
-public class OneFragment extends Fragment {
+public class LovingListFragment extends Fragment {
     private   MusicOperator lxrOperator;
     private String TAG = "Music";
       ListView lv;
@@ -114,9 +105,9 @@ public class OneFragment extends Fragment {
                     musicList.add(music);
                 }
 
-                if(!(localMusicFragment.sMusicList).equals(musicList))//点击之后变化歌单，如果当前歌单和此歌单不一致，则把当前的歌词设置为此歌单
+                if(!(LocalMusicFragment.sMusicList).equals(musicList))//点击之后变化歌单，如果当前歌单和此歌单不一致，则把当前的歌词设置为此歌单
                 {
-                    localMusicFragment.sMusicList=musicList;
+                    LocalMusicFragment.sMusicList=musicList;
                 }
 
                 //设置当前播放的音乐下标

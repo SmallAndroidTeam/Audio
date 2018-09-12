@@ -8,12 +8,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.mrxie.music.R;
-import com.example.mrxie.music.Service.MusicService;
-import com.example.mrxie.music.SongListInformation.App;
-import com.example.mrxie.music.SongListInformation.ImageTools;
-import com.example.mrxie.music.SongListInformation.MusicIconLoader;
+import com.example.mrxie.music.songListInformation.App;
+import com.example.mrxie.music.songListInformation.MusicIconLoader;
 
-import com.example.mrxie.music.SongListInformation.MusicUtils;
+import com.example.mrxie.music.songListInformation.MusicUtils;
 
 
 /**

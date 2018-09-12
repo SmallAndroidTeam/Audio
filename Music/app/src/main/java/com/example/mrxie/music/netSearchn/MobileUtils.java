@@ -1,10 +1,8 @@
-package com.example.mrxie.music.NetSearch;//package com.ofilm.test.viewpager1.utils;
+package com.example.mrxie.music.netSearchn;//package com.ofilm.test.viewpager1.utils;
 
 import android.content.Context;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-
-import com.example.mrxie.music.SongListInformation.App;
 
 // * 2015年8月15日 16:34:37
 // * 博文地址：http://blog.csdn.net/u010156024

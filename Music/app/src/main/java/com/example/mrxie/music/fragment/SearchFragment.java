@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.mrxie.music.NetSearch.SearchNetFragment;
+import com.example.mrxie.music.netSearchn.SearchNetFragment;
 import com.example.mrxie.music.R;
 import com.example.mrxie.music.adapter.TabFragmentPagerAdapter;
 
@@ -38,7 +38,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
 
         //把Fragment添加到list集合里面
         list = new ArrayList<>();
-        list.add(new searchMusicFragment());
+        list.add(new SearchMusicFragment());
         list.add(new SearchNetFragment());
 
         adapter = new TabFragmentPagerAdapter(getFragmentManager(),list);

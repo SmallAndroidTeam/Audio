@@ -1,14 +1,11 @@
 package com.example.mrxie.music.fragment;
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,23 +19,19 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.example.mrxie.music.R;
-import com.example.mrxie.music.Service.MusicService;
-import com.example.mrxie.music.SongListInformation.App;
-import com.example.mrxie.music.SongListInformation.Music;
-import com.example.mrxie.music.SongListInformation.MusicIconLoader;
-import com.example.mrxie.music.SongListInformation.MusicUtils;
-import com.example.mrxie.music.Toast.OnlyOneToast;
-import com.example.mrxie.music.activity.MainActivity;
+import com.example.mrxie.music.services.MusicService;
+import com.example.mrxie.music.songListInformation.App;
+import com.example.mrxie.music.songListInformation.Music;
+import com.example.mrxie.music.songListInformation.MusicIconLoader;
+import com.example.mrxie.music.songListInformation.MusicUtils;
+import com.example.mrxie.music.toast.OnlyOneToast;
 import com.example.mrxie.music.convertPXAndDP.DensityUtil;
 import com.example.mrxie.music.db.MusicOperator;
-import com.example.mrxie.music.db.MusicOperator;
-import com.example.mrxie.music.info.MusicName;
 import com.example.mrxie.music.ui.LrcView;
-import  com.example.mrxie.music.fragment.OneFragment;
 
 import java.util.ArrayList;
 
-public class localMusicFragment extends Fragment implements View.OnClickListener {
+public class LocalMusicFragment extends Fragment implements View.OnClickListener {
     private String TAG="Music";
     public static  ImageView mAddLikeMusicButton;
     private ImageView mSingleCycleMusicButton;
@@ -64,7 +57,7 @@ public class localMusicFragment extends Fragment implements View.OnClickListener
     private RelativeLayout RightPalyBoundary;
     public static MusicOperator lxrOperator;
     private static final int SET_RANKINGBEAN = 123;
-    private OneFragment oneFragment=new OneFragment();
+    private LovingListFragment oneFragment=new LovingListFragment();
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -82,8 +75,8 @@ public class localMusicFragment extends Fragment implements View.OnClickListener
 
     private void initLovebutton() {
         boolean isLike=false;
-        if(localMusicFragment.lxrOperator!=null) {
-            isLike = localMusicFragment.lxrOperator.CheckIsDataAlreadyInDBorNot(musicTitle.getText().toString());
+        if(LocalMusicFragment.lxrOperator!=null) {
+            isLike = LocalMusicFragment.lxrOperator.CheckIsDataAlreadyInDBorNot(musicTitle.getText().toString());
             if (isLike == true) {
                 mAddLikeMusicButton.setImageResource(R.drawable.like_image_selected);
 

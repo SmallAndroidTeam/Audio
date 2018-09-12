@@ -33,20 +33,20 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.mrxie.music.R;
-import com.example.mrxie.music.Service.MusicService;
-import com.example.mrxie.music.Toast.OnlyOneToast;
+import com.example.mrxie.music.services.MusicService;
+import com.example.mrxie.music.toast.OnlyOneToast;
 import com.example.mrxie.music.convertPXAndDP.DensityUtil;
 import com.example.mrxie.music.adapter.ContentAdapter;
 import com.example.mrxie.music.adapter.ContentModel;
+import com.example.mrxie.music.fragment.LocalMusicFragment;
 import com.example.mrxie.music.fragment.SearchFragment;
 import com.example.mrxie.music.fragment.TimingFragment;
-import com.example.mrxie.music.fragment.localMusicFragment;
-import com.example.mrxie.music.fragment.onlineMusicFragment;
-import com.example.mrxie.music.fragment.settingFragment;
-import com.example.mrxie.music.fragment.songListFragment;
+
+import com.example.mrxie.music.fragment.OnlineMusicFragment;
+import com.example.mrxie.music.fragment.SettingFragment;
+import com.example.mrxie.music.fragment.SongListFragment;
 import com.example.mrxie.music.ui.LrcView;
 import com.github.mjdev.libaums.UsbMassStorageDevice;
 
@@ -54,8 +54,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.security.auth.login.LoginException;
 
 import static java.lang.System.exit;
 
@@ -470,9 +468,9 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         mLvLeftMenu = (ListView) findViewById(R.id.id_lv_left_menu);
 
         setUpDrawer();
-        localMusicFragment.musicTitle=musicTitle;
+        LocalMusicFragment.musicTitle=musicTitle;
         MusicService.musicTitle=musicTitle;
-        localMusicFragment.activity=MainActivity.this;
+        LocalMusicFragment.activity=MainActivity.this;
 
     }
     private void setUpDrawer() {
@@ -582,7 +580,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             case 0://选中本地音乐
                 mLocalMusicButton.setBackgroundResource(R.drawable.localmusic_selected);//图标改变
                 if(mlocalMusicFragment==null){//初始化本地音乐页面localMusicFragment()
-                    mlocalMusicFragment=new localMusicFragment();
+                    mlocalMusicFragment=new LocalMusicFragment();
                     fragmentTransaction.add(R.id.IndexContent,mlocalMusicFragment);
                 }else{
                     fragmentTransaction.show(mlocalMusicFragment);
@@ -591,7 +589,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             case 1://选中歌曲列表的
                 msongListButton.setBackgroundResource(R.drawable.songlist_selected);//图标改变
                 if(msongListFragment==null){//初始化歌曲页面songListFragment()
-                    msongListFragment=new songListFragment();
+                    msongListFragment=new SongListFragment();
                     fragmentTransaction.add(R.id.IndexContent,msongListFragment);
                 }else{
                     fragmentTransaction.show(msongListFragment);
@@ -601,7 +599,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 monlineMusicButton.setBackgroundResource(R.drawable.onlinemusic_selected);//图标改变
 
                 if(monlineMusicFragment==null){//初始化在线音乐页面onlineMusicFragment()
-                    monlineMusicFragment=new onlineMusicFragment();
+                    monlineMusicFragment=new OnlineMusicFragment();
                     fragmentTransaction.add(R.id.IndexContent,monlineMusicFragment);
                 }else{
                     fragmentTransaction.show(monlineMusicFragment);
@@ -610,7 +608,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             case 3://选中设置按钮
                 msettingButton.setBackgroundResource(R.drawable.setting_selected);//图标改变
                 if(msettingFragment==null){//初始化设置页面settingFragment()
-                    msettingFragment=new settingFragment();
+                    msettingFragment=new SettingFragment();
                     fragmentTransaction.add(R.id.IndexContent,msettingFragment);
                 }else{
                     fragmentTransaction.show(msettingFragment);

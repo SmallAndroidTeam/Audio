@@ -1,4 +1,4 @@
-package com.example.mrxie.music.NetSearch;
+package com.example.mrxie.music.netSearchn;
 //
 //import android.content.Context;
 //import android.graphics.Bitmap;

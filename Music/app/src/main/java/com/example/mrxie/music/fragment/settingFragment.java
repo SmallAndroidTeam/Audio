@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 
 import com.example.mrxie.music.R;
 
-public class settingFragment extends Fragment {
+public class SettingFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

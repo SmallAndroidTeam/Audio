@@ -1,4 +1,4 @@
-package com.example.mrxie.music.Intent;
+package com.example.mrxie.music.intent;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

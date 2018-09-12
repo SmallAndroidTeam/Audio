@@ -1,9 +1,7 @@
-package com.example.mrxie.music.Toast;
+package com.example.mrxie.music.toast;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.Gravity;
-import android.widget.GridLayout;
 import android.widget.Toast;
 
 /**

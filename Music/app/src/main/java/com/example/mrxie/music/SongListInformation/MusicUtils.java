@@ -1,4 +1,4 @@
-package com.example.mrxie.music.SongListInformation;
+package com.example.mrxie.music.songListInformation;
 
 import java.io.File;
 import java.util.ArrayList;

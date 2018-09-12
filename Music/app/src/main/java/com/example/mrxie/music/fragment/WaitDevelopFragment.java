@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 
 import com.example.mrxie.music.R;
 
-public class FouthFragment extends Fragment {
+public class WaitDevelopFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater,

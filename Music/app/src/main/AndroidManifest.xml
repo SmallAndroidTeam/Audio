@@ -60,7 +60,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="landscape" />
 
-        <service android:name=".Service.MusicService" />
+        <service android:name=".services.MusicService" />
 
         <receiver android:name=".widget.appwidget_provider">
             <intent-filter>
@@ -100,7 +100,7 @@
         <!-- </intent-filter> -->
         <!-- </receiver> -->
         <receiver
-            android:name=".broadcastReceiver.usbBroadCastReceiver"
+            android:name=".broadcastReceiver.UsbBroadCastReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter android:priority="200">

@@ -11,22 +11,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.mrxie.music.R;
-import com.example.mrxie.music.Service.MusicService;
-import com.example.mrxie.music.SongListInformation.Music;
-import com.example.mrxie.music.SongListInformation.MusicUtils;
+import com.example.mrxie.music.services.MusicService;
+import com.example.mrxie.music.songListInformation.Music;
+import com.example.mrxie.music.songListInformation.MusicUtils;
 import com.example.mrxie.music.activity.MainActivity;
 import com.example.mrxie.music.adapter.ArtistAdapt;
-import com.example.mrxie.music.adapter.MusicListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TwoFragment extends Fragment {
+public class SingerListFragment extends Fragment {
 
 
     private ArtistAdapt    artistAdapter = new ArtistAdapt();
@@ -66,9 +64,9 @@ public class TwoFragment extends Fragment {
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if(!(localMusicFragment.sMusicList).equals(MusicUtils.sMusicList))//点击之后变化歌单，如果当前歌单和此歌单不一致，则把当前的歌词设置为此歌单
+                if(!(LocalMusicFragment.sMusicList).equals(MusicUtils.sMusicList))//点击之后变化歌单，如果当前歌单和此歌单不一致，则把当前的歌词设置为此歌单
                 {
-                    localMusicFragment.sMusicList=MusicUtils.sMusicList;
+                    LocalMusicFragment.sMusicList=MusicUtils.sMusicList;
                 }
 
                 //设置当前播放的音乐下标

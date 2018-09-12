@@ -1,39 +1,32 @@
 package com.example.mrxie.music.fragment;
 
-import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.mrxie.music.Intent.ImageLoaderUtil;
-import com.example.mrxie.music.Intent.MusicAdapter;
-import com.example.mrxie.music.Intent.MusicNeteaseVo;
-import com.example.mrxie.music.Intent.NetworkUtil;
-import com.example.mrxie.music.Intent.RequestHelper;
+import com.example.mrxie.music.intent.MusicAdapter;
+import com.example.mrxie.music.intent.MusicNeteaseVo;
+import com.example.mrxie.music.intent.NetworkUtil;
+import com.example.mrxie.music.intent.RequestHelper;
 import com.example.mrxie.music.R;
-import com.example.mrxie.music.Service.MusicService;
-import com.example.mrxie.music.SongListInformation.App;
+import com.example.mrxie.music.services.MusicService;
+import com.example.mrxie.music.songListInformation.App;
 
 
-import com.example.mrxie.music.SongListInformation.Music;
-import com.squareup.picasso.Picasso;
+import com.example.mrxie.music.songListInformation.Music;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,11 +36,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
-public class ThreeFragment extends Fragment implements View.OnClickListener
+public class NewSongFragment extends Fragment implements View.OnClickListener
         , AdapterView.OnItemClickListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
     /**
      * 请求音乐数据标志码
@@ -217,12 +206,13 @@ public class ThreeFragment extends Fragment implements View.OnClickListener
             Music music = new Music(musicNeteaseVo.title, musicNeteaseVo.url, musicNeteaseVo.pic, musicNeteaseVo.author, musicNeteaseVo.lrc);
             arrayList.add(music);
         }
-        localMusicFragment.sMusicList = arrayList;
+        LocalMusicFragment.sMusicList = arrayList;
         MusicService.playingMusicIndex = position;
         new MusicService().initMusic();
         Intent intent = new Intent(getActivity(), MusicService.class);
         intent.setAction(MusicService.TOGGLEPAUSE_ACTION);
         getActivity().startService(intent);
+        adapter.notifyDataSetChanged();
     }
 //        showSelectedMusicInfo(musics.get(position));
 //        playSelectedMusic(musics.get(position).url);

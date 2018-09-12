@@ -1,18 +1,13 @@
 package com.example.mrxie.music.broadcastReceiver;
 
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.hardware.usb.UsbDevice;
-import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
 import android.os.Build;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -20,18 +15,13 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.example.mrxie.music.R;
-import com.example.mrxie.music.Toast.OnlyOneToast;
 import com.example.mrxie.music.activity.LoadingActivity;
-import com.example.mrxie.music.activity.MainActivity;
 import com.github.mjdev.libaums.UsbMassStorageDevice;
-
-import java.util.HashMap;
-import java.util.Iterator;
 
 /**
  * 静态广播，如果有悬浮窗的权限则一插入U盘且没启动App就会有一个弹出提示是否打开AUDIO播放U盘内的歌曲
  */
-public class usbBroadCastReceiver extends BroadcastReceiver {
+public class UsbBroadCastReceiver extends BroadcastReceiver {
     public final  static String  USB_DEVICE_ATTACHED="android.hardware.usb.action.USB_DEVICE_ATTACHED";
     public final  static String USB_DEVICE_DETACHED="android.hardware.usb.action.USB_DEVICE_DETACHED";
     private final  static String TAG="Music";

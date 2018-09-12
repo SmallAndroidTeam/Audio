@@ -1,4 +1,4 @@
-package com.example.mrxie.music.Intent;
+package com.example.mrxie.music.intent;
 
 /**百度音乐描述实体*/
 public class MusicVo {

@@ -1,7 +1,6 @@
 package com.example.mrxie.music.adapter;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -9,14 +8,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.mrxie.music.R;
-import com.example.mrxie.music.SongListInformation.App;
-import com.example.mrxie.music.SongListInformation.Music;
-import com.example.mrxie.music.SongListInformation.MusicIconLoader;
-import com.example.mrxie.music.SongListInformation.MusicUtils;
-import com.example.mrxie.music.fragment.TwoFragment;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.example.mrxie.music.songListInformation.App;
+import com.example.mrxie.music.songListInformation.MusicIconLoader;
+import com.example.mrxie.music.songListInformation.MusicUtils;
+import com.example.mrxie.music.fragment.SingerListFragment;
 
 public class ArtistAdapt extends BaseAdapter{
 
@@ -33,12 +28,12 @@ public class ArtistAdapt extends BaseAdapter{
 
     @Override
     public int getCount() {
-        return TwoFragment.musicList.size();
+        return SingerListFragment.musicList.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return TwoFragment.musicList.get(position);
+        return SingerListFragment.musicList.get(position);
     }
 
     @Override
@@ -67,12 +62,12 @@ public class ArtistAdapt extends BaseAdapter{
         }else {
             holder.mark.setVisibility(View.INVISIBLE);
         }
-                Bitmap icon = MusicIconLoader.getInstance().load(TwoFragment.musicList.get(position).getImage());
+                Bitmap icon = MusicIconLoader.getInstance().load(SingerListFragment.musicList.get(position).getImage());
                 holder.icon.setImageBitmap(icon);
-            holder.title.setText(TwoFragment.musicList.get(position).getArtist());
+            holder.title.setText(SingerListFragment.musicList.get(position).getArtist());
             int k = 0;
             for (int i = 0; i < MusicUtils.sMusicList.size(); i++) {
-                if (TwoFragment.musicList.get(position).getArtist().equals(MusicUtils.sMusicList.get(i).getArtist())) {
+                if (SingerListFragment.musicList.get(position).getArtist().equals(MusicUtils.sMusicList.get(i).getArtist())) {
                     k++;
                 }
             }

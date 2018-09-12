@@ -19,7 +19,7 @@ import android.widget.TextView;
 
 import com.example.mrxie.music.R;
 
-import com.example.mrxie.music.SongListInformation.MusicIconLoader;
+import com.example.mrxie.music.songListInformation.MusicIconLoader;
 import com.example.mrxie.music.info.User;
 
 import java.util.ArrayList;

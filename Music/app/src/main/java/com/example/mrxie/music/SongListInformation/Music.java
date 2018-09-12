@@ -1,4 +1,4 @@
-package com.example.mrxie.music.SongListInformation;
+package com.example.mrxie.music.songListInformation;
 
 /**
  * 2015年8月15日 16:34:37

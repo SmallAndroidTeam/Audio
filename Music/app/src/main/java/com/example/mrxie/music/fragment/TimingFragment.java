@@ -1,7 +1,6 @@
 package com.example.mrxie.music.fragment;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.mrxie.music.R;
-import com.example.mrxie.music.Service.MusicService;
+import com.example.mrxie.music.services.MusicService;
 
 /**
  * Created by wm on 2016/3/22.
