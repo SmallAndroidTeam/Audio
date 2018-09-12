@@ -13,7 +13,18 @@ public class Music {
 	private String image; // icon
 	private String artist; // 艺术家
      private String lrcpath;//歌词路径
-
+	
+	public Music() {
+	}
+	
+	public Music(String title, String uri, String image, String artist, String lrcpath) {
+		this.title = title;
+		this.uri = uri;
+		this.image = image;
+		this.artist = artist;
+		this.lrcpath = lrcpath;
+	}
+	
 	public String getLrcpath() {
 		return lrcpath;
 	}

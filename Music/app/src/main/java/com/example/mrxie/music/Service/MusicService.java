@@ -44,6 +44,7 @@ import com.example.mrxie.music.Toast.OnlyOneToast;
 import com.example.mrxie.music.activity.MainActivity;
 import com.example.mrxie.music.db.MusicOperator;
 import com.example.mrxie.music.fragment.OneFragment;
+import com.example.mrxie.music.fragment.ThreeFragment;
 import com.example.mrxie.music.fragment.localMusicFragment;
 import com.example.mrxie.music.info.MusicName;
 import com.example.mrxie.music.ui.LrcView;
@@ -178,6 +179,7 @@ public final class MusicService extends Service {
                         mPlayMusicSeekBar.setMax(mediaPlayer.getDuration());
                     if (localMusicFragment.sMusicList.get(MusicService.playingMusicIndex).getImage() != null) {//如果音乐专辑图片存在
                         //  OnlyOneToast.makeText(localMusicFragment.activity,sMusicList.get(playingMusicIndex).getImage());
+                        
                         Bitmap bitmap = MusicIconLoader.getInstance().load(localMusicFragment.sMusicList.get(MusicService.playingMusicIndex).getImage());
                         if (MusicImage != null)
                             MusicImage.setImageBitmap(bitmap);
@@ -187,6 +189,7 @@ public final class MusicService extends Service {
                             MusicImage.setImageResource(R.drawable.image);
                         //OnlyOneToast.makeText(localMusicFragment.activity,"无图片");
                     }
+                    
                     if (showLrcView != null)
                         setLrc();//设置歌词的路径
                     if (mPlayMusicSeekBar != null)
@@ -195,7 +198,6 @@ public final class MusicService extends Service {
                         mPlayMusicStartTimeTextView.setText(changeDigitsToTwoDigits(mediaPlayer.getCurrentPosition() / 1000 / 60) + ":" + changeDigitsToTwoDigits(mediaPlayer.getCurrentPosition() / 1000 % 60));
                     if (mPlayMusicStopTimeTextView != null)
                         mPlayMusicStopTimeTextView.setText(changeDigitsToTwoDigits((mediaPlayer.getDuration()) / 1000 / 60) + ":" + changeDigitsToTwoDigits(mediaPlayer.getDuration() / 1000 % 60));
-
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -216,7 +218,7 @@ public final class MusicService extends Service {
                 OnlyOneToast.makeText(localMusicFragment.activity,"暂无歌曲");
                 return;
             }
-
+            
             if(mediaPlayer.isPlaying()){
                 mediaPlayer.pause();
                 handler.removeCallbacks(runnable);

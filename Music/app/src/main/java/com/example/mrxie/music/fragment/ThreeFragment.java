@@ -28,9 +28,11 @@ import com.example.mrxie.music.Intent.MusicNeteaseVo;
 import com.example.mrxie.music.Intent.NetworkUtil;
 import com.example.mrxie.music.Intent.RequestHelper;
 import com.example.mrxie.music.R;
+import com.example.mrxie.music.Service.MusicService;
 import com.example.mrxie.music.SongListInformation.App;
 
 
+import com.example.mrxie.music.SongListInformation.Music;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -142,7 +144,7 @@ public class ThreeFragment extends Fragment implements View.OnClickListener
         albumIv = view.findViewById(R.id.album_pic_iv);
         musicNameTv = view.findViewById(R.id.music_name_tv);
         authorTv = view.findViewById(R.id.author_name_tv);
-        playerIv = view.findViewById(R.id.player_tv);
+      
         musicLv = view.findViewById(R.id.musics_lv);
         initData();
         initAdapter();
@@ -172,7 +174,7 @@ public class ThreeFragment extends Fragment implements View.OnClickListener
      * 设置监听
      */
     private void setListener() {
-        playerIv.setOnClickListener(this);
+       
         musicLv.setOnItemClickListener(this);
         mediaPlayer.setOnPreparedListener(this);
         mediaPlayer.setOnCompletionListener(this);
@@ -199,25 +201,41 @@ public class ThreeFragment extends Fragment implements View.OnClickListener
     @Override
     public void onCompletion(MediaPlayer mp) {
         int nextPlayIndex = (++nowPlayingIndex) % musics.size();//获取下一首歌的位置索引，最后一首歌的下一首是第一首
-        showSelectedMusicInfo(musics.get(nextPlayIndex));//显示音乐信息
+//        showSelectedMusicInfo(musics.get(nextPlayIndex));//显示音乐信息
         playSelectedMusic(musics.get(nextPlayIndex).url);//播放音乐
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (position < 0 || position + 1 > musics.size())
-            return;
-        showSelectedMusicInfo(musics.get(position));
-        playSelectedMusic(musics.get(position).url);
-//        startThreadRequestMusicPath(musics.get(position).song_id);
-        nowPlayingIndex = position;
+//        if (position < 0 || position + 1 > musics.size())
+//            return;
+        //	public Music(String title, String uri, String image, String artist, String lrcpath)
+        final ArrayList<Music> arrayList = new ArrayList<>();
+        for (MusicNeteaseVo musicNeteaseVo : musics) {
+            Log.i("m", "onItemClick: " + musicNeteaseVo.lrc);
+            Log.i("musiciamge", musicNeteaseVo.pic);
+            Music music = new Music(musicNeteaseVo.title, musicNeteaseVo.url, musicNeteaseVo.pic, musicNeteaseVo.author, musicNeteaseVo.lrc);
+            arrayList.add(music);
+        }
+        localMusicFragment.sMusicList = arrayList;
+        MusicService.playingMusicIndex = position;
+        new MusicService().initMusic();
+        Intent intent = new Intent(getActivity(), MusicService.class);
+        intent.setAction(MusicService.TOGGLEPAUSE_ACTION);
+        getActivity().startService(intent);
     }
+//        showSelectedMusicInfo(musics.get(position));
+//        playSelectedMusic(musics.get(position).url);
+////        startThreadRequestMusicPath(musics.get(position).song_id);
+//        nowPlayingIndex = position;
+    
 
-    private void showSelectedMusicInfo(MusicNeteaseVo music) {
-        ImageLoaderUtil.loadPicByUrl(albumIv, music.pic);//加载图片
-        musicNameTv.setText(music.title);//显示歌名
-        authorTv.setText(music.author);//显示歌手
-    }
+
+//    private void showSelectedMusicInfo(MusicNeteaseVo music) {
+//        ImageLoaderUtil.loadPicByUrl(albumIv, music.pic);//加载图片
+//        musicNameTv.setText(music.title);//显示歌名
+//        authorTv.setText(music.author);//显示歌手
+//    }
 
     /**
      * 播放选中的音乐

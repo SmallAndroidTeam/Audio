@@ -75,7 +75,12 @@ public class OneFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        getActivity().unregisterReceiver(broadcastReceiver);
+        try {
+            getActivity().unregisterReceiver(broadcastReceiver);
+        }catch (RuntimeException e){
+            e.printStackTrace();
+        }
+       
     }
 
     //

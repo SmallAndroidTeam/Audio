@@ -17,4 +17,5 @@
         lrc:dividerHeight="20dp"
         lrc:rows="3"
         />
+
 </LinearLayout>

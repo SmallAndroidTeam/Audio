@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -19,12 +21,18 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.Scroller;
 
 import com.example.mrxie.music.R;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * 2015年8月15日 16:34:37
@@ -248,11 +256,46 @@ public class LrcView extends View {
 
 	// 外部提供方法
 	// 设置lrc的路径
-	public void setLrcPath(String path) {
+	public void setLrcPath(final  String path) {
 		reset();
 		File file = new File(path);
+		
 		if (!file.exists()) {
-			postInvalidate();
+			if(path.indexOf("http")!=-1){//是网络歌词路径
+			  new Thread(new Runnable() {
+				  @Override
+				  public void run() {
+					  try {
+						  OkHttpClient okHttpClient=new OkHttpClient();
+						  Request request=new Request.Builder().url(path).build();
+						  Response response=okHttpClient.newCall(request).execute();
+						  String lrc=response.body().string();
+						 String[] lrcLine=lrc.split("\n");
+						  String[] arr;
+						 for(String line:lrcLine){
+							 arr = parseLine(line);
+							 if (arr == null) continue;
+							
+							 // 如果解析出来只有一个
+							 if (arr.length == 1) {
+								 String last = mLrcs.remove(mLrcs.size() - 1);
+								 mLrcs.add(last + arr[0]);
+								 continue;
+							 }
+							 mTimes.add(Long.parseLong(arr[0]));
+							 mLrcs.add(arr[1]);
+						 }
+					  } catch (IOException e) {
+						  e.printStackTrace();
+					  }
+					
+				  }
+			  }).start();
+				
+			  
+			}else{
+				postInvalidate();
+			}
 			return;
 		}
 
