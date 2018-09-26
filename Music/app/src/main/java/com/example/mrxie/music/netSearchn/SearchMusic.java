@@ -3,6 +3,8 @@ package com.example.mrxie.music.netSearchn;
 import android.os.Handler;
 import android.os.Message;
 
+import com.example.mrxie.music.fragment.fragmentSearch.SearchNetFragment;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;

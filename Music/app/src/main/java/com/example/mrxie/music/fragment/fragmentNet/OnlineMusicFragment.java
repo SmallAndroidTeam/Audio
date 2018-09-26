@@ -1,4 +1,4 @@
-package com.example.mrxie.music.fragment;
+package com.example.mrxie.music.fragment.fragmentNet;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -14,6 +14,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.mrxie.music.R;
+import com.example.mrxie.music.fragment.LovingListFragment;
+import com.example.mrxie.music.fragment.SingerListFragment;
+import com.example.mrxie.music.fragment.WaitDevelopFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +31,7 @@ public class OnlineMusicFragment extends Fragment implements View.OnClickListene
     private List<Fragment> mFragmentList = new ArrayList<Fragment>();
     private FragmentAdapter mFragmentAdapter;
 
-    String[] titles = new String[]{"收藏列表", "通讯录", "发现", "待开发"};
+    //String[] titles = new String[]{"收藏列表", "通讯录", "发现", "待开发"};
 
     @Nullable
     @Override

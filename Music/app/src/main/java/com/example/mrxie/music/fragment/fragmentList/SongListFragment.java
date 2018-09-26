@@ -1,4 +1,4 @@
-package com.example.mrxie.music.fragment;
+package com.example.mrxie.music.fragment.fragmentList;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import  com.example.mrxie.music.R;
+import com.example.mrxie.music.fragment.LocalMusicFragment;
 import com.example.mrxie.music.services.MusicService;
 import com.example.mrxie.music.songListInformation.MusicUtils;
 import com.example.mrxie.music.activity.MainActivity;
@@ -24,7 +25,6 @@ import java.util.List;
 
 
 public class SongListFragment extends Fragment {
-
 
     private MusicListAdapter mMusicListAdapter = new MusicListAdapter();
     ListView lv;

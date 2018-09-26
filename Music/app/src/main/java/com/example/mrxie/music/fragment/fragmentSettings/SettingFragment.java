@@ -1,4 +1,4 @@
-package com.example.mrxie.music.fragment;
+package com.example.mrxie.music.fragment.fragmentSettings;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;

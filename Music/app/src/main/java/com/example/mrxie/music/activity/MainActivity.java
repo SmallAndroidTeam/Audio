@@ -41,12 +41,12 @@ import com.example.mrxie.music.convertPXAndDP.DensityUtil;
 import com.example.mrxie.music.adapter.ContentAdapter;
 import com.example.mrxie.music.adapter.ContentModel;
 import com.example.mrxie.music.fragment.LocalMusicFragment;
-import com.example.mrxie.music.fragment.SearchFragment;
+import com.example.mrxie.music.fragment.fragmentSearch.SearchFragment;
 import com.example.mrxie.music.fragment.TimingFragment;
 
-import com.example.mrxie.music.fragment.OnlineMusicFragment;
-import com.example.mrxie.music.fragment.SettingFragment;
-import com.example.mrxie.music.fragment.SongListFragment;
+import com.example.mrxie.music.fragment.fragmentNet.OnlineMusicFragment;
+import com.example.mrxie.music.fragment.fragmentSettings.SettingFragment;
+import com.example.mrxie.music.fragment.fragmentList.SongListFragment;
 import com.example.mrxie.music.ui.LrcView;
 import com.github.mjdev.libaums.UsbMassStorageDevice;
 

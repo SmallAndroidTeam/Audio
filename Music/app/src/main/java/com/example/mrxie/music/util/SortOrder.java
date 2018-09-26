@@ -11,7 +11,7 @@
  * governing permissions and limitations under the License.
  */
 
-package com.example.mrxie.music.ui;
+package com.example.mrxie.music.util;
 
 import android.provider.MediaStore;
 

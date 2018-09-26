@@ -1,4 +1,4 @@
-package com.example.mrxie.music.fragment;
+package com.example.mrxie.music.fragment.fragmentNet;
 
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.mrxie.music.fragment.LocalMusicFragment;
 import com.example.mrxie.music.intent.MusicAdapter;
 import com.example.mrxie.music.intent.MusicNeteaseVo;
 import com.example.mrxie.music.intent.NetworkUtil;
@@ -24,14 +25,10 @@ import com.example.mrxie.music.intent.RequestHelper;
 import com.example.mrxie.music.R;
 import com.example.mrxie.music.services.MusicService;
 import com.example.mrxie.music.songListInformation.App;
-
-
 import com.example.mrxie.music.songListInformation.Music;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

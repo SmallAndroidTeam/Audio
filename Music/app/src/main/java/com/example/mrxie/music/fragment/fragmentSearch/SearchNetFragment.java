@@ -1,4 +1,4 @@
-package com.example.mrxie.music.netSearchn;
+package com.example.mrxie.music.fragment.fragmentSearch;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -21,6 +21,11 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.mrxie.music.R;
+import com.example.mrxie.music.netSearchn.Constants;
+import com.example.mrxie.music.netSearchn.MobileUtils;
+import com.example.mrxie.music.netSearchn.SearchMusic;
+import com.example.mrxie.music.netSearchn.SearchResult;
+import com.example.mrxie.music.netSearchn.SearchResultAdapter;
 import com.example.mrxie.music.songListInformation.Music;
 
 
