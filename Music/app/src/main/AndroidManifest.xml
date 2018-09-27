@@ -29,7 +29,9 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-
+    <!-- 使用音场效果必要的权限 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
     <!-- 获取弹出系统对话框的权限 -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     // 手机必须支持USB主机特性(OTG)
@@ -59,6 +61,8 @@
             android:name=".activity.MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="landscape" />
+        <activity android:name=".activity.EqualizerActivity"
+            android:launchMode="singleTask"/>
 
         <service android:name=".services.MusicService" />
 

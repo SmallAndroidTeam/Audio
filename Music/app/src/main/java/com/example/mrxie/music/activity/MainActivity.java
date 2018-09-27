@@ -33,6 +33,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.mrxie.music.R;
 import com.example.mrxie.music.fragment.fragmentList.TabListFragment;
@@ -508,8 +509,16 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
                         break;
                     case 4:
-
                     case 5:
+                        if(MusicService.mediaPlayer.isPlaying()==false){
+                            Toast.makeText(MainActivity.this,"当前没有音乐播放",Toast.LENGTH_LONG).show();
+                        }else{
+                            Intent intent = new Intent(MainActivity.this,EqualizerActivity.class);
+                            startActivity(intent);
+                            drawerLayout.closeDrawers();
+                        }
+                        break;
+                    case 6:
                         exit(0);
                         break;
 
@@ -525,7 +534,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         list.add(new ContentModel(R.mipmap.topmenu_icn_skin, "主题换肤", 2));
         list.add(new ContentModel(R.mipmap.topmenu_icn_time, "定时关闭音乐", 3));
         list.add(new ContentModel(R.mipmap.topmenu_icn_vip, "下载歌曲品质", 4));
-        list.add(new ContentModel(R.mipmap.topmenu_icn_exit, "退出", 5));
+        list.add(new ContentModel(R.mipmap.topmenu_icn_equalizer, "均衡器", 5));
+        list.add(new ContentModel(R.mipmap.topmenu_icn_exit, "退出", 6));
 
     }
     private void initEvents() {

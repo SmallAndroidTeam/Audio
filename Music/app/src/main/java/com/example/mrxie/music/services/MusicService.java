@@ -13,18 +13,26 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
+import android.media.audiofx.Equalizer;
+import android.media.audiofx.Visualizer;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.example.mrxie.music.R;
+import com.example.mrxie.music.SharedPreferencesToSaveEQSeekBar.SharedPreferencesHelper;
+import com.example.mrxie.music.activity.EqualizerActivity;
+import com.example.mrxie.music.defineViewd.VisualizerView;
 import com.example.mrxie.music.songListInformation.App;
 import com.example.mrxie.music.songListInformation.MusicIconLoader;
 import com.example.mrxie.music.songListInformation.MusicUtils;
@@ -87,6 +95,15 @@ public final class MusicService extends Service {
           handleCommandIntent(intent);
         }
     };
+
+    // 定义系统的频谱
+    public Visualizer mVisualizer;
+    // 定义系统的均衡器
+    public Equalizer mEqualizer;
+    public VisualizerView mVisualizerView;
+    public static final float VISUALIZER_HEIGHT_DIP = 50f;
+    private SharedPreferencesHelper sharedPreferencesHelper = new SharedPreferencesHelper(App.sContext,"EqualizerSeekbar");
+    public int progress_pre=0;
     @Override
     public void onCreate() {
         //注册广播
@@ -741,6 +758,143 @@ public final class MusicService extends Service {
 
         return super.onStartCommand(intent, flags, startId);
     }
+    /*
+     *
+     *    均衡器
+     *
+     * */
+    public void setupEqualizerFxAndUI() {
+        // Create the Equalizer object (an AudioEffect subclass) and attach it
+        // to our media player,
+        // with a default priority (0).
+        mEqualizer = new Equalizer(0, mediaPlayer.getAudioSessionId());
+        mEqualizer.setEnabled(true);
+
+        TextView eqTextView = new TextView(App.sContext);
+        eqTextView.setText("Equalizer:");
+        EqualizerActivity.mLinearLayout.addView(eqTextView);
+        // 获取均衡控制器支持最小值和最大值
+        final short minEQLevel = mEqualizer.getBandLevelRange()[0];
+        final short maxEQLevel = mEqualizer.getBandLevelRange()[1];
+        // 获取均衡控制器支持的所有频率
+        short bands = mEqualizer.getNumberOfBands();
+        for (short i = 0; i < bands; i++) {
+            final short band = i;
+            //创建一个TextView，用于显示频率
+            TextView freqTextView = new TextView(App.sContext);
+            freqTextView.setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
+            freqTextView.setGravity(Gravity.CENTER_HORIZONTAL);
+            //设置该均衡控制器的频率
+            freqTextView.setText((mEqualizer.getCenterFreq(band) / 1000)
+                    + " Hz");
+            EqualizerActivity.mLinearLayout.addView(freqTextView);
+            //创建一个水平排列组件的LinearLayout
+            LinearLayout row = new LinearLayout(App.sContext);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            //创建显示均衡控制器最小值的TextView
+            TextView minDbTextView = new TextView(App.sContext);
+            minDbTextView.setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
+            //显示均衡控制器的最小值
+            minDbTextView.setText((minEQLevel / 100) + " dB");
+            //创建显示均衡控制器最大值的TextView
+            TextView maxDbTextView = new TextView(App.sContext);
+            maxDbTextView.setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
+            //显示均衡控制器的最大值
+            maxDbTextView.setText((maxEQLevel / 100) + " dB");
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            layoutParams.weight = 1;
+            //定义SeekBar作为调整工具
+            SeekBar bar = new SeekBar(App.sContext);
+            bar.setLayoutParams(layoutParams);
+            bar.setMax(maxEQLevel - minEQLevel);
+            bar.setProgress(mEqualizer.getBandLevel(band)-minEQLevel);
+            Log.i(TAG, "setupEqualizerFxAndUI: mEqualizer.getBandLevel(band):"+mEqualizer.getBandLevel(band));
+            //为SeekBar的拖动事件设置事件监听器
+
+            bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                public void onProgressChanged(SeekBar seekBar, int progress,
+                                              boolean fromUser) {
+                    // 设置该频率的均衡值
+                    //progress_pre=Integer.parseInt(sharedPreferencesHelper.getSharedPreference("SeekBar",progress + minEQLevel).toString());
+                    mEqualizer.setBandLevel(band,(short) (progress + minEQLevel));//设置每个模式为需要的值
+                    //sharedPreferencesHelper.remove("SeekBar");
+                    //sharedPreferencesHelper.put("SeekBar",progress + minEQLevel);
+                    int s =progress+minEQLevel;
+                    Log.i(TAG, "setupEqualizerFxAndUI:progress_pre+minEQLevel:"+ s);
+//                    if(fromUser){
+//                        sharedPreferencesHelper.remove("SeekBar");
+//                        mEqualizer.setBandLevel(band,(short) (progress + minEQLevel));
+//                        sharedPreferencesHelper.put("SeekBar",progress);
+//                        Log.i(TAG, "onProgressChanged: sharedPreferencesHelper fromUser true"+progress);
+//                    }else {
+//                        progress=Integer.parseInt(sharedPreferencesHelper.getSharedPreference("SeekBar",progress).toString());
+//                        mEqualizer.setBandLevel(band,(short) (progress + minEQLevel));
+//                        Log.i(TAG, "onProgressChanged: sharedPreferencesHelper fromUser false");
+//                    }
+
+                }
+
+                public void onStartTrackingTouch(SeekBar seekBar) {
+                }
+
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                }
+            });
+            //使用水平排列组件的LinearLayout盛装三个组件
+            row.addView(minDbTextView);
+            row.addView(bar);
+            row.addView(maxDbTextView);
+            //将水平排列组件的LinearLayout添加到myLayout容器中
+            EqualizerActivity.mLinearLayout.addView(row);
+        }
+    }
+    public void setupVisualizerFxAndUI() {
+        // Create a VisualizerView (defined below), which will render the
+        // simplified audio
+        // wave form to a Canvas.
+        // 创建一个VisualizerView（在下面定义），它将简化的音频波形呈现给Canvas。
+        // 创建MyVisualizerView组件，用于显示波形图
+        mVisualizerView = new VisualizerView(App.sContext);
+        mVisualizerView.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                (int) (VISUALIZER_HEIGHT_DIP * 2.0)));
+        // 将VisualizerView组件添加到layout容器中
+        EqualizerActivity.mLinearLayout.addView(mVisualizerView);
+
+        // Create the Visualizer object and attach it to our media player.
+        if(mVisualizer!=null){
+            mVisualizer=null;
+        }
+        // 创建Visualizer对象并将其附加到我们的媒体播放器。
+        // 以MediaPlayer的AudioSessionId创建Visualizer
+        // 相当于设置Visualizer负责显示该MediaPlayer的音频数据
+        mVisualizer = new Visualizer(mediaPlayer.getAudioSessionId());
+        mVisualizer.setEnabled(false);
+        mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
+        // 为mVisualizer设置监听器
+        mVisualizer.setDataCaptureListener(
+                new Visualizer.OnDataCaptureListener() {
+                    public void onWaveFormDataCapture(Visualizer visualizer,
+                                                      byte[] bytes, int samplingRate) {
+                        mVisualizerView.updateVisualizer(bytes);
+                    }
+
+
+                    public void onFftDataCapture(Visualizer visualizer,
+                                                 byte[] bytes, int samplingRate) {
+                    }
+                }, Visualizer.getMaxCaptureRate() / 2, true, false);
+    }
+
+
 
     @Override
     public void onDestroy() {//当关闭服务时
