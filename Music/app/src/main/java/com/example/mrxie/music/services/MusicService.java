@@ -778,6 +778,7 @@ public final class MusicService extends Service {
         final short maxEQLevel = mEqualizer.getBandLevelRange()[1];
         // 获取均衡控制器支持的所有频率
         short bands = mEqualizer.getNumberOfBands();
+        final String []SharePreferencesKeyvalue={"band1","band2","band3","band4","band5"};
         for (short i = 0; i < bands; i++) {
             final short band = i;
             //创建一个TextView，用于显示频率
@@ -815,20 +816,28 @@ public final class MusicService extends Service {
             SeekBar bar = new SeekBar(App.sContext);
             bar.setLayoutParams(layoutParams);
             bar.setMax(maxEQLevel - minEQLevel);
-            bar.setProgress(mEqualizer.getBandLevel(band)-minEQLevel);
-            Log.i(TAG, "setupEqualizerFxAndUI: mEqualizer.getBandLevel(band):"+mEqualizer.getBandLevel(band));
+            if(sharedPreferencesHelper.getSharedPreference(SharePreferencesKeyvalue[band],mEqualizer.getBandLevel(band))==null){
+                bar.setProgress(mEqualizer.getBandLevel(band)-minEQLevel);
+                Log.i(TAG, "setupEqualizerFxAndUI: sharedPreferencesHelper.getSharedPreference==null");
+            }else {
+                progress_pre=Integer.parseInt(sharedPreferencesHelper.getSharedPreference(SharePreferencesKeyvalue[band],mEqualizer.getBandLevel(band)).toString());
+                bar.setProgress(progress_pre-minEQLevel);
+                Log.i(TAG, "setupEqualizerFxAndUI: progress_pre:"+progress_pre);
+            }
+
             //为SeekBar的拖动事件设置事件监听器
 
             bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
                 public void onProgressChanged(SeekBar seekBar, int progress,
                                               boolean fromUser) {
                     // 设置该频率的均衡值
-                    //progress_pre=Integer.parseInt(sharedPreferencesHelper.getSharedPreference("SeekBar",progress + minEQLevel).toString());
+                    //progress_pre=Integer.parseInt(sharedPreferencesHelper.getSharedPreference("SeekBar",mEqualizer.getBandLevel(band)).toString());
                     mEqualizer.setBandLevel(band,(short) (progress + minEQLevel));//设置每个模式为需要的值
                     //sharedPreferencesHelper.remove("SeekBar");
-                    //sharedPreferencesHelper.put("SeekBar",progress + minEQLevel);
-                    int s =progress+minEQLevel;
-                    Log.i(TAG, "setupEqualizerFxAndUI:progress_pre+minEQLevel:"+ s);
+                    sharedPreferencesHelper.put(SharePreferencesKeyvalue[band],mEqualizer.getBandLevel(band));
+                    Log.i(TAG, SharePreferencesKeyvalue[band]+mEqualizer.getBandLevel(band));
+                    //Log.i(TAG, "setupEqualizerFxAndUI: progress:"+progress);
 //                    if(fromUser){
 //                        sharedPreferencesHelper.remove("SeekBar");
 //                        mEqualizer.setBandLevel(band,(short) (progress + minEQLevel));
