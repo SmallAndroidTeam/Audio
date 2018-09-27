@@ -35,6 +35,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.mrxie.music.R;
+import com.example.mrxie.music.fragment.fragmentList.TabListFragment;
 import com.example.mrxie.music.services.MusicService;
 import com.example.mrxie.music.toast.OnlyOneToast;
 import com.example.mrxie.music.convertPXAndDP.DensityUtil;
@@ -589,7 +590,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             case 1://选中歌曲列表的
                 msongListButton.setBackgroundResource(R.drawable.songlist_selected);//图标改变
                 if(msongListFragment==null){//初始化歌曲页面songListFragment()
-                    msongListFragment=new SongListFragment();
+                    //msongListFragment=new SongListFragment();
+                    msongListFragment = new TabListFragment();
                     fragmentTransaction.add(R.id.IndexContent,msongListFragment);
                 }else{
                     fragmentTransaction.show(msongListFragment);
