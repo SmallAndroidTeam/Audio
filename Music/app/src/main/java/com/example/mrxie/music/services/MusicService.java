@@ -778,7 +778,7 @@ public final class MusicService extends Service {
         final short maxEQLevel = mEqualizer.getBandLevelRange()[1];
         // 获取均衡控制器支持的所有频率
         short bands = mEqualizer.getNumberOfBands();
-        final String []SharePreferencesKeyvalue={"band1","band2","band3","band4","band5"};
+        final String []SharePreferencesKeyvalue={"band1","band2","band3","band4","band5"};//SharePreferences键值的名称
         for (short i = 0; i < bands; i++) {
             final short band = i;
             //创建一个TextView，用于显示频率
@@ -832,22 +832,9 @@ public final class MusicService extends Service {
                 public void onProgressChanged(SeekBar seekBar, int progress,
                                               boolean fromUser) {
                     // 设置该频率的均衡值
-                    //progress_pre=Integer.parseInt(sharedPreferencesHelper.getSharedPreference("SeekBar",mEqualizer.getBandLevel(band)).toString());
                     mEqualizer.setBandLevel(band,(short) (progress + minEQLevel));//设置每个模式为需要的值
-                    //sharedPreferencesHelper.remove("SeekBar");
                     sharedPreferencesHelper.put(SharePreferencesKeyvalue[band],mEqualizer.getBandLevel(band));
                     Log.i(TAG, SharePreferencesKeyvalue[band]+mEqualizer.getBandLevel(band));
-                    //Log.i(TAG, "setupEqualizerFxAndUI: progress:"+progress);
-//                    if(fromUser){
-//                        sharedPreferencesHelper.remove("SeekBar");
-//                        mEqualizer.setBandLevel(band,(short) (progress + minEQLevel));
-//                        sharedPreferencesHelper.put("SeekBar",progress);
-//                        Log.i(TAG, "onProgressChanged: sharedPreferencesHelper fromUser true"+progress);
-//                    }else {
-//                        progress=Integer.parseInt(sharedPreferencesHelper.getSharedPreference("SeekBar",progress).toString());
-//                        mEqualizer.setBandLevel(band,(short) (progress + minEQLevel));
-//                        Log.i(TAG, "onProgressChanged: sharedPreferencesHelper fromUser false");
-//                    }
 
                 }
 
