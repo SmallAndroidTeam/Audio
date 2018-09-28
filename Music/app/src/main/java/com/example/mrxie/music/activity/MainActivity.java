@@ -37,6 +37,7 @@ import android.widget.Toast;
 
 import com.example.mrxie.music.R;
 import com.example.mrxie.music.fragment.fragmentList.TabListFragment;
+import com.example.mrxie.music.fragment.fragmentSettings.SourcequalityFragment;
 import com.example.mrxie.music.services.MusicService;
 import com.example.mrxie.music.toast.OnlyOneToast;
 import com.example.mrxie.music.convertPXAndDP.DensityUtil;
@@ -509,6 +510,10 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
                         break;
                     case 4:
+                        SourcequalityFragment fragment4 = new SourcequalityFragment();
+                        fragment4.show(getSupportFragmentManager(), "quality");
+                        drawerLayout.closeDrawers();
+                        break;
                     case 5:
                         if(MusicService.mediaPlayer.isPlaying()==false){
                             Toast.makeText(MainActivity.this,"当前没有音乐播放",Toast.LENGTH_LONG).show();
