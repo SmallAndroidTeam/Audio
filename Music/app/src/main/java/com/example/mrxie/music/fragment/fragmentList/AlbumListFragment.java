@@ -1,4 +1,4 @@
-package com.example.mrxie.music.fragment;
+package com.example.mrxie.music.fragment.fragmentList;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

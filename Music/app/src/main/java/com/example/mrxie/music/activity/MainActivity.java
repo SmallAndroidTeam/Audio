@@ -49,7 +49,6 @@ import com.example.mrxie.music.fragment.TimingFragment;
 
 import com.example.mrxie.music.fragment.fragmentNet.OnlineMusicFragment;
 import com.example.mrxie.music.fragment.fragmentSettings.SettingFragment;
-import com.example.mrxie.music.fragment.fragmentList.SongListFragment;
 import com.example.mrxie.music.ui.LrcView;
 import com.github.mjdev.libaums.UsbMassStorageDevice;
 

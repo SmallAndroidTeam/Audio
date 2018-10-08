@@ -1,4 +1,4 @@
-package com.example.mrxie.music.fragment.fragmentList;
+package com.example.mrxie.music.fragment;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;

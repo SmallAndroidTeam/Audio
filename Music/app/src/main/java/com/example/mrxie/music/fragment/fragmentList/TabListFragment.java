@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.example.mrxie.music.R;
-import com.example.mrxie.music.fragment.AlbumListFragment;
 import com.example.mrxie.music.songListInformation.App;
 import com.example.mrxie.music.songListInformation.MusicUtils;
 import com.example.mrxie.music.ui.IConstants;
@@ -23,6 +22,7 @@ import com.example.mrxie.music.util.CommonUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+//所有列表的主界面
 public class TabListFragment extends Fragment implements  View.OnClickListener{
 
     private TextView tvRecently, tvFavority, tvSong, tvArtist, tvAlbum, tvDownload, tvUsb;
