@@ -6,7 +6,7 @@
     android:orientation="horizontal"
   
     android:layout_height="20dp">
-    <com.example.mrxie.music.defineViewd.AlwaysMarqueeTextView
+    <com.of.music.defineViewd.AlwaysMarqueeTextView
         android:id="@+id/musicTitle"
         android:layout_width="20dp"
         android:layout_height="wrap_content"

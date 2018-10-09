@@ -5,8 +5,8 @@
     android:gravity="center"
     android:id="@+id/lrcLinearLayout"
     >
-    <com.example.mrxie.music.ui.LrcView
-        xmlns:lrc="http://schemas.android.com/apk/res/com.example.mrxie.music"
+    <com.of.music.ui.LrcView
+        xmlns:lrc="http://schemas.android.com/apk/res/com.of.music"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/show_lyric"
