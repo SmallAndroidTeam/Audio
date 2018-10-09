@@ -20,7 +20,7 @@ import android.widget.TextView;
 
 import com.example.mrxie.music.R;
 import com.example.mrxie.music.services.MusicService;
-import com.example.mrxie.music.songListInformation.App;
+import com.example.mrxie.music.Application.App;
 import com.example.mrxie.music.songListInformation.Music;
 import com.example.mrxie.music.songListInformation.MusicIconLoader;
 import com.example.mrxie.music.songListInformation.MusicUtils;

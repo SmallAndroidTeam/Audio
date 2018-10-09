@@ -50,6 +50,7 @@ import com.example.mrxie.music.fragment.TimingFragment;
 import com.example.mrxie.music.fragment.fragmentNet.OnlineMusicFragment;
 import com.example.mrxie.music.fragment.fragmentSettings.SettingFragment;
 import com.example.mrxie.music.ui.LrcView;
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.github.mjdev.libaums.UsbMassStorageDevice;
 
 import java.util.ArrayList;
@@ -90,6 +91,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fresco.initialize(this);
         //无标题
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         //全屏

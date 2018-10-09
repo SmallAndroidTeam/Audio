@@ -13,21 +13,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.example.mrxie.music.R;
 import com.example.mrxie.music.info.MusicInfo;
-import com.example.mrxie.music.songListInformation.App;
+import com.example.mrxie.music.Application.App;
 import com.example.mrxie.music.songListInformation.MusicUtils;
 import com.example.mrxie.music.ui.IConstants;
 import com.example.mrxie.music.util.PreferencesUtility;
 import com.example.mrxie.music.util.SortOrder;
 import com.example.mrxie.music.util.comparator.MusicComparator;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-//��������list
 public class MusicListFragment extends Fragment {
     private static final String TAG = "MusicListFragment";
     private Adapter mAdapter;

@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.example.mrxie.music.R;
-import com.example.mrxie.music.songListInformation.App;
+import com.example.mrxie.music.Application.App;
 import com.example.mrxie.music.songListInformation.MusicUtils;
 import com.example.mrxie.music.ui.IConstants;
 import com.example.mrxie.music.util.CommonUtils;

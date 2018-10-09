@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 
+import com.example.mrxie.music.Application.App;
 import com.example.mrxie.music.info.AlbumInfo;
 import com.example.mrxie.music.info.ArtistInfo;
 import com.example.mrxie.music.info.MusicInfo;

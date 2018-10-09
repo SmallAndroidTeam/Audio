@@ -1,4 +1,4 @@
-package com.example.mrxie.music.songListInformation;
+package com.example.mrxie.music.Application;
 
 import android.app.Application;
 import android.content.Context;
@@ -6,15 +6,11 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
 
-/**
- * 2015年8月15日 16:34:37
- * 博文地址：http://blog.csdn.net/u010156024
- */
 public class App extends Application {
 	public static Context sContext;
 	public static int sScreenWidth;
 	public static int sScreenHeight;
-	private String TAG="Music";
+	private String TAG="App";
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -26,5 +22,4 @@ public class App extends Application {
 		sScreenWidth = dm.widthPixels;
 		sScreenHeight = dm.heightPixels;
 	}
-	
 }

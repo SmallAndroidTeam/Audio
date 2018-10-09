@@ -24,7 +24,7 @@ import com.example.mrxie.music.intent.NetworkUtil;
 import com.example.mrxie.music.intent.RequestHelper;
 import com.example.mrxie.music.R;
 import com.example.mrxie.music.services.MusicService;
-import com.example.mrxie.music.songListInformation.App;
+import com.example.mrxie.music.Application.App;
 import com.example.mrxie.music.songListInformation.Music;
 import org.json.JSONArray;
 import org.json.JSONException;
