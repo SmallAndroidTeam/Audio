@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-//±¾µØÒôÀÖlist
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½list
 public class MusicListFragment extends Fragment {
     private static final String TAG = "MusicListFragment";
     private Adapter mAdapter;
@@ -129,7 +129,7 @@ public class MusicListFragment extends Fragment {
             return new ListItemViewHolder(LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.fragment_music_list_item,viewGroup,false));
         }
 
-        //½«Êý¾ÝÓë½çÃæ½øÐÐ°ó¶¨
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð°ï¿½
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position){
             MusicInfo model = null;
@@ -142,7 +142,7 @@ public class MusicListFragment extends Fragment {
                 ((ListItemViewHolder)holder).title.setText(model.artist.toString());
 
                 //--------------------------------------------------------------------------------------
-                // ÅÐ¶Ï¸ÃÌõÄ¿ÒôÀÖÊÇ·ñÔÚ²¥·Å À´ÏÔÊ¾»òÕßÒþ²Ø²¥·Å×´Ì¬Í¼±ê
+                // ï¿½Ð¶Ï¸ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø²ï¿½ï¿½ï¿½×´Ì¬Í¼ï¿½ï¿½
                 // MusicPlayer
             }
         }
@@ -169,7 +169,7 @@ public class MusicListFragment extends Fragment {
                     @Override
                     public void onClick(View v){
                         //-------------------------------------------------------------------------------
-                        // Ìí¼Ó moreOverflow µÄµã»÷ÊÂ¼þ
+                        // ï¿½ï¿½ï¿½ moreOverflow ï¿½Äµï¿½ï¿½ï¿½Â¼ï¿½
                     }
                 });
 

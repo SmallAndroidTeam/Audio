@@ -84,6 +84,7 @@ public class TabListFragment extends Fragment implements  View.OnClickListener{
         vpTablist.setAdapter(mFragmentAdapter);
         mFragmentAdapter.notifyDataSetChanged();
         vpTablist.setCurrentItem(2);//默认显示单曲列表
+        tvSong.setTextColor(getResources().getColor(R.color.red));
         // ViewPager的监听事件
         vpTablist.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -108,33 +109,49 @@ public class TabListFragment extends Fragment implements  View.OnClickListener{
     @Override
     public void onClick(View v)
     {
-
+        resetTvColor();
         switch (v.getId()) {
         case R.id.tv_recently:
             vpTablist.setCurrentItem(0, true);
+            tvRecently.setTextColor(getResources().getColor(R.color.red));
             break;
         case R.id.tv_favority:
             vpTablist.setCurrentItem(1, true);
+            tvFavority.setTextColor(getResources().getColor(R.color.red));
             break;
         case R.id.tv_song:
             vpTablist.setCurrentItem(2, true);
+            tvSong.setTextColor(getResources().getColor(R.color.red));
             break;
         case R.id.tv_artist:
             vpTablist.setCurrentItem(3, true);
+            tvArtist.setTextColor(getResources().getColor(R.color.red));
             break;
         case R.id.tv_album:
             vpTablist.setCurrentItem(4, true);
+            tvAlbum.setTextColor(getResources().getColor(R.color.red));
             break;
         case R.id.tv_download:
             vpTablist.setCurrentItem(5, true);
+            tvDownload.setTextColor(getResources().getColor(R.color.red));
             break;
         case R.id.tv_usb:
             vpTablist.setCurrentItem(6, true);
+            tvUsb.setTextColor(getResources().getColor(R.color.red));
             break;
         default:
                 break;
          }
+    }
 
+    private void resetTvColor(){
+        tvRecently.setTextColor(getResources().getColor(R.color.text_color));
+        tvFavority.setTextColor(getResources().getColor(R.color.text_color));
+        tvSong.setTextColor(getResources().getColor(R.color.text_color));
+        tvArtist.setTextColor(getResources().getColor(R.color.text_color));
+        tvAlbum.setTextColor(getResources().getColor(R.color.text_color));
+        tvDownload.setTextColor(getResources().getColor(R.color.text_color));
+        tvUsb.setTextColor(getResources().getColor(R.color.text_color));
     }
 
     //设置音乐overflow条目
