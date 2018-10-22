@@ -13,7 +13,8 @@ public class Music {
 	private String image; // icon
 	private String artist; // 艺术家
      private String lrcpath;//歌词路径
-	
+	private long duration;
+	private String album;
 	public Music() {
 	}
 	
@@ -79,6 +80,20 @@ public class Music {
 
 	public void setArtist(String artist) {
 		this.artist = artist;
+	}
+	public String getAlbum() {
+		return album;
+	}
+	
+	public void setAlbum(String album) {
+		this.album = album;
+	}
+	public long getDuration() {
+		return duration;
+	}
+	
+	public void setDuration(long duration) {
+		this.duration = duration;
 	}
 
 }

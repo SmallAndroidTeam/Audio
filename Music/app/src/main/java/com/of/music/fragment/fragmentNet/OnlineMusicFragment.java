@@ -7,15 +7,22 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import com.of.music.Application.App;
 import com.of.music.R;
+import com.of.music.activity.ControlPanel;
+import com.of.music.adapter.Bind;
 import com.of.music.fragment.LovingListFragment;
 import com.of.music.fragment.SingerListFragment;
 import com.of.music.fragment.WaitDevelopFragment;
+import com.of.music.services.AudioPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,14 +36,15 @@ public class OnlineMusicFragment extends Fragment implements View.OnClickListene
     private WaitDevelopFragment fouthFragmen;
     private List<Fragment> mFragmentList = new ArrayList<Fragment>();
     private FragmentAdapter mFragmentAdapter;
-
+   
+   
     //String[] titles = new String[]{"收藏列表", "通讯录", "发现", "待开发"};
-
+    private boolean isPlayFragmentShow;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.onlinemusic, container, false);
-//        title = (TextView) view.findViewById(R.id.title);
+      
         item_weixin = (TextView) view.findViewById(R.id.item_weixin);
         item_tongxunlu = (TextView) view.findViewById(R.id.item_tongxunlu);
         item_faxian = (TextView) view.findViewById(R.id.item_faxian);
@@ -60,7 +68,7 @@ public class OnlineMusicFragment extends Fragment implements View.OnClickListene
 
         mFragmentAdapter = new FragmentAdapter(getFragmentManager(), mFragmentList);
         vp.setOffscreenPageLimit(4);//ViewPager的缓存为4帧
- mFragmentAdapter.notifyDataSetChanged();
+        mFragmentAdapter.notifyDataSetChanged();
         vp.setAdapter(mFragmentAdapter);
         vp.setCurrentItem(0);//初始设置ViewPager选中第一帧
         item_weixin.setTextColor(Color.parseColor("#66CDAA"));
@@ -97,19 +105,21 @@ public class OnlineMusicFragment extends Fragment implements View.OnClickListene
         switch (v.getId()) {
             case R.id.item_weixin:
                 vp.setCurrentItem(0, true);
+                
                 break;
             case R.id.item_tongxunlu:
                 vp.setCurrentItem(1, true);
                 break;
             case R.id.item_faxian:
                 vp.setCurrentItem(2, true);
-
                 break;
             case R.id.item_me:
                 vp.setCurrentItem(3, true);
                 break;
+          
         }
     }
+   
 
 
     public class FragmentAdapter extends FragmentPagerAdapter {

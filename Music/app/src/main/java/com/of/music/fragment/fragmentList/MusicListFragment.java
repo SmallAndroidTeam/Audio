@@ -131,17 +131,11 @@ public class MusicListFragment extends Fragment {
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position){
             MusicInfo model = null;
-            //if (position > 0 ){
                 model = mList.get(position);
-            //}
             if (holder instanceof ListItemViewHolder)
             {
                 ((ListItemViewHolder)holder).mainTitle.setText(model.musicName.toString());
                 ((ListItemViewHolder)holder).title.setText(model.artist.toString());
-
-                //--------------------------------------------------------------------------------------
-                // �жϸ���Ŀ�����Ƿ��ڲ��� ����ʾ�������ز���״̬ͼ��
-                // MusicPlayer
             }
         }
 
