@@ -1,0 +1,178 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:id="@+id/activityRoot"
+    android:layout_height="match_parent"
+
+
+
+
+    android:background="#faf4f4"
+    tools:context=".activity.EqualizerActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:background="#FFA99B9F">
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="保存" />
+
+        <Switch
+            android:id="@+id/mSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="false"
+            android:layout_alignParentTop="false"
+            android:layout_marginTop="7dp" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/maxDbTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="-70dp"
+        android:layout_marginRight="-70dp"
+        android:layout_marginTop="110dp"
+        android:layout_marginStart="50dp"
+        android:text="+12 dB"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/minDbTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="215dp"
+        android:layout_marginLeft="50dp"
+        android:text="-12 dB"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/middleDbTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="240dp"
+        android:layout_marginLeft="50dp"
+        android:text="  0 dB"
+        android:textColor="#000000" />
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="16dp">
+
+    <com.of.music.defineViewd.VerticalSeekBar
+        android:id="@+id/vertical_Seekbar1"
+        android:layout_width="wrap_content"
+        android:layout_height="350dip"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="155dp"
+        android:layout_marginTop="70dp"
+        android:progressDrawable="@drawable/vertical_seekbar" />
+        <!--android:layout_toRightOf="@+id/progressBar" -->
+    <com.of.music.defineViewd.VerticalSeekBar
+        android:id="@+id/vertical_Seekbar2"
+        android:layout_width="wrap_content"
+        android:layout_height="350dip"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/vertical_Seekbar1"
+        android:layout_marginStart="330dp"
+        android:progressDrawable="@drawable/vertical_seekbar" />
+
+    <com.of.music.defineViewd.VerticalSeekBar
+        android:id="@+id/vertical_Seekbar3"
+        android:layout_width="wrap_content"
+        android:layout_height="350dip"
+        android:layout_alignTop="@+id/vertical_Seekbar1"
+        android:layout_centerHorizontal="true"
+        android:progressDrawable="@drawable/vertical_seekbar"/>
+
+    <com.of.music.defineViewd.VerticalSeekBar
+        android:id="@+id/vertical_Seekbar4"
+        android:layout_width="wrap_content"
+        android:layout_height="350dip"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/vertical_Seekbar1"
+        android:layout_marginEnd="330dp"
+        android:progressDrawable="@drawable/vertical_seekbar" />
+
+    <com.of.music.defineViewd.VerticalSeekBar
+        android:id="@+id/vertical_Seekbar5"
+        android:layout_width="wrap_content"
+        android:layout_height="350dip"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/vertical_Seekbar1"
+        android:layout_marginEnd="155dp"
+        android:layout_marginRight="70dp"
+        android:progressDrawable="@drawable/vertical_seekbar"/>
+</RelativeLayout>
+
+    <TextView
+        android:id="@+id/freqTextView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="174dp"
+        android:layout_marginStart="147dp"
+        android:text="80Hz"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/freqTextView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/freqTextView1"
+        android:layout_marginStart="326dp"
+        android:text="500Hz"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/freqTextView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/freqTextView1"
+        android:layout_centerHorizontal="true"
+        android:text="1KHz"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/freqTextView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/freqTextView1"
+        android:layout_marginEnd="321dp"
+        android:text="5KHz"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/freqTextView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/freqTextView1"
+        android:layout_marginEnd="138dp"
+        android:text="16KHz"
+        android:textColor="#000000" />
+
+    <com.of.music.defineViewd.AutoLocateHorizontalView
+        android:id="@+id/recyleview"
+        android:layout_width="match_parent"
+        android:layout_height="89dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="25dp"
+        android:background="#efe7e7" />
+
+</RelativeLayout>
