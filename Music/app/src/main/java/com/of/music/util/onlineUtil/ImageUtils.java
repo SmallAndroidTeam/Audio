@@ -1,4 +1,4 @@
-package com.of.music.util;
+package com.of.music.util.onlineUtil;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -14,7 +14,6 @@ import android.support.annotation.Nullable;
 import com.of.music.model.RequestCode;
 
 import java.io.File;
-
 
 
 /**

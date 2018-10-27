@@ -160,6 +160,7 @@ public final class MusicService extends Service {
             if (playingMusicIndex != -1) {
                 mediaPlayer.reset();
                 try {
+                 
                     mediaPlayer.setDataSource(LocalMusicFragment.sMusicList.get(playingMusicIndex).getUri());
                     mediaPlayer.prepare();
                     if (musicTitle != null) {

@@ -27,7 +27,7 @@ import com.of.music.Application.Preferences;
 import com.of.music.R;
 import com.of.music.adapter.ViewBinder;
 import com.of.music.services.PlayService;
-import com.of.music.util.PermissionReq;
+import com.of.music.util.onlineUtil.PermissionReq;
 
 
 /**

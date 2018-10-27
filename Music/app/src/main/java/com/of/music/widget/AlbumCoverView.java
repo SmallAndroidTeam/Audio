@@ -13,8 +13,8 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.of.music.R;
-import com.of.music.util.CoverLoader;
-import com.of.music.util.ImageUtils;
+import com.of.music.util.onlineUtil.CoverLoader;
+import com.of.music.util.onlineUtil.ImageUtils;
 
 
 /**

@@ -18,9 +18,16 @@ public class Music {
 	public Music() {
 	}
 	
-	public Music(String title, String uri, String image, String artist, String lrcpath) {
+	public Music(String title, String uri, String image, String artist, String lrcpath) {//本地歌曲的构造函数
 		this.title = title;
 		this.uri = uri;
+		this.image = image;
+		this.artist = artist;
+		this.lrcpath = lrcpath;
+	}
+	
+	public Music(String title, String image, String artist, String lrcpath) {
+		this.title = title;
 		this.image = image;
 		this.artist = artist;
 		this.lrcpath = lrcpath;

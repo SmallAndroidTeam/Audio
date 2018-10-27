@@ -1,4 +1,4 @@
-package com.of.music.activity;
+package com.of.music.downloadExecute;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,7 +8,7 @@ import com.of.music.http.HttpCallback;
 import com.of.music.http.HttpClient;
 import com.of.music.model.DownloadInfo;
 import com.of.music.model.IExecutor;
-import com.of.music.util.ToastUtils;
+import com.of.music.util.onlineUtil.ToastUtils;
 
 
 /**

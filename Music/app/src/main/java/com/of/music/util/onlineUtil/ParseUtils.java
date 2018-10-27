@@ -1,4 +1,4 @@
-package com.of.music.util;
+package com.of.music.util.onlineUtil;
 
 /**
  * Created by wcy on 2017/7/8.

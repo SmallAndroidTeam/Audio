@@ -2,28 +2,21 @@ package com.of.music.fragment.fragmentNet;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.renderscript.RenderScript;
 import android.support.annotation.Nullable;
 
-import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import com.of.music.Application.AppCache;
 import com.of.music.R;
-import com.of.music.activity.ControlPanel;
 import com.of.music.activity.OnlineMusicActivity;
 import com.of.music.adapter.Bind;
 import com.of.music.adapter.SheetAdapter;
-import com.of.music.model.Extras;
 import com.of.music.model.Keys;
 import com.of.music.model.SheetInfo;
-import com.of.music.services.AudioPlayer;
 
 import java.util.List;
 

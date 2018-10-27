@@ -1,4 +1,4 @@
-package com.of.music.util;
+package com.of.music.util.onlineUtil;
 
 import android.content.ContentUris;
 import android.content.Context;
@@ -21,7 +21,7 @@ import java.util.List;
  * 歌曲工具类
  * Created by wcy on 2015/11/27.
  */
-public class MusicUtils {
+public class IMusicUtils {
     private static final String SELECTION = MediaStore.Audio.AudioColumns.SIZE + " >= ? AND " + MediaStore.Audio.AudioColumns.DURATION + " >= ?";
 
     /**

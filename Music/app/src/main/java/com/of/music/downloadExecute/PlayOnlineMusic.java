@@ -1,4 +1,4 @@
-package com.of.music.activity;
+package com.of.music.downloadExecute;
 
 import android.app.Activity;
 import android.text.TextUtils;
@@ -8,11 +8,9 @@ import com.of.music.http.HttpClient;
 import com.of.music.model.DownloadInfo;
 import com.of.music.model.Imusic;
 import com.of.music.model.OnlineMusic;
-import com.of.music.songListInformation.Music;
-import com.of.music.util.FileUtils;
+import com.of.music.util.onlineUtil.FileUtils;
 
 import java.io.File;
-
 
 
 /**
@@ -21,7 +19,8 @@ import java.io.File;
  */
 public abstract class PlayOnlineMusic extends PlayMusic {
     private OnlineMusic mOnlineMusic;
-
+     public static String fileLink;
+     public static String path;
     public PlayOnlineMusic(Activity activity, OnlineMusic onlineMusic) {
         super(activity, 3);
         mOnlineMusic = onlineMusic;
@@ -46,7 +45,8 @@ public abstract class PlayOnlineMusic extends PlayMusic {
         } else {
             mCounter++;
         }
-
+        //fileLink=mOnlineMusic.getLrclink();
+         mOnlineMusic.setLrclink(FileUtils.getLrcDir()+lrcFileName);
         // 下载封面
         String albumFileName = FileUtils.getAlbumFileName(artist, title);
         File albumFile = new File(FileUtils.getAlbumDir(), albumFileName);
@@ -81,7 +81,8 @@ public abstract class PlayOnlineMusic extends PlayMusic {
             }
         });
     }
-
+   
+  
     private void downloadLrc(String url, String fileName) {
         HttpClient.downloadFile(url, FileUtils.getLrcDir(), fileName, new HttpCallback<File>() {
             @Override

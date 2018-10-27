@@ -1,4 +1,4 @@
-package com.of.music.activity;
+package com.of.music.downloadExecute;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.of.music.Application.App;
@@ -15,9 +16,9 @@ import com.of.music.Application.Preferences;
 import com.of.music.R;
 import com.of.music.model.DownloadMusicInfo;
 import com.of.music.model.IExecutor;
-import com.of.music.util.FileUtils;
-import com.of.music.util.ToastUtils;
 import com.of.music.util.comparator.NetworkUtils;
+import com.of.music.util.onlineUtil.FileUtils;
+import com.of.music.util.onlineUtil.ToastUtils;
 
 
 /**
@@ -67,7 +68,9 @@ public abstract class DownloadMusic implements IExecutor<Void> {
     protected void downloadMusic(String url, String artist, String title, String coverPath) {
         try {
             String fileName = FileUtils.getMp3FileName(artist, title);
+            Log.i("Url","  "+fileName);
             Uri uri = Uri.parse(url);
+            Log.i("Url","  "+uri);
             DownloadManager.Request request = new DownloadManager.Request(uri);
             request.setTitle(FileUtils.getFileName(artist, title));
             request.setDescription("正在下载…");

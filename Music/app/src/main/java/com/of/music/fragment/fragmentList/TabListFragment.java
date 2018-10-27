@@ -17,7 +17,7 @@ import com.of.music.R;
 import com.of.music.Application.App;
 import com.of.music.songListInformation.MusicUtils;
 import com.of.music.ui.IConstants;
-import com.of.music.util.CommonUtils;
+import com.of.music.util.onlineUtil.CommonUtils;
 
 import java.util.ArrayList;
 import java.util.List;

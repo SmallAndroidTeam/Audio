@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.of.music.R;
 import com.of.music.model.OnlineMusic;
-import com.of.music.util.FileUtils;
+import com.of.music.util.onlineUtil.FileUtils;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.of.music.util;
+package com.of.music.util.onlineUtil;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -11,13 +11,11 @@ import android.text.TextUtils;
 
 import com.of.music.R;
 import com.of.music.model.Imusic;
-import com.of.music.songListInformation.Music;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-
 
 
 /**
@@ -175,7 +173,7 @@ public class CoverLoader {
      */
     private Bitmap loadCoverFromMediaStore(long albumId) {
         ContentResolver resolver = context.getContentResolver();
-        Uri uri = MusicUtils.getMediaStoreAlbumCoverUri(albumId);
+        Uri uri = IMusicUtils.getMediaStoreAlbumCoverUri(albumId);
         InputStream is;
         try {
             is = resolver.openInputStream(uri);

@@ -4,7 +4,7 @@ import android.os.Build;
 import android.util.Log;
 
 import com.of.music.BuildConfig;
-import com.of.music.util.FileUtils;
+import com.of.music.util.onlineUtil.FileUtils;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

@@ -11,7 +11,7 @@
  * governing permissions and limitations under the License.
  */
 
-package com.of.music.util;
+package com.of.music.util.onlineUtil;
 
 import android.provider.MediaStore;
 

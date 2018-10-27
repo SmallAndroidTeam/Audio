@@ -18,9 +18,9 @@ import com.of.music.Application.App;
 import com.of.music.info.MusicInfo;
 import com.of.music.songListInformation.MusicUtils;
 import com.of.music.ui.IConstants;
-import com.of.music.util.PreferencesUtility;
-import com.of.music.util.SortOrder;
 import com.of.music.util.comparator.MusicComparator;
+import com.of.music.util.onlineUtil.PreferencesUtility;
+import com.of.music.util.onlineUtil.SortOrder;
 
 import java.util.ArrayList;
 import java.util.Collections;

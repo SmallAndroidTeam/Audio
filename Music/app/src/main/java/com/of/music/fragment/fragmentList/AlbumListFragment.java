@@ -18,9 +18,9 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.of.music.Application.App;
 import com.of.music.info.AlbumInfo;
 import com.of.music.songListInformation.MusicUtils;
-import com.of.music.util.PreferencesUtility;
-import com.of.music.util.SortOrder;
 import com.of.music.util.comparator.AlbumComparator;
+import com.of.music.util.onlineUtil.PreferencesUtility;
+import com.of.music.util.onlineUtil.SortOrder;
 
 import java.util.ArrayList;
 import java.util.Collections;

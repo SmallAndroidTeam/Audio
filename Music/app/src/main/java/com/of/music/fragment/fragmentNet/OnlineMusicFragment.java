@@ -7,22 +7,16 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.of.music.Application.App;
 import com.of.music.R;
-import com.of.music.activity.ControlPanel;
-import com.of.music.adapter.Bind;
 import com.of.music.fragment.LovingListFragment;
 import com.of.music.fragment.SingerListFragment;
 import com.of.music.fragment.WaitDevelopFragment;
-import com.of.music.services.AudioPlayer;
 
 import java.util.ArrayList;
 import java.util.List;

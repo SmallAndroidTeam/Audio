@@ -15,8 +15,7 @@ import com.of.music.broadcastReceiver.NoisyAudioStreamReceiver;
 import com.of.music.model.DBManager;
 import com.of.music.model.Imusic;
 import com.of.music.model.PlayModeEnum;
-import com.of.music.songListInformation.Music;
-import com.of.music.util.ToastUtils;
+import com.of.music.util.onlineUtil.ToastUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -129,9 +128,9 @@ public class AudioPlayer implements OnPlayerEventListener{
     public void removeOnPlayEventListener(OnPlayerEventListener listener) {
         listeners.remove(listener);
     }
-
+   
     public void addAndPlay(Imusic music) {
-        Log.i("musicList","     "+musicList.size());
+       
         int position = musicList.indexOf(music);
         if (position < 0) {
             musicList.add(music);
@@ -139,10 +138,9 @@ public class AudioPlayer implements OnPlayerEventListener{
             DBManager.get().getMusicDao().insert(music);
             Log.i("musicList","     "+musicList.size());
             position = musicList.size() - 1;
-           
+          
         }
-  
-        play(position);
+//       play(position);
     }
 
     public void play(int position) {

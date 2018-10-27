@@ -9,7 +9,7 @@ import android.support.v4.app.Fragment;
 
 import com.hwangjr.rxbus.RxBus;
 import com.of.music.adapter.ViewBinder;
-import com.of.music.util.PermissionReq;
+import com.of.music.util.onlineUtil.PermissionReq;
 
 
 /**

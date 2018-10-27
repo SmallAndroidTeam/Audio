@@ -44,7 +44,7 @@ public class Imusic implements Serializable {
     private String fileName; // [本地]文件名
     @Property(nameInDb = "fileSize")
     private long fileSize; // [本地]文件大小
-    
+   
     @Generated(hash = 1254481321)
     public Imusic() {
     }
@@ -65,6 +65,7 @@ public class Imusic implements Serializable {
         this.path = path;
         this.fileName = fileName;
         this.fileSize = fileSize;
+        
     }
 
     public interface Type {
@@ -185,5 +186,6 @@ public class Imusic implements Serializable {
     public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
     }
+   
 }
 

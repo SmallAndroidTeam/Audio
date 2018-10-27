@@ -11,10 +11,9 @@ import android.util.Log;
 import com.of.music.model.DownloadMusicInfo;
 import com.of.music.model.Imusic;
 import com.of.music.model.SheetInfo;
-import com.of.music.songListInformation.Music;
-import com.of.music.util.CoverLoader;
-import com.of.music.util.ScreenUtils;
-import com.of.music.util.ToastUtils;
+import com.of.music.util.onlineUtil.CoverLoader;
+import com.of.music.util.onlineUtil.ScreenUtils;
+import com.of.music.util.onlineUtil.ToastUtils;
 
 import java.util.ArrayList;
 import java.util.List;

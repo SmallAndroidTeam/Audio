@@ -7,7 +7,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.of.music.R;
-import com.of.music.util.ScreenUtils;
+import com.of.music.util.onlineUtil.ScreenUtils;
 
 
 /**

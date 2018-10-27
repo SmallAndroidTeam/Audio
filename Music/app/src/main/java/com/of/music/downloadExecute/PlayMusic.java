@@ -1,4 +1,4 @@
-package com.of.music.activity;
+package com.of.music.downloadExecute;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -10,7 +10,6 @@ import com.of.music.Application.Preferences;
 import com.of.music.R;
 import com.of.music.model.IExecutor;
 import com.of.music.model.Imusic;
-import com.of.music.songListInformation.Music;
 import com.of.music.util.comparator.NetworkUtils;
 
 
@@ -33,7 +32,7 @@ public abstract class PlayMusic implements IExecutor<Imusic> {
         checkNetwork();
     }
 
-    private void checkNetwork() {
+    private synchronized void checkNetwork() {
         Preferences.init(App.sContext);
         boolean mobileNetworkPlay = Preferences.enableMobileNetworkPlay();
         if (NetworkUtils.isActiveNetworkMobile(mActivity) && !mobileNetworkPlay) {

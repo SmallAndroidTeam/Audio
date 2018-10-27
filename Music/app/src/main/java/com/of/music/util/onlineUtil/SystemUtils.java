@@ -1,4 +1,4 @@
-package com.of.music.util;
+package com.of.music.util.onlineUtil;
 
 import android.app.ActivityManager;
 import android.app.Service;

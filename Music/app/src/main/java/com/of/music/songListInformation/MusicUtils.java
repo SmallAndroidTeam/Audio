@@ -16,7 +16,7 @@ import com.of.music.info.AlbumInfo;
 import com.of.music.info.ArtistInfo;
 import com.of.music.info.MusicInfo;
 import com.of.music.ui.IConstants;
-import com.of.music.util.PreferencesUtility;
+import com.of.music.util.onlineUtil.PreferencesUtility;
 
 public class MusicUtils {
 
@@ -92,7 +92,8 @@ public class MusicUtils {
 	 * @return
 	 */
 	public static String getLrcDir() {
-		String lrcDir = getAppLocalDir() + "lrc" + File.separator;
+		
+		String lrcDir = getBaseDir() + "/music/lrc" + File.separator;
 		return mkdir(lrcDir);
 	}
 

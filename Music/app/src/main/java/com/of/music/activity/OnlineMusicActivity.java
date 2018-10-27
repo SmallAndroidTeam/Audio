@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.util.ArrayMap;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,35 +16,41 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
 import com.of.music.Application.App;
 import com.of.music.R;
 import com.of.music.adapter.Bind;
 import com.of.music.adapter.OnMoreClickListener;
 import com.of.music.adapter.OnlineMusicAdapter;
-import com.of.music.fragment.fragmentNet.NewSongFragment;
+import com.of.music.downloadExecute.DownloadOnlineMusic;
+import com.of.music.downloadExecute.PlayOnlineMusic;
+import com.of.music.downloadExecute.ShareOnlineMusic;
+import com.of.music.fragment.LocalMusicFragment;
 import com.of.music.http.HttpCallback;
 import com.of.music.http.HttpClient;
-import com.of.music.model.Extras;
 import com.of.music.model.Imusic;
 import com.of.music.model.LoadStateEnum;
 import com.of.music.model.OnlineMusic;
 import com.of.music.model.OnlineMusicList;
 import com.of.music.model.SheetInfo;
 import com.of.music.services.AudioPlayer;
-import com.of.music.util.FileUtils;
-import com.of.music.util.ImageUtils;
-import com.of.music.util.ScreenUtils;
-import com.of.music.util.ToastUtils;
-import com.of.music.util.ViewUtils;
+import com.of.music.services.MusicService;
+import com.of.music.songListInformation.Music;
+import com.of.music.util.onlineUtil.FileUtils;
+import com.of.music.util.onlineUtil.ImageUtils;
+import com.of.music.util.onlineUtil.ScreenUtils;
+import com.of.music.util.onlineUtil.ToastUtils;
+import com.of.music.util.onlineUtil.ViewUtils;
 import com.of.music.widget.AutoLoadListView;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class OnlineMusicActivity extends BaseActivity implements OnItemClickListener
@@ -62,7 +69,7 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
     public  static List<OnlineMusic> mMusicList = new ArrayList<>();
     private OnlineMusicAdapter mAdapter = new OnlineMusicAdapter(mMusicList);
     private int mOffset = 0;
-   
+     private int pos;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,6 +126,28 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
                 }
                 mOffset += MUSIC_LIST_SIZE;
                 mMusicList.addAll(response.getSong_list());
+                arrayList.clear();
+                getMusicList.clear();
+                for(int i=0;i<mMusicList.size();i++){
+                    OnlineMusic onlineMusic=mMusicList.get(i);
+                    play(onlineMusic,i);
+                }
+            
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        if(getCount==0){
+                            for(int i=0;i<getMusicList.size();i++){
+                                arrayList.add(getMusicList.get(i));
+                                Log.i("teste11111", "index: "+i+"//"+getMusicList.get(i).getTitle());
+                            }
+                            this.cancel();
+                        }else{
+                            Log.i("teste11112", "run: "+getCount);
+                        }
+                    }
+                },0,100);
+               
                 Log.i("mMusicLisc",mMusicList+",,,,,,");
                 mAdapter.notifyDataSetChanged();
             }
@@ -144,10 +173,45 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
     public void onLoad() {
         getMusic(mOffset);
     }
+//    private  ArrayList<Music> musicArrayList;
+//    private Music musicItem;
+//    private  boolean isExecuteComplete=false;
 
+ 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        play((OnlineMusic) parent.getAdapter().getItem(position));
+//       OnlineMusic onlineMusic=(OnlineMusic) parent.getAdapter().getItem(position);
+//
+//        Log.i("ooooooo",onlineMusic.getLrclink());
+//        play(onlineMusic);
+//        arrayList=new ArrayList<>();
+//        Music music=new Music(title,url,coverpath,artist,onlineMusic.getLrclink());
+//        arrayList.add(music);
+//        Log.i("ooooooo","      "+arrayList.size());
+        final int index=position-1;
+      new Timer().schedule(new TimerTask() {
+          @Override
+          public void run() {
+              if(getCount==0){
+                  Log.i("teste11111","      "+arrayList.size()+"///"+mMusicList.size());
+                  LocalMusicFragment.sMusicList = arrayList;
+                  MusicService.playingMusicIndex =index;
+                  runOnUiThread(new Runnable() {
+                      @Override
+                      public void run() {
+                          new MusicService().initMusic();
+                      }
+                  });
+                 
+                  Intent intent = new Intent(OnlineMusicActivity.this, MusicService.class);
+                  intent.setAction(MusicService.TOGGLEPAUSE_ACTION);
+                  startService(intent);
+                  this.cancel();
+              }
+          }
+      },0,100);
+   
+
     }
 
     @Override
@@ -169,6 +233,7 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
                         artistInfo(onlineMusic);
                         break;
                     case 2:// 下载
+                        Log.i("Url", "onClick: "+onlineMusic.getSong_id());
                         download(onlineMusic);
                         break;
                 }
@@ -200,28 +265,59 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
                     }
                 });
     }
-
-    private void play(OnlineMusic onlineMusic) {
+    public ArrayList<Music> arrayList=new ArrayList<>();
+    public  String url;
+    public  String title;
+    public  String coverpath;
+    public  String artist;
+    private Map<Integer,Music> getMusicList=new ArrayMap<>();
+    private  boolean isExcuteComplete=false;
+    private int getCount=0;
+    private synchronized void play(final  OnlineMusic onlineMusic, final int index) {
+        getCount++;
         new PlayOnlineMusic(this, onlineMusic) {
             @Override
             public void onPrepare() {
                 showProgress();
             }
-
             @Override
             public void onExecuteSuccess(Imusic music) {
                 cancelProgress();
                 AudioPlayer.get().init(App.sContext);
                 AudioPlayer.get().addAndPlay(music);
+                url=music.getPath();
+                title=music.getTitle();
+                coverpath=music.getCoverPath();
+                artist=music.getArtist();
                 Log.i("ooooooo",music.getPath());
-                ToastUtils.show("已添加到播放列表");
+                Log.i("ooooooo",title);
+                Log.i("ooooooo",music.getCoverPath());
+                Log.i("ooooooo",artist);
+                Music music1=new Music(title,url,coverpath,artist,onlineMusic.getLrclink());
+                Log.i("test11", "onExecuteSuccess: "+onlineMusic.getLrclink()+"/n:"
+                +new File(onlineMusic.getLrclink()).exists());
+                music1.setId(index);
+                getMusicList.put(index,music1);
+                getCount--;
+//                ToastUtils.show("已添加到播放列表");
+//                MediaPlayer mediaPlayer=new MediaPlayer();
+//               try {
+//                    mediaPlayer.reset();
+//                    mediaPlayer.setDataSource(url);
+//                    mediaPlayer.prepare();
+//                    mediaPlayer.start();
+//               } catch (IOException e) {
+//                   e.printStackTrace();
+//               }
             }
 
             @Override
             public void onExecuteFail(Exception e) {
                 cancelProgress();
+                getCount--;
                 ToastUtils.show(R.string.unable_to_play);
             }
+            
         }.execute();
     }
 

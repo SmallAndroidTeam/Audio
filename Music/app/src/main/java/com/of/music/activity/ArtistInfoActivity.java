@@ -25,7 +25,7 @@ import com.of.music.http.HttpClient;
 import com.of.music.model.ArtistInfo;
 import com.of.music.model.Extras;
 import com.of.music.model.LoadStateEnum;
-import com.of.music.util.ViewUtils;
+import com.of.music.util.onlineUtil.ViewUtils;
 
 
 public class ArtistInfoActivity extends BaseActivity {

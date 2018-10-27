@@ -16,14 +16,12 @@ import android.widget.TextView;
 
 import com.of.music.R;
 import com.of.music.broadcastReceiver.StatusBarReceiver;
-import com.of.music.fragment.fragmentNet.NewSongFragment;
 import com.of.music.fragment.fragmentNet.OnlineMusicFragment;
 import com.of.music.model.Extras;
 import com.of.music.model.Imusic;
 import com.of.music.services.PlayService;
-import com.of.music.songListInformation.Music;
-import com.of.music.util.CoverLoader;
-import com.of.music.util.FileUtils;
+import com.of.music.util.onlineUtil.CoverLoader;
+import com.of.music.util.onlineUtil.FileUtils;
 
 import java.util.ArrayList;
 import java.util.List;

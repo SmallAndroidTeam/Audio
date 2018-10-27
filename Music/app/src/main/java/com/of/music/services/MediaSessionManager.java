@@ -8,8 +8,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import com.of.music.Application.App;
 import com.of.music.Application.AppCache;
 import com.of.music.model.Imusic;
-import com.of.music.songListInformation.Music;
-import com.of.music.util.CoverLoader;
+import com.of.music.util.onlineUtil.CoverLoader;
 
 
 /**

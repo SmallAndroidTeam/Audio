@@ -1,4 +1,4 @@
-package com.of.music.util;
+package com.of.music.util.onlineUtil;
 
 import android.content.Context;
 import android.os.Environment;
@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import com.of.music.Application.AppCache;
 import com.of.music.R;
 import com.of.music.model.Imusic;
-import com.of.music.songListInformation.Music;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -27,7 +26,8 @@ public class FileUtils {
     private static final String LRC = ".lrc";
 
     private static String getAppDir() {
-        return Environment.getExternalStorageDirectory() + "/PonyMusic";
+        
+        return Environment.getExternalStorageDirectory() + "/Music";
     }
 
     public static String getMusicDir() {
@@ -36,7 +36,7 @@ public class FileUtils {
     }
 
     public static String getLrcDir() {
-        String dir = getAppDir() + "/Lyric/";
+        String dir = getAppDir() + "/lrc/";
         return mkdirs(dir);
     }
 

@@ -11,9 +11,8 @@ import android.widget.TextView;
 import com.of.music.R;
 import com.of.music.model.Imusic;
 import com.of.music.services.AudioPlayer;
-import com.of.music.songListInformation.Music;
-import com.of.music.util.CoverLoader;
-import com.of.music.util.FileUtils;
+import com.of.music.util.onlineUtil.CoverLoader;
+import com.of.music.util.onlineUtil.FileUtils;
 
 import java.util.List;
 

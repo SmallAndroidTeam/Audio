@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import com.of.music.Application.App;
 
@@ -82,6 +83,7 @@ public class LocalMusicUtils {
 			}
             name=name.substring(0,name.indexOf('.'));
 			String path=MusicUtils.getLrcDir()+name+".lrc";
+			Log.i("test111", "addMedia: "+path);
 			if(isRepeat(title, artist)) continue;
 			music = new Music();
 			music.setId(cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)));
