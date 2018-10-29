@@ -1,5 +1,6 @@
 package com.of.music.songListInformation;
 
+import java.io.File;
 import java.util.ArrayList;
 import android.database.Cursor;
 import android.net.Uri;
@@ -7,6 +8,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 
 import com.of.music.Application.App;
+import com.of.music.util.onlineUtil.FileUtils;
 
 
 public class LocalMusicUtils {
@@ -92,7 +94,15 @@ public class LocalMusicUtils {
 			music.setLrcpath(path);
 			music.setUri(cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)));
 			music.setLength(cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)));
-			music.setImage(getAlbumImage(cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID))));
+			
+			String albumAddress= FileUtils.getAlbumDir()+ FileUtils.getAlbumFileName(artist,title);
+			if(new File(albumAddress).exists()){
+				music.setImage(albumAddress);
+			}else{
+				music.setImage(getAlbumImage(cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID))));
+			}
+			
+			Log.i("musicsize11", "addMedia: "+albumAddress+"//"+new File(albumAddress).exists());
 			results.add(music);
 		}
 

@@ -24,7 +24,12 @@ public abstract class BaseFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         handler = new Handler(Looper.getMainLooper());
         ViewBinder.bind(this, getView());
-        RxBus.get().register(this);
+        try{
+            RxBus.get().register(this);
+        }catch (Exception e){
+        
+        }
+      
     }
 
     @Override
