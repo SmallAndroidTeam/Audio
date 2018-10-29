@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.of.music.R;
 import com.of.music.model.Imusic;
 import com.of.music.services.AudioPlayer;
+import com.of.music.songListInformation.MusicIconLoader;
 import com.of.music.util.onlineUtil.CoverLoader;
 import com.of.music.util.onlineUtil.FileUtils;
 
@@ -66,6 +67,7 @@ public class PlaylistAdapter extends BaseAdapter {
         holder.vPlaying.setVisibility((isPlaylist && position == AudioPlayer.get().getPlayPosition()) ? View.VISIBLE : View.INVISIBLE);
         Imusic music = musicList.get(position);
         Bitmap cover = CoverLoader.get().loadThumb(music);
+        
         holder.ivCover.setImageBitmap(cover);
         holder.tvTitle.setText(music.getTitle());
         String artist = FileUtils.getArtistAndAlbum(music.getArtist(), music.getAlbum());

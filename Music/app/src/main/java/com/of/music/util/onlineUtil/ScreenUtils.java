@@ -3,6 +3,8 @@ package com.of.music.util.onlineUtil;
 import android.content.Context;
 import android.view.WindowManager;
 
+import com.of.music.Application.App;
+
 /**
  * 工具类
  * Created by hzwangchenyan on 2016/1/6.
@@ -15,7 +17,7 @@ public class ScreenUtils {
     }
 
     public static int getScreenWidth() {
-        WindowManager wm = (WindowManager) sContext.getSystemService(Context.WINDOW_SERVICE);
+        WindowManager wm = (WindowManager) App.sContext.getSystemService(Context.WINDOW_SERVICE);
         return wm.getDefaultDisplay().getWidth();
     }
 

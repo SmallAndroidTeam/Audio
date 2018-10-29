@@ -82,7 +82,7 @@ public abstract class DownloadMusic implements IExecutor<Void> {
             DownloadManager downloadManager = (DownloadManager) App.sContext.getSystemService(Context.DOWNLOAD_SERVICE);
             long id = downloadManager.enqueue(request);
             String musicAbsPath = FileUtils.getMusicDir().concat(fileName);
-            DownloadMusicInfo downloadMusicInfo = new DownloadMusicInfo(title, musicAbsPath, coverPath);
+            DownloadMusicInfo downloadMusicInfo = new DownloadMusicInfo(title, musicAbsPath, coverPath,FileUtils.getMusicDir()+FileUtils.getMp3FileName(artist, title));
             AppCache.get().getDownloadList().put(id, downloadMusicInfo);
         } catch (Throwable th) {
             th.printStackTrace();

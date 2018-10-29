@@ -67,6 +67,8 @@
             android:launchMode="singleTask"/>
         <activity android:name=".activity.OnlineMusicActivity"
             android:launchMode="singleTask"/>
+        <activity android:name=".activity.MusicInfoActivity"
+            android:launchMode="singleTask"/>
         <service android:name=".services.MusicService" />
 
         <receiver android:name=".widget.appwidget_provider">

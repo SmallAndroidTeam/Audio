@@ -16,6 +16,10 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.of.music.Application.App;
 import com.of.music.R;
 import com.of.music.adapter.Bind;
@@ -41,9 +45,6 @@ import com.of.music.util.onlineUtil.ScreenUtils;
 import com.of.music.util.onlineUtil.ToastUtils;
 import com.of.music.util.onlineUtil.ViewUtils;
 import com.of.music.widget.AutoLoadListView;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -64,7 +65,7 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
     @Bind(R.id.ll_load_fail)
     private LinearLayout llLoadFail;
     private View vHeader;
-    private  static  SheetInfo mListInfo;
+    private  static SheetInfo mListInfo;
     private OnlineMusicList mOnlineMusicList;
     public  static List<OnlineMusic> mMusicList = new ArrayList<>();
     private OnlineMusicAdapter mAdapter = new OnlineMusicAdapter(mMusicList);
@@ -273,7 +274,7 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
     private Map<Integer,Music> getMusicList=new ArrayMap<>();
     private  boolean isExcuteComplete=false;
     private int getCount=0;
-    private synchronized void play(final  OnlineMusic onlineMusic, final int index) {
+    private synchronized void play(final OnlineMusic onlineMusic, final int index) {
         getCount++;
         new PlayOnlineMusic(this, onlineMusic) {
             @Override

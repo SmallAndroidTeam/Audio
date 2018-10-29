@@ -21,7 +21,7 @@ public class Preferences {
     private static Context sContext;
 
     public static void init(Context context) {
-        sContext = context.getApplicationContext();
+        sContext = App.sContext;
     }
 
     public static int getPlayPosition() {

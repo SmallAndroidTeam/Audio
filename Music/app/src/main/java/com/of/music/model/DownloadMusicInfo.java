@@ -7,13 +7,14 @@ public class DownloadMusicInfo {
     private String title;
     private String musicPath;
     private String coverPath;
-
-    public DownloadMusicInfo(String title, String musicPath, String coverPath) {
+    private String lrcPath;
+    public DownloadMusicInfo(String title, String musicPath, String coverPath,String lrcPath) {
         this.title = title;
         this.musicPath = musicPath;
         this.coverPath = coverPath;
+        this.lrcPath=lrcPath;
     }
-
+     public  String getLrcPath(){return lrcPath;}
     public String getTitle() {
         return title;
     }

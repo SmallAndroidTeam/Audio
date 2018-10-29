@@ -24,7 +24,7 @@ import java.util.List;
  */
 public class AppCache {
     private Context mContext;
-    private final List<Imusic> mLocalMusicList = new ArrayList<>();
+    private final ArrayList<Imusic> mLocalMusicList = new ArrayList<>();
     private final List<SheetInfo> mSheetList = new ArrayList<>();
     private final List<Activity> mActivityStack = new ArrayList<>();
     private final LongSparseArray<DownloadMusicInfo> mDownloadList = new LongSparseArray<>();
@@ -55,7 +55,7 @@ public class AppCache {
         return mContext;
     }
 
-    public List<Imusic> getLocalMusicList() {
+    public ArrayList<Imusic> getLocalMusicList() {
         return mLocalMusicList;
     }
 

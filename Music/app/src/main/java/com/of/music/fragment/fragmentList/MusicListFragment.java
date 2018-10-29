@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -124,13 +125,15 @@ public class MusicListFragment extends Fragment {
 
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType){
+            
             return new ListItemViewHolder(LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.fragment_music_list_item,viewGroup,false));
         }
 
-        //�������������а�
+        //
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position){
             MusicInfo model = null;
+           // Log.i("222", "onBindViewHolder: "+mList.size());
                 model = mList.get(position);
             if (holder instanceof ListItemViewHolder)
             {
@@ -141,8 +144,8 @@ public class MusicListFragment extends Fragment {
 
         @Override
         public int getItemCount(){
-            return (null != mList? mList.size()+1:0);
-        }
+            return (null != mList? mList.size():0);
+        }//重点
 
         public class ListItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
             //ViewHolder
