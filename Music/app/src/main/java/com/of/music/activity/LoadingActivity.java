@@ -14,9 +14,13 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.solver.Metrics;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
+import android.text.BoringLayout;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -25,6 +29,8 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import com.of.music.R;
 import com.of.music.Toast.OnlyOneToast;
+import com.of.music.convertPXAndDP.DensityUtil;
+import com.of.music.ui.LrcView;
 
 
 public class LoadingActivity extends Activity {
@@ -49,7 +55,23 @@ public class LoadingActivity extends Activity {
         AppIsStart=true;
         getPermission();//动态获取权限
     }
-
+    
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if(hasFocus){
+            initLrcFontSize();
+        }
+    }
+    
+    private void initLrcFontSize() {
+       //px sp dp dip
+        int screeHeight=getResources().getDisplayMetrics().heightPixels;
+        int marginLeft=(int)(1.0*screeHeight/6);
+        LrcView.defaultTextSize=DensityUtil.px2sp(this, (marginLeft));//设置默认的歌词大小
+        LrcView.defaultDividerHeight=marginLeft/2;
+    }
+    
     @Override
     protected void onResume() {
         super.onResume();

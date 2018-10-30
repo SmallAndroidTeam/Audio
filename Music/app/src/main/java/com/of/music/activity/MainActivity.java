@@ -395,6 +395,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private  void  initImageIconPositionAndSize(){
         WindowManager windowManager=getWindowManager();
         long screenHeigt=windowManager.getDefaultDisplay().getHeight();//屏幕的高度
+        Log.i("recen", "initImageIconPositionAndSize: "+screenHeigt);
         long screenWidth=windowManager.getDefaultDisplay().getWidth();
         int marginLeft=(int)(1.0*screenHeigt/10);
         int TitleBarHeigt=(int)(2.0*screenHeigt/10);
@@ -453,8 +454,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         msettingButton.setLayoutParams(msettingButtonLayoutParams);
         //设置标题字体大小
         musicTitle.setTextSize(DensityUtil.px2sp(this,marginLeft/2));
-        LrcView.defaultTextSize=DensityUtil.px2sp(this,marginLeft);//设置默认的歌词大小
-        LrcView.defaultDividerHeight=marginLeft/2;
+       
+       
         // Log.i(TAG, (musicTitle!=null)+"initImageIconPositionAndSize: "+"screentHeight:"+screenHeigt+"/screenWidth:"+screenWidth+"//"+(int)(1.0*screenWidth*3/7));
 
     }

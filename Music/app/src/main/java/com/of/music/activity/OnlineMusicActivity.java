@@ -2,6 +2,7 @@ package com.of.music.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -48,6 +49,7 @@ import com.of.music.widget.AutoLoadListView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -71,9 +73,13 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
     private OnlineMusicAdapter mAdapter = new OnlineMusicAdapter(mMusicList);
     private int mOffset = 0;
      private int pos;
+     private List<Imusic> imusicArrayList=new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(getRequestedOrientation()!= ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE){
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
             setContentView(R.layout.activity_online_music);
         setTitle(mListInfo.getTitle());
         Log.i("mListInfo","         "+mListInfo);
@@ -180,7 +186,7 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
 
  
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    public void onItemClick(final AdapterView<?> parent, View view,final  int position, long id) {
 //       OnlineMusic onlineMusic=(OnlineMusic) parent.getAdapter().getItem(position);
 //
 //        Log.i("ooooooo",onlineMusic.getLrclink());
@@ -203,16 +209,17 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
                           new MusicService().initMusic();
                       }
                   });
-                 
+                  
                   Intent intent = new Intent(OnlineMusicActivity.this, MusicService.class);
                   intent.setAction(MusicService.TOGGLEPAUSE_ACTION);
                   startService(intent);
+                  AudioPlayer.get().init(App.sContext);
+                  AudioPlayer.get().addAndPlay(onlineMusicImusicMap.get((OnlineMusic) parent.getAdapter().getItem(position)));
                   this.cancel();
               }
           }
       },0,100);
-   
-
+     
     }
 
     @Override
@@ -274,6 +281,7 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
     private Map<Integer,Music> getMusicList=new ArrayMap<>();
     private  boolean isExcuteComplete=false;
     private int getCount=0;
+   private Map<OnlineMusic,Imusic> onlineMusicImusicMap=new HashMap<>();
     private synchronized void play(final OnlineMusic onlineMusic, final int index) {
         getCount++;
         new PlayOnlineMusic(this, onlineMusic) {
@@ -284,8 +292,7 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
             @Override
             public void onExecuteSuccess(Imusic music) {
                 cancelProgress();
-                AudioPlayer.get().init(App.sContext);
-                AudioPlayer.get().addAndPlay(music);
+                 onlineMusicImusicMap.put(onlineMusic,music);
                 url=music.getPath();
                 title=music.getTitle();
                 coverpath=music.getCoverPath();

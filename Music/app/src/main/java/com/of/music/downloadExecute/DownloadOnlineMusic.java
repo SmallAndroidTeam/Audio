@@ -44,9 +44,9 @@ public abstract class DownloadOnlineMusic extends DownloadMusic {
         // 下载封面
         String albumFileName = FileUtils.getAlbumFileName(artist, title);
         final File albumFile = new File(FileUtils.getAlbumDir(), albumFileName);
-        String picUrl = mOnlineMusic.getPic_big();
+        String picUrl = mOnlineMusic.getPic_small();
         if (TextUtils.isEmpty(picUrl)) {
-            picUrl = mOnlineMusic.getPic_small();
+            picUrl = mOnlineMusic.getPic_big();
         }
         if (!albumFile.exists() && !TextUtils.isEmpty(picUrl)) {
          HttpClient.downloadFile(picUrl, FileUtils.getAlbumDir(), albumFileName, null);

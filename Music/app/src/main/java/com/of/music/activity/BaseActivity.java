@@ -43,6 +43,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+       
         if (Preferences.isNightMode()) {
             setTheme(getDarkTheme());
         }

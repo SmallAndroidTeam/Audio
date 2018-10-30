@@ -45,6 +45,7 @@ import com.of.music.model.Keys;
 import com.of.music.model.RequestCode;
 import com.of.music.services.AudioPlayer;
 import com.of.music.services.MusicService;
+import com.of.music.songListInformation.LocalMusicUtils;
 import com.of.music.songListInformation.Music;
 import com.of.music.songListInformation.MusicUtils;
 import com.of.music.util.onlineUtil.FileUtils;
@@ -65,7 +66,7 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
     
     private Loader<Cursor> loader;
     private PlaylistAdapter adapter;
-    
+    private List<Imusic> imusics=new ArrayList<>();
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -77,7 +78,7 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
         super.onActivityCreated(savedInstanceState);
       
         adapter = new PlaylistAdapter(AppCache.get().getLocalMusicList());
-        
+        imusics=AppCache.get().getLocalMusicList();
         adapter.setOnMoreClickListener(this);
         lvLocalMusic.setAdapter(adapter);
         loadMusic();
@@ -132,21 +133,13 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
     
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        ArrayList<Imusic> musicArrayList=new ArrayList<>();
-       final ArrayList<Music> musics=new ArrayList<>();
-        musicArrayList=AppCache.get().getLocalMusicList();
-        Log.i("musicsize",musicArrayList.get(0).getCoverPath()+"  "+musicArrayList.get(0).getTitle()
-                +"  "+musicArrayList.get(0).getAlbum()+"  "+musicArrayList.get(0).getArtist()+"   "
-                +musicArrayList.get(0).getPath()+"  "+musicArrayList.get(0).getFileName()+"    "
-                +MusicUtils.sMusicList.get(0).getLrcpath()+"    "+MusicUtils.sMusicList.get(0).getImage());
-        for(int i=0;i<musicArrayList.size();i++){
-            
-            Music imusic=new Music(musicArrayList.get(i).getTitle(),musicArrayList.get(i).getPath()
-                    ,musicArrayList.get(i).getCoverPath() ,musicArrayList.get(i).getArtist()
-                    ,MusicUtils.sMusicList.get(i).getLrcpath());
-            musics.add(imusic);
+        ArrayList<Music> musics=new ArrayList<>();
+        for(int i=0;i<imusics.size();i++){
+            Music music=new Music(imusics.get(i).getTitle(),imusics.get(i).getPath(),imusics.get(i).getAlbum()
+                    ,imusics.get(i).getArtist(),FileUtils.getLrcDir()+FileUtils.getLrcFileName(imusics.get(i).getArtist(), imusics.get(i).getTitle()));
+            musics.add(music);
         }
-        LocalMusicFragment.sMusicList = musics;
+        LocalMusicFragment.sMusicList =musics;
         MusicService.playingMusicIndex =position;
         Intent intent = new Intent(getActivity(), MusicService.class);
         intent.setAction(MusicService.TOGGLEPAUSE_ACTION);
