@@ -36,15 +36,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FavoriteListFragment extends Fragment {
-    //private MusicOperator lxrOperator;
     public static List<FavouriteMusicListInfo> favouriteMusicListInfos;
     private static String TAG = "FavoriteListFragment";
     ListView lv;
     private ArrayList<Music> musicList = new ArrayList<Music>();
     SwipeRefreshLayout mSwipeRefreshLayout;
-    //public  static List<MusicName> stringList = new ArrayList<MusicName>();
     FavouriteListAdapt favouriteListAdapt;
-    //SongNameAdapt songNameAdapt;
     MyBoadCast broadcastReceiver;
     private static int oldMusicIndex1=-1;//上次点击歌单的下标，开始设置为-1，则没有点击过歌单
     @Override
@@ -53,13 +50,9 @@ public class FavoriteListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_download_list, container, false);
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.srl_favouritelist);
         lv = (ListView) view.findViewById(R.id.lv1_favouritelist);
-        //lxrOperator = new MusicOperator(getActivity());初始化数据库
         favouriteMusicListInfos = LitePal.findAll(FavouriteMusicListInfo.class);
-        //stringList = lxrOperator.queryMany();
         favouriteListAdapt = new FavouriteListAdapt(getActivity(),favouriteMusicListInfos);
-        //songNameAdapt = new SongNameAdapt(getActivity(), favouriteMusicInfo);
         lv.setAdapter(favouriteListAdapt);
-        //lv.setAdapter(songNameAdapt);
         initData();
         broadcastReceiver = new MyBoadCast();
         IntentFilter filter = new IntentFilter();
