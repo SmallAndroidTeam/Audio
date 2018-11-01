@@ -15,8 +15,10 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.util.LongSparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,12 +36,17 @@ import com.of.music.activity.ArtistInfoActivity;
 import com.of.music.activity.MusicInfoActivity;
 import com.of.music.activity.OnlineMusicActivity;
 import com.of.music.adapter.Bind;
+import com.of.music.adapter.DownloadListAdapter;
 import com.of.music.adapter.OnMoreClickListener;
 import com.of.music.adapter.PlaylistAdapter;
 import com.of.music.adapter.RxBusTags;
+import com.of.music.db.DownloadMusicOperater;
+import com.of.music.downloadExecute.DownloadMusic;
 import com.of.music.downloadExecute.DownloadOnlineMusic;
 import com.of.music.fragment.LocalMusicFragment;
 import com.of.music.fragment.fragmentNet.BaseFragment;
+import com.of.music.info.MusicName;
+import com.of.music.model.DownloadMusicInfo;
 import com.of.music.model.Imusic;
 import com.of.music.model.Keys;
 import com.of.music.model.RequestCode;
@@ -55,6 +62,7 @@ import com.of.music.util.onlineUtil.ToastUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import me.wcy.music.loader.MusicLoaderCallback;
 
@@ -63,67 +71,35 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
     private ListView lvLocalMusic;
     @Bind(R.id.v_searching)
     private TextView vSearching;
-    
+    ArrayList<Music> downloadlist;
     private Loader<Cursor> loader;
-    private PlaylistAdapter adapter;
-    private List<Imusic> imusics=new ArrayList<>();
+    private DownloadListAdapter adapter;
+    private List<DownloadMusicInfo> imusics=new ArrayList<>();
+    private DownloadMusicOperater downloadMusicOperater;
+    @Bind(R.id.downloadsrl)
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_folder_list, container, false);
+        
     }
     
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-      
-        adapter = new PlaylistAdapter(AppCache.get().getLocalMusicList());
-        imusics=AppCache.get().getLocalMusicList();
-        adapter.setOnMoreClickListener(this);
-        lvLocalMusic.setAdapter(adapter);
-        loadMusic();
-    }
-    
-    private void loadMusic() {
-        lvLocalMusic.setVisibility(View.GONE);
-        vSearching.setVisibility(View.VISIBLE);
-        PermissionReq.with(this)
-                .permissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                .result(new PermissionReq.Result() {
-                    @Override
-                    public void onGranted() {
-                        initLoader();
-                    }
-                    
-                    @Override
-                    public void onDenied() {
-                        ToastUtils.show(R.string.no_permission_storage);
-                        lvLocalMusic.setVisibility(View.VISIBLE);
-                        vSearching.setVisibility(View.GONE);
-                    }
-                })
-                .request();
-    }
-    
-    private void initLoader() {
-        loader = getActivity().getLoaderManager().initLoader(0, null, new MusicLoaderCallback(getContext(),
-                new ValueCallback<List<Imusic>>() {
-                    @Override
-                    public void onReceiveValue(List<Imusic> value) {
-                        AppCache.get().getLocalMusicList().clear();
-                        AppCache.get().getLocalMusicList().addAll(value);
-                        lvLocalMusic.setVisibility(View.VISIBLE);
-                        vSearching.setVisibility(View.GONE);
-                        adapter.notifyDataSetChanged();
-                    }
-                }));
-    }
-    
-    @Subscribe(tags = {@Tag(RxBusTags.SCAN_MUSIC)})
-    public void scanMusic(Object object) {
-        if (loader != null) {
-            loader.forceLoad();
+        downloadMusicOperater=new DownloadMusicOperater(getActivity());
+        imusics=downloadMusicOperater.queryMany();
+        adapter = new DownloadListAdapter(getActivity(),imusics);
+        downloadlist=new ArrayList<>();
+        for(int i=0;i<imusics.size();i++){
+            Music music=new Music(imusics.get(i).getTitle(),imusics.get(i).getMusicPath()
+                    ,imusics.get(i).getCoverPath(),imusics.get(i).getArtist(),imusics.get(i).getLrcPath());
+            downloadlist.add(music);
         }
+        
+        lvLocalMusic.setAdapter(adapter);
+        adapter.setOnMoreClickListener(this);
     }
     
     @Override
@@ -133,22 +109,21 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
     
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        ArrayList<Music> musics=new ArrayList<>();
-        for(int i=0;i<imusics.size();i++){
-            Music music=new Music(imusics.get(i).getTitle(),imusics.get(i).getPath(),imusics.get(i).getAlbum()
-                    ,imusics.get(i).getArtist(),FileUtils.getLrcDir()+FileUtils.getLrcFileName(imusics.get(i).getArtist(), imusics.get(i).getTitle()));
-            musics.add(music);
-        }
-        LocalMusicFragment.sMusicList =musics;
-        MusicService.playingMusicIndex =position;
+        Log.i("download",imusics.get(position).getTime());
+        LocalMusicFragment.sMusicList=downloadlist;
+        MusicService.playingMusicIndex=position;
+        new MusicService().initMusic();
         Intent intent = new Intent(getActivity(), MusicService.class);
         intent.setAction(MusicService.TOGGLEPAUSE_ACTION);
-        getActivity().startService(intent);
+        Objects.requireNonNull(getActivity()).startService(intent);
+        downloadMusicOperater.alter(imusics.get(position).getTime(),String.valueOf(System.currentTimeMillis()));
+        DownloadMusicOperater downloadMusicOperater1=new DownloadMusicOperater(getActivity());
+        Log.i("download",downloadMusicOperater1.queryMany().get(position).getTime());
     }
     
     @Override
     public void onMoreClick(final int position) {
-        final Imusic music=AppCache.get().getLocalMusicList().get(position);
+        final DownloadMusicInfo music=imusics.get(position);
         AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
         dialog.setTitle(music.getTitle());
         dialog.setItems(R.array.local_music_dialog, new DialogInterface.OnClickListener() {
@@ -165,12 +140,12 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
                         deleteMusic(music);
                         break;
                 }
-            
-        } });
+                
+            } });
         dialog.show();
     }
-    private void shareMusic(Imusic music) {
-        File file = new File(music.getPath());
+    private void shareMusic(DownloadMusicInfo music) {
+        File file = new File(music.getMusicPath());
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("audio/*");
         intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
@@ -190,6 +165,7 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
     /**
      * 设置铃声
      */
+    
     private void setRingtone(Imusic music) {
         Uri uri = MediaStore.Audio.Media.getContentUriForPath(music.getPath());
         // 查询音乐文件在媒体库是否存在
@@ -216,20 +192,22 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
         cursor.close();
     }
     
-    private void deleteMusic(final Imusic music) {
+    private void deleteMusic(final DownloadMusicInfo music) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
         String title = music.getTitle();
-        String msg = getString(R.string.delete_music, title);
+        final String msg = getString(R.string.delete_music, title);
         dialog.setMessage(msg);
         dialog.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                File file = new File(music.getPath());
+                File file = new File(music.getMusicPath());
                 if (file.delete()) {
                     // 刷新媒体库
                     Intent intent =
-                            new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://".concat(music.getPath())));
+                            new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://".concat(music.getMusicPath())));
                     getContext().sendBroadcast(intent);
+                    LocalMusicFragment.sMusicList.remove(music);
+                    downloadMusicOperater.delete(music.getTitle());
                 }
             }
         });

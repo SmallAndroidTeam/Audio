@@ -56,7 +56,7 @@ public class FileUtils {
     }
 
     public static String getRelativeMusicDir() {
-        String dir = "PonyMusic/Music/";
+        String dir = "Music/Music/";
         return mkdirs(dir);
     }
 

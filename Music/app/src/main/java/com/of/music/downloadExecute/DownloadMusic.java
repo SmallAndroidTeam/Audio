@@ -6,6 +6,7 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
@@ -14,11 +15,17 @@ import com.of.music.Application.App;
 import com.of.music.Application.AppCache;
 import com.of.music.Application.Preferences;
 import com.of.music.R;
+import com.of.music.db.DownloadMusicOperater;
+import com.of.music.db.MusicOperator;
+import com.of.music.info.MusicName;
 import com.of.music.model.DownloadMusicInfo;
 import com.of.music.model.IExecutor;
 import com.of.music.util.comparator.NetworkUtils;
 import com.of.music.util.onlineUtil.FileUtils;
 import com.of.music.util.onlineUtil.ToastUtils;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 
 /**
@@ -26,16 +33,18 @@ import com.of.music.util.onlineUtil.ToastUtils;
  */
 public abstract class DownloadMusic implements IExecutor<Void> {
     private Activity mActivity;
-
+    public static DownloadMusicOperater downloadMusicOperater;
+    public static final ArrayList<DownloadMusicInfo> downloadMusicInfos=new ArrayList<>();
     public DownloadMusic(Activity activity) {
         mActivity = activity;
+        downloadMusicOperater=new DownloadMusicOperater(activity);
     }
-
+    
     @Override
     public void execute() {
         checkNetwork();
     }
-
+    
     private void checkNetwork() {
         Preferences.init(App.sContext);
         boolean mobileNetworkDownload = Preferences.enableMobileNetworkDownload();
@@ -46,7 +55,7 @@ public abstract class DownloadMusic implements IExecutor<Void> {
             builder.setPositiveButton(R.string.download_tips_sure, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                   downloadWrapper();
+                    downloadWrapper();
                 }
             });
             builder.setNegativeButton(R.string.cancel, null);
@@ -57,14 +66,14 @@ public abstract class DownloadMusic implements IExecutor<Void> {
             downloadWrapper();
         }
     }
-
+    
     private void downloadWrapper() {
         onPrepare();
         download();
     }
-
+    
     protected abstract void download();
-
+    
     protected void downloadMusic(String url, String artist, String title, String coverPath) {
         try {
             String fileName = FileUtils.getMp3FileName(artist, title);
@@ -82,8 +91,16 @@ public abstract class DownloadMusic implements IExecutor<Void> {
             DownloadManager downloadManager = (DownloadManager) App.sContext.getSystemService(Context.DOWNLOAD_SERVICE);
             long id = downloadManager.enqueue(request);
             String musicAbsPath = FileUtils.getMusicDir().concat(fileName);
-            DownloadMusicInfo downloadMusicInfo = new DownloadMusicInfo(title, musicAbsPath, coverPath,FileUtils.getMusicDir()+FileUtils.getMp3FileName(artist, title));
-            AppCache.get().getDownloadList().put(id, downloadMusicInfo);
+            
+            MusicName musicName=new MusicName(artist,title,coverPath,musicAbsPath,FileUtils.getMusicDir()+FileUtils.getMp3FileName(artist, title));
+            String data=String.valueOf(System.currentTimeMillis());
+            Log.i("downloaddata",data);
+            if(!downloadMusicOperater.Dataexist(title,musicAbsPath,coverPath,artist,FileUtils.getLrcDir()+FileUtils.getLrcFileName(artist, title))) {
+                DownloadMusicInfo downloadMusicInfo = new DownloadMusicInfo(title, musicAbsPath, coverPath, artist, FileUtils.getLrcDir() + FileUtils.getLrcFileName(artist, title), data);
+                
+                downloadMusicOperater.add(downloadMusicInfo);
+            }
+            Log.i("downloadf","///////"+downloadMusicInfos.size());
         } catch (Throwable th) {
             th.printStackTrace();
             ToastUtils.show("下载失败");

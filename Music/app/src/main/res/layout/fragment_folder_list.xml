@@ -2,7 +2,10 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" android:background="@color/white_96p">
-
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/downloadsrl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <ListView
         android:id="@+id/lv_local_music"
         android:layout_width="match_parent"
@@ -21,4 +24,5 @@
         android:textColor="@color/grey"
         android:textSize="14sp"
         android:visibility="gone" />
+    </android.support.v4.widget.SwipeRefreshLayout>
 </FrameLayout>

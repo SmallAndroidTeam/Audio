@@ -1,6 +1,8 @@
 package com.of.music.adapter;
 
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.LongSparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,7 +10,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.of.music.Application.App;
 import com.of.music.R;
+import com.of.music.info.MusicName;
 import com.of.music.model.DownloadInfo;
 import com.of.music.model.DownloadMusicInfo;
 import com.of.music.model.Imusic;
@@ -18,14 +22,17 @@ import com.of.music.util.onlineUtil.CoverLoader;
 import com.of.music.util.onlineUtil.FileUtils;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DownloadListAdapter extends BaseAdapter{
     private List<DownloadMusicInfo> downloadInfoList;
     private OnMoreClickListener listener;
     private boolean isPlaylist;
-    
-    public DownloadListAdapter(List<DownloadMusicInfo> musicList) {
+    public Context context;
+    public DownloadListAdapter(Context context,List<DownloadMusicInfo> musicList) {
+        super();
+        this.context=context;
         this.downloadInfoList = musicList;
     }
     
@@ -54,23 +61,27 @@ public class DownloadListAdapter extends BaseAdapter{
     
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        DownloadListAdapter.ViewHolder holder;
+        final ViewHolder holder;
         if (convertView == null) {
-            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_holder_music, parent, false);
-            holder = new DownloadListAdapter.ViewHolder(convertView);
+            convertView=convertView.inflate(App.sContext, R.layout.view_holder_music, null);
+            holder = new ViewHolder();
+            holder.tvArtist=convertView.findViewById(R.id.tv_artist);
+            holder.ivCover=convertView.findViewById(R.id.iv_cover);
+            holder.ivMore=convertView.findViewById(R.id.iv_more);
+            holder.tvTitle=convertView.findViewById(R.id.tv_title);
+            holder.vDivider=convertView.findViewById(R.id.v_divider);
+            holder.vPlaying=convertView.findViewById(R.id.v_playing);
             convertView.setTag(holder);
         } else {
-            holder = (DownloadListAdapter.ViewHolder) convertView.getTag();
+            holder =(ViewHolder)convertView.getTag();
         }
         holder.vPlaying.setVisibility((isPlaylist && position == AudioPlayer.get().getPlayPosition()) ? View.VISIBLE : View.INVISIBLE);
-        DownloadMusicInfo music = downloadInfoList.get(position);
-        String albumAddress= music.getCoverPath();
-       
+        DownloadMusicInfo musicName=downloadInfoList.get(position);
+        String albumAddress= musicName.getCoverPath();
         Bitmap   cover= MusicIconLoader.getInstance().load(albumAddress);
-       
         holder.ivCover.setImageBitmap(cover);
-        holder.tvTitle.setText(music.getTitle());
-      
+        holder.tvTitle.setText(musicName.getTitle());
+        holder.tvArtist.setText(musicName.getArtist());
         holder.ivMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,21 +99,12 @@ public class DownloadListAdapter extends BaseAdapter{
     }
     
     private static class ViewHolder {
-        @Bind(R.id.v_playing)
         private View vPlaying;
-        @Bind(R.id.iv_cover)
         private ImageView ivCover;
-        @Bind(R.id.tv_title)
         private TextView tvTitle;
-        @Bind(R.id.tv_artist)
         private TextView tvArtist;
-        @Bind(R.id.iv_more)
         private ImageView ivMore;
-        @Bind(R.id.v_divider)
         private View vDivider;
         
-        public ViewHolder(View view) {
-            ViewBinder.bind(this, view);
-        }
     }
 }
