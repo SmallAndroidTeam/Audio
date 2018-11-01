@@ -28,6 +28,8 @@ import com.of.music.songListInformation.Music;
 import com.of.music.util.onlineUtil.FileUtils;
 
 import org.litepal.LitePal;
+import org.litepal.crud.LitePalSupport;
+import org.litepal.exceptions.DataSupportException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,18 +37,23 @@ import java.util.List;
 public class RecentlyListFragment extends BaseFragment implements AdapterView.OnItemClickListener,OnMoreClickListener {
    
    private ListView lvPlaylist;
-
+    ArrayList<Music> musics;
     private PlaylistAdapter adapter;
     private List<RecentlyMusicListInfo> imusicArrayList;
    @Override
-   public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
        LitePal.getDatabase();
        View view = inflater.inflate(R.layout.fragment_recently_list, null);
        lvPlaylist=view.findViewById(R.id.lv_playlist);
-      
        imusicArrayList=LitePal.findAll(RecentlyMusicListInfo.class);
-      
+       Log.i("recently","从Recentlylist播放"+imusicArrayList.size());
+       musics=new ArrayList<>();
+       for(int i=0;i<imusicArrayList.size();i++){
+           Music music=new Music(imusicArrayList.get(i).getName(),imusicArrayList.get(i).getUri()
+                   ,imusicArrayList.get(i).getImage(),imusicArrayList.get(i).getArtist(),imusicArrayList.get(i).getLrc_uri());
+           musics.add(music);
+       }
         adapter = new PlaylistAdapter(getActivity(),imusicArrayList);
         adapter.setIsPlaylist(true);
         adapter.setOnMoreClickListener(this);
@@ -58,17 +65,10 @@ public class RecentlyListFragment extends BaseFragment implements AdapterView.On
 
    @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-       Log.i("recently","从Recentlylist播放");
        Log.i("recently","从Recentlylist播放"+imusicArrayList.get(position).getName());
-        ArrayList<Music> musics=new ArrayList<>();
-        for(int i=0;i<imusicArrayList.size();i++){
-           
-           Music music=new Music(imusicArrayList.get(i).getName(),imusicArrayList.get(i).getUri()
-                   ,imusicArrayList.get(i).getImage(),imusicArrayList.get(i).getArtist(),imusicArrayList.get(i).getLrc_uri());
-         musics.add(music);
-        }
         LocalMusicFragment.sMusicList=musics;
         MusicService.playingMusicIndex =position;
+       new MusicService().initMusic();
        Intent intent = new Intent(getActivity(), MusicService.class);
        intent.setAction(MusicService.TOGGLEPAUSE_ACTION);
        getActivity().startService(intent);
@@ -77,17 +77,16 @@ public class RecentlyListFragment extends BaseFragment implements AdapterView.On
    @Override
    public void onMoreClick(final int position) {
         String[] items = new String[]{"移除"};
-       Imusic music = AudioPlayer.get().getMusicList().get(position);
-       AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+        Music music=musics.get(position);
+      final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
         dialog.setTitle(music.getTitle());
        dialog.setItems(items, new DialogInterface.OnClickListener() {
            @Override
             public void onClick(DialogInterface dialog, int which) {
-                AudioPlayer.get().delete(position);
+                imusicArrayList.remove(position);
                 adapter.notifyDataSetChanged();
           }
         });
-
        dialog.show();
    }
 }

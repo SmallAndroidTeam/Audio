@@ -38,6 +38,7 @@ import com.of.music.defineViewd.VisualizerView;
 import com.of.music.fragment.LocalMusicFragment;
 import com.of.music.info.FavouriteMusicListInfo;
 import com.of.music.info.MusicName;
+import com.of.music.info.RecentlyMusicListInfo;
 import com.of.music.songListInformation.Music;
 import com.of.music.songListInformation.MusicIconLoader;
 import com.of.music.songListInformation.MusicUtils;
@@ -245,6 +246,13 @@ public final class MusicService extends Service {
                 OnlyOneToast.makeText(LocalMusicFragment.activity, "暂无歌曲");
             }
         }
+        RecentlyMusicListInfo recentlyMusicListInfo=new RecentlyMusicListInfo();
+        recentlyMusicListInfo.setImage(ss);
+        recentlyMusicListInfo.setArtist(s);
+        recentlyMusicListInfo.setLrc_uri(ssss);
+        recentlyMusicListInfo.setUri(sss);
+        recentlyMusicListInfo.setName(LocalMusicFragment.sMusicList.get(playingMusicIndex).getTitle());
+        recentlyMusicListInfo.save();
         return true;
     }
     
