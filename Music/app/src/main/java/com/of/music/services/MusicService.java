@@ -36,12 +36,15 @@ import com.of.music.Toast.OnlyOneToast;
 import com.of.music.activity.EqualizerActivity;
 import com.of.music.defineViewd.VisualizerView;
 import com.of.music.fragment.LocalMusicFragment;
+import com.of.music.info.FavouriteMusicListInfo;
 import com.of.music.info.MusicName;
 import com.of.music.songListInformation.Music;
 import com.of.music.songListInformation.MusicIconLoader;
 import com.of.music.songListInformation.MusicUtils;
 import com.of.music.ui.LrcView;
 import com.of.music.widget.appwidget_provider;
+
+import org.litepal.LitePal;
 
 import java.io.File;
 import java.io.IOException;
@@ -547,11 +550,20 @@ public final class MusicService extends Service {
             }
             if(isLike==true){
                 LocalMusicFragment.lxrOperator.delete(song);
+                LitePal.deleteAll(FavouriteMusicListInfo.class,"name=?",song);
                 LocalMusicFragment.mAddLikeMusicButton.setImageResource(R.drawable.like_image);
                 OnlyOneToast.makeText(getApplicationContext(),"已取消喜欢");
             }else{
                 MusicName lxr = new MusicName(song,artist,song_Image,uri,Lrc_uri);
                 LocalMusicFragment. lxrOperator.add(lxr);
+                //LitePal框架存储到数据库
+                FavouriteMusicListInfo favouriteMusicListInfo1 = new FavouriteMusicListInfo();
+                favouriteMusicListInfo1.setName(song);
+                favouriteMusicListInfo1.setArtist(artist);
+                favouriteMusicListInfo1.setImage(song_Image);
+                favouriteMusicListInfo1.setUri(uri);
+                favouriteMusicListInfo1.setLrc_uri(Lrc_uri);
+                favouriteMusicListInfo1.save();
                 LocalMusicFragment.mAddLikeMusicButton.setImageResource(R.drawable.like_image_selected);
                 OnlyOneToast.makeText(getApplicationContext(),"已添加到我喜欢的音乐");
             }

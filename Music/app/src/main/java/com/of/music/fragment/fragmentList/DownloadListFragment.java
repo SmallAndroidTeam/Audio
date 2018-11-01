@@ -1,16 +1,20 @@
 package com.of.music.fragment.fragmentList;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
@@ -26,6 +30,7 @@ import android.webkit.ValueCallback;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hwangjr.rxbus.annotation.Subscribe;
 import com.hwangjr.rxbus.annotation.Tag;
@@ -59,6 +64,8 @@ import com.of.music.util.onlineUtil.FileUtils;
 import com.of.music.util.onlineUtil.PermissionReq;
 import com.of.music.util.onlineUtil.ToastUtils;
 
+import org.litepal.LitePal;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +83,7 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
     private DownloadListAdapter adapter;
     private List<DownloadMusicInfo> imusics=new ArrayList<>();
     private DownloadMusicOperater downloadMusicOperater;
+    DownloadBroadcast broadcastReceiver=new DownloadBroadcast();
     @Bind(R.id.downloadsrl)
     private SwipeRefreshLayout mSwipeRefreshLayout;
     @Nullable
@@ -100,6 +108,30 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
         
         lvLocalMusic.setAdapter(adapter);
         adapter.setOnMoreClickListener(this);
+        //初始化下拉控件颜色
+        mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright, android.R.color.holo_green_light,
+                android.R.color.holo_orange_light, android.R.color.holo_red_light);
+    
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new AsyncTask<Void, Void, Void>() {
+                
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        SystemClock.sleep(2000);
+                        return null;
+                    }
+                
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                    
+                        Toast.makeText(getActivity(), "下拉刷新成功", Toast.LENGTH_SHORT).show();
+                        mSwipeRefreshLayout.setRefreshing(false);
+                    }
+                }.execute();
+            }
+        });
     }
     
     @Override
@@ -242,5 +274,17 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
                 lvLocalMusic.setSelectionFromTop(position, offset);
             }
         });
+    }
+    public class DownloadBroadcast extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i("Music", "onReceive: 广播接受成功");
+            imusics.clear();
+            Log.i("Music", "清理后，收藏列表（favouriteMusicListInfos）的歌曲数目：  "+imusics.size());
+          imusics=downloadMusicOperater.queryMany();
+            Log.i("Music", "查找后，收藏列表（favouriteMusicListInfos）的歌曲数目"+imusics.size());
+            DownloadListAdapter favouriteListAdapt = new DownloadListAdapter(getActivity(),imusics);
+            lvLocalMusic.setAdapter(favouriteListAdapt);
+        }
     }
 }
