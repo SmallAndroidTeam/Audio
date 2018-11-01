@@ -5,8 +5,10 @@ import android.app.Dialog;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
@@ -20,6 +22,7 @@ import com.of.music.db.MusicOperator;
 import com.of.music.info.MusicName;
 import com.of.music.model.DownloadMusicInfo;
 import com.of.music.model.IExecutor;
+import com.of.music.services.MusicService;
 import com.of.music.util.comparator.NetworkUtils;
 import com.of.music.util.onlineUtil.FileUtils;
 import com.of.music.util.onlineUtil.ToastUtils;
@@ -97,8 +100,9 @@ public abstract class DownloadMusic implements IExecutor<Void> {
             Log.i("downloaddata",data);
             if(!downloadMusicOperater.Dataexist(title,musicAbsPath,coverPath,artist,FileUtils.getLrcDir()+FileUtils.getLrcFileName(artist, title))) {
                 DownloadMusicInfo downloadMusicInfo = new DownloadMusicInfo(title, musicAbsPath, coverPath, artist, FileUtils.getLrcDir() + FileUtils.getLrcFileName(artist, title), data);
-                
                 downloadMusicOperater.add(downloadMusicInfo);
+                //修改数据库中的数据
+               
             }
             Log.i("downloadf","///////"+downloadMusicInfos.size());
         } catch (Throwable th) {
@@ -106,4 +110,5 @@ public abstract class DownloadMusic implements IExecutor<Void> {
             ToastUtils.show("下载失败");
         }
     }
+   
 }

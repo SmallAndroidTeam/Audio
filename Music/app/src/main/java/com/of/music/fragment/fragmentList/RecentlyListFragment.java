@@ -19,12 +19,15 @@ import com.of.music.adapter.OnMoreClickListener;
 import com.of.music.adapter.PlaylistAdapter;
 import com.of.music.fragment.LocalMusicFragment;
 import com.of.music.fragment.fragmentNet.BaseFragment;
+import com.of.music.info.RecentlyMusicListInfo;
 import com.of.music.model.Imusic;
 import com.of.music.services.AudioPlayer;
 import com.of.music.services.MusicService;
 import com.of.music.services.OnPlayerEventListener;
 import com.of.music.songListInformation.Music;
 import com.of.music.util.onlineUtil.FileUtils;
+
+import org.litepal.LitePal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,16 +37,18 @@ public class RecentlyListFragment extends BaseFragment implements AdapterView.On
    private ListView lvPlaylist;
 
     private PlaylistAdapter adapter;
-    private List<Imusic> imusicArrayList;
+    private List<RecentlyMusicListInfo> imusicArrayList;
    @Override
    public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+       LitePal.getDatabase();
        View view = inflater.inflate(R.layout.fragment_recently_list, null);
        lvPlaylist=view.findViewById(R.id.lv_playlist);
-       AudioPlayer.get().init(App.sContext);
-        imusicArrayList= AudioPlayer.get().getMusicList();
-       adapter = new PlaylistAdapter(AudioPlayer.get().getMusicList());
-       adapter.setIsPlaylist(true);
+      
+       imusicArrayList=LitePal.findAll(RecentlyMusicListInfo.class);
+      
+        adapter = new PlaylistAdapter(getActivity(),imusicArrayList);
+        adapter.setIsPlaylist(true);
         adapter.setOnMoreClickListener(this);
         lvPlaylist.setAdapter(adapter);
         lvPlaylist.setOnItemClickListener(this);
@@ -54,12 +59,12 @@ public class RecentlyListFragment extends BaseFragment implements AdapterView.On
    @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
        Log.i("recently","从Recentlylist播放");
+       Log.i("recently","从Recentlylist播放"+imusicArrayList.get(position).getName());
         ArrayList<Music> musics=new ArrayList<>();
         for(int i=0;i<imusicArrayList.size();i++){
            
-           Music music=new Music(imusicArrayList.get(i).getTitle(),imusicArrayList.get(i).getPath()
-                  ,imusicArrayList.get(i).getAlbum(),imusicArrayList.get(i).getArtist()
-                    , FileUtils.getLrcDir()+FileUtils.getLrcFileName(imusicArrayList .get(i).getArtist(), imusicArrayList.get(i).getTitle()));
+           Music music=new Music(imusicArrayList.get(i).getName(),imusicArrayList.get(i).getUri()
+                   ,imusicArrayList.get(i).getImage(),imusicArrayList.get(i).getArtist(),imusicArrayList.get(i).getLrc_uri());
          musics.add(music);
         }
         LocalMusicFragment.sMusicList=musics;

@@ -32,6 +32,7 @@ import com.of.music.downloadExecute.ShareOnlineMusic;
 import com.of.music.fragment.LocalMusicFragment;
 import com.of.music.http.HttpCallback;
 import com.of.music.http.HttpClient;
+import com.of.music.info.RecentlyMusicListInfo;
 import com.of.music.model.Imusic;
 import com.of.music.model.LoadStateEnum;
 import com.of.music.model.OnlineMusic;
@@ -219,6 +220,12 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
               }
           }
       },0,100);
+        RecentlyMusicListInfo recentlyMusicListInfo=new RecentlyMusicListInfo();
+        recentlyMusicListInfo.setImage(arrayList.get(index).getImage());
+        recentlyMusicListInfo.setArtist(arrayList.get(index).getArtist());
+        recentlyMusicListInfo.setLrc_uri(arrayList.get(index).getLrcpath());
+        recentlyMusicListInfo.setUri(arrayList.get(index).getUri());
+        recentlyMusicListInfo.save();
      
     }
 

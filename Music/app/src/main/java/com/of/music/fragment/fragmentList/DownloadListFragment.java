@@ -148,7 +148,7 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
         Intent intent = new Intent(getActivity(), MusicService.class);
         intent.setAction(MusicService.TOGGLEPAUSE_ACTION);
         Objects.requireNonNull(getActivity()).startService(intent);
-        downloadMusicOperater.alter(imusics.get(position).getTime(),String.valueOf(System.currentTimeMillis()));
+        downloadMusicOperater.alter(imusics.get(position).getTitle(),String.valueOf(System.currentTimeMillis()));
         DownloadMusicOperater downloadMusicOperater1=new DownloadMusicOperater(getActivity());
         Log.i("download",downloadMusicOperater1.queryMany().get(position).getTime());
     }
@@ -281,7 +281,7 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
             Log.i("Music", "onReceive: 广播接受成功");
             imusics.clear();
             Log.i("Music", "清理后，收藏列表（favouriteMusicListInfos）的歌曲数目：  "+imusics.size());
-          imusics=downloadMusicOperater.queryMany();
+            imusics=downloadMusicOperater.queryMany();
             Log.i("Music", "查找后，收藏列表（favouriteMusicListInfos）的歌曲数目"+imusics.size());
             DownloadListAdapter favouriteListAdapt = new DownloadListAdapter(getActivity(),imusics);
             lvLocalMusic.setAdapter(favouriteListAdapt);
