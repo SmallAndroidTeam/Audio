@@ -19,6 +19,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.Gravity;
@@ -36,6 +37,9 @@ import com.of.music.Toast.OnlyOneToast;
 import com.of.music.activity.EqualizerActivity;
 import com.of.music.defineViewd.VisualizerView;
 import com.of.music.fragment.LocalMusicFragment;
+import com.of.music.fragment.fragmentList.DownloadListFragment;
+import com.of.music.fragment.fragmentList.FragmentAlter;
+import com.of.music.fragment.fragmentList.RecentlyListFragment;
 import com.of.music.info.FavouriteMusicListInfo;
 import com.of.music.info.MusicName;
 import com.of.music.info.RecentlyMusicListInfo;
@@ -88,6 +92,7 @@ public final class MusicService extends Service {
     public static final  String LOVE_ACTION="com.of.music.LOVE_BROADCAST";
     public static final  String NOTIFICATION_LOVE_ACTION="com.of.music.NOTIFICATION_LOVE_BROADCAST";
     public static final String PLAYVIEW_LOVE_ACTION="ADD_LOVE_ACTION";
+    public static final String RECENTLY_ADDACTION = "com.of.music.recentlyfragment";
     public static final String UPDATE_ACTION="update";
     private static final int NotificationId=1000;
     private static  Notification mNotification;
@@ -95,6 +100,7 @@ public final class MusicService extends Service {
     private static RemoteViews remoteViews;
     private static   AppWidgetManager appWidgetManager;
     private static  ComponentName componentName;
+    
     private static boolean ForegroundIsExist=false;//判断前台服务是否存在
     private final BroadcastReceiver mIntentReceiver=new BroadcastReceiver() {
         @Override

@@ -19,6 +19,7 @@ import com.of.music.Application.Preferences;
 import com.of.music.R;
 import com.of.music.db.DownloadMusicOperater;
 import com.of.music.db.MusicOperator;
+import com.of.music.fragment.fragmentList.DownloadListFragment;
 import com.of.music.info.MusicName;
 import com.of.music.model.DownloadMusicInfo;
 import com.of.music.model.IExecutor;
@@ -102,7 +103,8 @@ public abstract class DownloadMusic implements IExecutor<Void> {
                 DownloadMusicInfo downloadMusicInfo = new DownloadMusicInfo(title, musicAbsPath, coverPath, artist, FileUtils.getLrcDir() + FileUtils.getLrcFileName(artist, title), data);
                 downloadMusicOperater.add(downloadMusicInfo);
                 //修改数据库中的数据
-               
+                DownloadListFragment downloadListFragment=new DownloadListFragment();
+                downloadListFragment.DownloadBroadcast();
             }
             Log.i("downloadf","///////"+downloadMusicInfos.size());
         } catch (Throwable th) {

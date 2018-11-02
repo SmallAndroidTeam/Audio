@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.of.music.R;
 import com.of.music.Application.App;
 import com.of.music.info.MusicInfo;
+import com.of.music.songListInformation.Music;
 import com.of.music.songListInformation.MusicUtils;
 import com.of.music.ui.IConstants;
 import com.of.music.util.comparator.MusicComparator;
@@ -37,7 +38,7 @@ public class MusicListFragment extends Fragment {
     private PreferencesUtility mPreferenceUtility;
     private Context mContext = App.sContext;
     private HashMap<String, Integer> positionMap = new HashMap<>();
-
+   private ArrayList<Music> musicArrayList=new ArrayList<>();
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser){
         super.setUserVisibleHint(isVisibleToUser);
@@ -92,6 +93,7 @@ public class MusicListFragment extends Fragment {
                     }
                 }
                 mAdapter.updateDataSet(songList);
+                
                 return null;
             }
 

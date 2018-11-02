@@ -91,7 +91,6 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
     public static void setmListInfo(SheetInfo mListInfo) {
         OnlineMusicActivity.mListInfo = mListInfo;
     }
-    
     @Override
     protected void onServiceBound() {
       //  mListInfo = (SheetInfo) getIntent().getSerializableExtra(Extras.MUSIC_LIST_TYPE);
@@ -221,7 +220,6 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
           }
       },0,100);
       
-     
     }
 
     @Override

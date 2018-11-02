@@ -83,7 +83,7 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
     private DownloadListAdapter adapter;
     private List<DownloadMusicInfo> imusics=new ArrayList<>();
     private DownloadMusicOperater downloadMusicOperater;
-    DownloadBroadcast broadcastReceiver=new DownloadBroadcast();
+   
     @Bind(R.id.downloadsrl)
     private SwipeRefreshLayout mSwipeRefreshLayout;
     @Nullable
@@ -240,6 +240,7 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
                     getContext().sendBroadcast(intent);
                     LocalMusicFragment.sMusicList.remove(music);
                     downloadMusicOperater.delete(music.getTitle());
+                    DownloadBroadcast();
                 }
             }
         });
@@ -275,9 +276,7 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
             }
         });
     }
-    public class DownloadBroadcast extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
+    public  void DownloadBroadcast() {
             Log.i("Music", "onReceive: 广播接受成功");
             imusics.clear();
             Log.i("Music", "清理后，收藏列表（favouriteMusicListInfos）的歌曲数目：  "+imusics.size());
@@ -285,6 +284,6 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
             Log.i("Music", "查找后，收藏列表（favouriteMusicListInfos）的歌曲数目"+imusics.size());
             DownloadListAdapter favouriteListAdapt = new DownloadListAdapter(getActivity(),imusics);
             lvLocalMusic.setAdapter(favouriteListAdapt);
-        }
+       
     }
 }
