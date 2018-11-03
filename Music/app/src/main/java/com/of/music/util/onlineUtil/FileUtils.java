@@ -119,7 +119,7 @@ public class FileUtils {
         if (TextUtils.isEmpty(title)) {
             title = AppCache.get().getContext().getString(R.string.unknown);
         }
-        return artist + " - " + title;
+        return artist + "_" + title;
     }
 
     public static String getArtistAndAlbum(String artist, String album) {
@@ -141,7 +141,7 @@ public class FileUtils {
         if (str == null) {
             return null;
         }
-        String regEx = "[\\/:*?\"<>|]";
+        String regEx = "[\\/:*?\"<>| ']";
         Pattern p = Pattern.compile(regEx);
         Matcher m = p.matcher(str);
         return m.replaceAll("").trim();

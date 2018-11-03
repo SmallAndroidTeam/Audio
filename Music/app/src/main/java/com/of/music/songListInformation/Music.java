@@ -17,7 +17,7 @@ public class Music {
 	private String album;
 	public Music() {
 	}
-	
+
 	public Music(String title, String uri, String image, String artist, String lrcpath) {//本地歌曲的构造函数
 		this.title = title;
 		this.uri = uri;

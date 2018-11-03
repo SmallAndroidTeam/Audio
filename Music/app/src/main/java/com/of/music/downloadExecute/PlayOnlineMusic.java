@@ -19,7 +19,6 @@ import java.io.File;
  */
 public abstract class PlayOnlineMusic extends PlayMusic {
     private OnlineMusic mOnlineMusic;
-     public static String fileLink;
      public static String path;
     public PlayOnlineMusic(Activity activity, OnlineMusic onlineMusic) {
         super(activity, 3);
@@ -40,7 +39,7 @@ public abstract class PlayOnlineMusic extends PlayMusic {
         // 下载歌词
         String lrcFileName = FileUtils.getLrcFileName(artist, title);
         File lrcFile = new File(FileUtils.getLrcDir() + lrcFileName);
-        if (!lrcFile.exists() && !TextUtils.isEmpty(mOnlineMusic.getLrclink())) {
+        if (!lrcFile.exists() && !TextUtils.isEmpty(mOnlineMusic.getLrclink())&&mOnlineMusic.getLrclink().startsWith("http")) {
             downloadLrc(mOnlineMusic.getLrclink(), lrcFileName);
         } else {
             mCounter++;
@@ -54,7 +53,7 @@ public abstract class PlayOnlineMusic extends PlayMusic {
         if (TextUtils.isEmpty(picUrl)) {
             picUrl = mOnlineMusic.getPic_small();
         }
-        if (!albumFile.exists() && !TextUtils.isEmpty(picUrl)) {
+        if (!albumFile.exists() && !TextUtils.isEmpty(picUrl)&&picUrl.startsWith("http")) {
             downloadAlbum(picUrl, albumFileName);
         } else {
             mCounter++;

@@ -43,7 +43,6 @@ public class AppCache {
 
     public void init(Application application) {
         mContext = application.getApplicationContext();
-        ToastUtils.init(mContext);
         Preferences.init(mContext);
         ScreenUtils.init(mContext);
         CrashHandler.getInstance().init();

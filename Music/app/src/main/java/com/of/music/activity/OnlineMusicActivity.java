@@ -23,6 +23,7 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.of.music.Application.App;
 import com.of.music.R;
+import com.of.music.Toast.OnlyOneToast;
 import com.of.music.adapter.Bind;
 import com.of.music.adapter.OnMoreClickListener;
 import com.of.music.adapter.OnlineMusicAdapter;
@@ -132,7 +133,9 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
                     return;
                 }
                 mOffset += MUSIC_LIST_SIZE;
+                mMusicList.clear();
                 mMusicList.addAll(response.getSong_list());
+                Log.i("audio111", "onSuccess: "+mMusicList.get(0).getLrclink());
                 arrayList.clear();
                 getMusicList.clear();
                 for(int i=0;i<mMusicList.size();i++){
@@ -146,7 +149,7 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
                         if(getCount==0){
                             for(int i=0;i<getMusicList.size();i++){
                                 arrayList.add(getMusicList.get(i));
-                                Log.i("teste11111", "index: "+i+"//"+getMusicList.get(i).getTitle());
+                              //  Log.i("teste11111", "index: "+i+"//"+getMusicList.get(i).getTitle());
                             }
                             this.cancel();
                         }else{
@@ -224,6 +227,7 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
 
     @Override
     public void onMoreClick(int position) {
+       
         final OnlineMusic onlineMusic = mMusicList.get(position);
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
         dialog.setTitle(mMusicList.get(position).getTitle());
@@ -242,7 +246,8 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
                         break;
                     case 2:// 下载
                         Log.i("Url", "onClick: "+onlineMusic.getSong_id());
-                        download(onlineMusic);
+                   Log.i("audio111", "onClick: "+onlineMusic.getLrclink());
+                            download(onlineMusic);
                         break;
                 }
             }

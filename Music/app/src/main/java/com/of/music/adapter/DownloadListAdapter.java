@@ -2,6 +2,7 @@ package com.of.music.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,14 +27,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DownloadListAdapter extends BaseAdapter{
-    private List<DownloadMusicInfo> downloadInfoList;
+    private List<DownloadMusicInfo> downloadInfoList=new ArrayList<>();
     private OnMoreClickListener listener;
     private boolean isPlaylist;
     public Context context;
     public DownloadListAdapter(Context context,List<DownloadMusicInfo> musicList) {
         super();
         this.context=context;
-        this.downloadInfoList = musicList;
+        this.downloadInfoList.clear();
+        this.downloadInfoList.addAll(musicList);
+    }
+    
+    public List<DownloadMusicInfo> getDownloadInfoList() {
+        return downloadInfoList;
+    }
+    
+    public void setDownloadInfoList(List<DownloadMusicInfo> downloadInfoList) {
+        this.downloadInfoList.clear();
+        this.downloadInfoList.addAll(downloadInfoList);
     }
     
     public void setIsPlaylist(boolean isPlaylist) {
@@ -61,16 +72,17 @@ public class DownloadListAdapter extends BaseAdapter{
     
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
+       
         final ViewHolder holder;
         if (convertView == null) {
-            convertView=convertView.inflate(App.sContext, R.layout.view_holder_music, null);
+            convertView=convertView.inflate(App.sContext, R.layout.fragement_download_music_item, null);
             holder = new ViewHolder();
-            holder.tvArtist=convertView.findViewById(R.id.tv_artist);
-            holder.ivCover=convertView.findViewById(R.id.iv_cover);
-            holder.ivMore=convertView.findViewById(R.id.iv_more);
-            holder.tvTitle=convertView.findViewById(R.id.tv_title);
-            holder.vDivider=convertView.findViewById(R.id.v_divider);
-            holder.vPlaying=convertView.findViewById(R.id.v_playing);
+            holder.tvArtist=convertView.findViewById(R.id.tv_artist1);
+            holder.ivCover=convertView.findViewById(R.id.iv_cover1);
+            holder.ivMore=convertView.findViewById(R.id.iv_more1);
+            holder.tvTitle=convertView.findViewById(R.id.tv_title1);
+            holder.vDivider=convertView.findViewById(R.id.v_divider1);
+            holder.vPlaying=convertView.findViewById(R.id.v_playing1);
             convertView.setTag(holder);
         } else {
             holder =(ViewHolder)convertView.getTag();

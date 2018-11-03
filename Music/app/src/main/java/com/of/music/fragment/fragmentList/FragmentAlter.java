@@ -9,7 +9,7 @@ public class FragmentAlter {
        downloadFragmenet=downloadfragmenet;
     }
     public static void setRecentlyFragment(Fragment recentlyfragmenet){
-        downloadFragmenet=recentlyfragmenet;
+        recentlyFragment=recentlyfragmenet;
     }
     
     public static Fragment getDownloadFragmenet() {

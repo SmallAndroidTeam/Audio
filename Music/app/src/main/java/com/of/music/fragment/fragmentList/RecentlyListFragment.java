@@ -44,20 +44,15 @@ public class RecentlyListFragment extends BaseFragment implements AdapterView.On
    private ListView lvPlaylist;
     ArrayList<Music> musics;
     private PlaylistAdapter adapter;
-    private List<RecentlyMusicListInfo> imusicArrayList;
-    private MyBoadCast broadcastReceiver;
+    private List<RecentlyMusicListInfo> imusicArrayList=new ArrayList<>();
+   
    @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
        LitePal.getDatabase();
        View view = inflater.inflate(R.layout.fragment_recently_list, null);
        lvPlaylist=view.findViewById(R.id.lv_playlist);
-       imusicArrayList=LitePal.findAll(RecentlyMusicListInfo.class);
-       broadcastReceiver = new RecentlyListFragment.MyBoadCast();
-       IntentFilter filter = new IntentFilter();
-       filter.addAction(MusicService.RECENTLY_ADDACTION);
-       getActivity().registerReceiver(broadcastReceiver, filter);
-    
+       imusicArrayList=LitePal.select("name","artist","image","uri","Lrc_uri","playTime").order("playTime desc").find(RecentlyMusicListInfo.class);
        Log.i("recently","从Recentlylist播放"+imusicArrayList.size());
        musics=new ArrayList<>();
        for(int i=0;i<imusicArrayList.size();i++){
@@ -89,34 +84,30 @@ public class RecentlyListFragment extends BaseFragment implements AdapterView.On
    public void onMoreClick(final int position) {
         String[] items = new String[]{"移除"};
         Music music=musics.get(position);
+        String name=music.getTitle();
+        String uri=imusicArrayList.get(position).getUri();
       final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
         dialog.setTitle(music.getTitle());
        dialog.setItems(items, new DialogInterface.OnClickListener() {
            @Override
             public void onClick(DialogInterface dialog, int which) {
+                LitePal.deleteAll(RecentlyMusicListInfo.class,"uri=?",imusicArrayList.get(position).getUri());
+                Log.i("delete","         "+LitePal.findAll(RecentlyMusicListInfo.class).size());
                 imusicArrayList.remove(position);
-                adapter.notifyDataSetChanged();
+               adapter.notifyDataSetChanged();
+             
           }
         });
+      
        dialog.show();
    }
-    public class MyBoadCast extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.i("Music", "onReceive: 广播接受成功");
-            imusicArrayList.clear();
-            Log.i("Music", "清理后，收藏列表（favouriteMusicListInfos）的歌曲数目：  "+imusicArrayList.size());
-            imusicArrayList = LitePal.findAll(RecentlyMusicListInfo.class);
-            Log.i("Music", "查找后，收藏列表（favouriteMusicListInfos）的歌曲数目"+imusicArrayList.size());
-            PlaylistAdapter favouriteListAdapt = new PlaylistAdapter(getActivity(),imusicArrayList);
-            lvPlaylist.setAdapter(favouriteListAdapt);
-        }
-    }
+   
     public   void  AlterAdapter(){
         Log.i("Music", "onReceive: 广播接受成功");
         imusicArrayList.clear();
         Log.i("Music", "清理后，收藏列表（favouriteMusicListInfos）的歌曲数目：  "+imusicArrayList.size());
-        imusicArrayList = LitePal.findAll(RecentlyMusicListInfo.class);
+
+        imusicArrayList = LitePal.select("name","artist","image","uri","Lrc_uri","playTime").order("playTime desc").find(RecentlyMusicListInfo.class);
         Log.i("Music", "查找后，收藏列表（favouriteMusicListInfos）的歌曲数目"+imusicArrayList.size());
         PlaylistAdapter favouriteListAdapt = new PlaylistAdapter(getActivity(),imusicArrayList);
         lvPlaylist.setAdapter(favouriteListAdapt);

@@ -7,19 +7,84 @@ import android.util.Log;
 
 import com.of.music.model.DownloadMusicInfo;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DownloadMusicOperater{
-    private DownloadMusicOpenHelper dbHelper;
-    private SQLiteDatabase db;
-    
+    private  DownloadMusicOpenHelper dbHelper;
+    private  SQLiteDatabase db;
+    private final static float MAX_DOWNVIDEO_TOTAL_SIZE=10*1024*1024;
     private String TAG="downloadMusic";
     public DownloadMusicOperater(Context context) {
         dbHelper = new DownloadMusicOpenHelper(context, "downloadmusicData", null, 1);
         db = dbHelper.getWritableDatabase();
     }
+    //如果下载的视频大于1G则先把视频下载下来，再通过子线程把最先下载的视频删除,直到下载的总视频大小不大于1G
+    public  synchronized void keepDownloadVideoTotalSize(final String DownLoadPath){
+        if(DownLoadPath==null){
+            return;
+        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                File file=new File(DownLoadPath);
+                List<DownloadMusicInfo> downVideoPaths=new ArrayList<>();//存储视频的下载地址
+                double currentDownVideoTotalSize=0;//当前下载视频的总的大小
+                if(!file.exists()||file.isDirectory()){
+                    Log.i("movie2", "下载路径获取失败"+DownLoadPath+"//"+file.exists()+"//"+file.isDirectory());
+                }else{
+                    Cursor cursor=db.rawQuery("select * from downloadmusicData order by data asc",null);
+                    if(cursor.moveToFirst()){
+                        do{
+                            String path=cursor.getString(cursor.getColumnIndex("uri"));
+                            String modify=cursor.getString(cursor.getColumnIndex("data"));//修改时间
+                            File file1=new File(path);
+                            if(file1.exists()&&file1.isFile())
+                            {
+                                Log.i("dsfsadf", "run: "+path+"//"+modify);
+                                DownloadMusicInfo video=new DownloadMusicInfo();
+                                video.setMusicPath(path);
+                             
+                                downVideoPaths.add(video);
+                                currentDownVideoTotalSize+=file1.length();//得到总的下载视频大小
+                            }
+                            
+                        }while (cursor.moveToNext());
+                    }
+                    Log.i("movie2", "当前下载视频总的大小为："+currentDownVideoTotalSize+"//"+currentDownVideoTotalSize/1024/1024+"M"+"\n总的视频个数为：" +
+                            ""+downVideoPaths.size());
+                    
+                    if(currentDownVideoTotalSize>MAX_DOWNVIDEO_TOTAL_SIZE){//如果下载视频的总大小大于1G
+                        for(DownloadMusicInfo video:downVideoPaths){
+                            String path=video.getMusicPath();
+                            File file1=new File(path);
+                            long videoSize=file1.length();
+                            if(file1.exists()&&file1.isFile()){
+                                if(file1.delete())//如果删成功
+                                {
+                                    deleteSaveVideo(path);//删除存储的视频
+                                    currentDownVideoTotalSize-=videoSize;
+                                    if(currentDownVideoTotalSize<=MAX_DOWNVIDEO_TOTAL_SIZE){
+                                        Log.i("movie2", "现在下载视频总的大小为："+currentDownVideoTotalSize+"//"+currentDownVideoTotalSize/1024/1024+"M");
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                        }
+                    }
+                    
+                }
+            }
+        }).start();
+        
+    }
     
+    //删除存储的地址
+    public synchronized  void deleteSaveVideo(String saveVideoPath){
+        db.execSQL("delete from downloadmusicData where uri=?", new String[] { saveVideoPath });
+    }
     // 添加联系人
     public void add(DownloadMusicInfo lxr) {
         Log.i(TAG, "add: name"+lxr.getTitle());

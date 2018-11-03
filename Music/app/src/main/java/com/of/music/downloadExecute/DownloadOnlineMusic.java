@@ -36,7 +36,7 @@ public abstract class DownloadOnlineMusic extends DownloadMusic {
         // 下载歌词
         String lrcFileName = FileUtils.getLrcFileName(artist, title);
         File lrcFile = new File(FileUtils.getLrcDir() + lrcFileName);
-        if (!TextUtils.isEmpty(mOnlineMusic.getLrclink()) && !lrcFile.exists()) {
+        if (!TextUtils.isEmpty(mOnlineMusic.getLrclink()) && !lrcFile.exists()&&mOnlineMusic.getLrclink().startsWith("http")) {
             HttpClient.downloadFile(mOnlineMusic.getLrclink(), FileUtils.getLrcDir(), lrcFileName, null);
         }
         music.setLrcpath(FileUtils.getLrcDir()+lrcFileName);
@@ -48,7 +48,7 @@ public abstract class DownloadOnlineMusic extends DownloadMusic {
         if (TextUtils.isEmpty(picUrl)) {
             picUrl = mOnlineMusic.getPic_big();
         }
-        if (!albumFile.exists() && !TextUtils.isEmpty(picUrl)) {
+        if (!albumFile.exists() && !TextUtils.isEmpty(picUrl)&&picUrl.startsWith("http")) {
          HttpClient.downloadFile(picUrl, FileUtils.getAlbumDir(), albumFileName, null);
         }
         music.setAlbum(FileUtils.getAlbumDir()+albumFileName);
@@ -61,8 +61,13 @@ public abstract class DownloadOnlineMusic extends DownloadMusic {
                  
                     return;
                 }
-                downloadMusic(response.getBitrate().getFile_link(), artist, title, albumFile.getPath());
-                onExecuteSuccess(null);
+                  if(response.getBitrate().getFile_link().startsWith("http")){//目的是为了防止下载链接为本地地址而导致应用崩了
+                      downloadMusic(response.getBitrate().getFile_link(), artist, title, albumFile.getPath());
+                      onExecuteSuccess(null);
+                  }else{
+                      onExecuteFail(null);
+                  }
+                
             }
             @Override
             public void onFail(Exception e) {

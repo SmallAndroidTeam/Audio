@@ -11,6 +11,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.media.audiofx.Equalizer;
@@ -258,7 +259,28 @@ public final class MusicService extends Service {
         recentlyMusicListInfo.setLrc_uri(ssss);
         recentlyMusicListInfo.setUri(sss);
         recentlyMusicListInfo.setName(LocalMusicFragment.sMusicList.get(playingMusicIndex).getTitle());
-        recentlyMusicListInfo.save();
+        recentlyMusicListInfo.setPlayTime(String.valueOf(System.currentTimeMillis()));
+        Cursor cursor=LitePal.findBySQL("select count(*) from RecentlyMusicListInfo where name = ?", recentlyMusicListInfo.getName());
+        Log.i("audio11", "initMusic: ");
+      if(cursor.moveToFirst()){
+          Log.i("audio11", "initMusic:1 "+cursor.getInt(0));
+          if(cursor.getInt(0)>0){
+           recentlyMusicListInfo.updateAll("name = ?",recentlyMusicListInfo.getName());
+          }else{
+              recentlyMusicListInfo.save();
+          }
+      }else{
+          Log.i("audio11", "initMusic:2 ");
+          recentlyMusicListInfo.save();
+      }
+     
+        
+//        RecentlyListFragment recentlyListFragment=new RecentlyListFragment();
+//      recentlyListFragment.AlterAdapter();
+       if(FragmentAlter.getRecentlyFragment()!=null)
+       {
+           ((RecentlyListFragment)FragmentAlter.getRecentlyFragment()).AlterAdapter();
+       }
         return true;
     }
     

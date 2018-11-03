@@ -4,6 +4,7 @@ import android.content.Context;
 import android.widget.Toast;
 
 import com.of.music.Application.App;
+import com.of.music.Toast.OnlyOneToast;
 
 /**
  * Toast工具类
@@ -12,12 +13,9 @@ import com.of.music.Application.App;
 public class ToastUtils {
     private static Context sContext;
     private static Toast sToast;
-
-    public static void init(Context context) {
-        sContext = App.sContext;
-    }
-
     public static void show(int resId) {
+        if(sContext==null)
+        sContext=App.sContext;
         show(sContext.getString(resId));
     }
 

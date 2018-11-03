@@ -73,6 +73,9 @@ public class HttpClient {
     }
 
     public static void downloadFile(String url, String destFileDir, String destFileName, @Nullable final HttpCallback<File> callback) {
+       
+        
+        
         OkHttpUtils.get().url(url).build()
                 .execute(new FileCallBack(destFileDir, destFileName) {
                     @Override

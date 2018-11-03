@@ -97,7 +97,8 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         downloadMusicOperater=new DownloadMusicOperater(getActivity());
-        imusics=downloadMusicOperater.queryMany();
+        imusics.clear();
+        imusics.addAll(downloadMusicOperater.queryMany());
         adapter = new DownloadListAdapter(getActivity(),imusics);
         downloadlist=new ArrayList<>();
         for(int i=0;i<imusics.size();i++){
@@ -111,28 +112,28 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
         //初始化下拉控件颜色
         mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright, android.R.color.holo_green_light,
                 android.R.color.holo_orange_light, android.R.color.holo_red_light);
-    
+
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 new AsyncTask<Void, Void, Void>() {
-                
+
                     @Override
                     protected Void doInBackground(Void... voids) {
                         SystemClock.sleep(2000);
                         return null;
                     }
-                
+
                     @Override
                     protected void onPostExecute(Void aVoid) {
-                    
+
                         Toast.makeText(getActivity(), "下拉刷新成功", Toast.LENGTH_SHORT).show();
                         mSwipeRefreshLayout.setRefreshing(false);
                     }
                 }.execute();
             }
         });
-    }
+   }
     
     @Override
     protected void setListener() {
@@ -240,7 +241,6 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
                     getContext().sendBroadcast(intent);
                     LocalMusicFragment.sMusicList.remove(music);
                     downloadMusicOperater.delete(music.getTitle());
-                    DownloadBroadcast();
                 }
             }
         });
@@ -276,14 +276,26 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
             }
         });
     }
-    public  void DownloadBroadcast() {
+    public void DownloadAlter() {
             Log.i("Music", "onReceive: 广播接受成功");
             imusics.clear();
             Log.i("Music", "清理后，收藏列表（favouriteMusicListInfos）的歌曲数目：  "+imusics.size());
-            imusics=downloadMusicOperater.queryMany();
+            imusics.addAll(downloadMusicOperater.queryMany());
             Log.i("Music", "查找后，收藏列表（favouriteMusicListInfos）的歌曲数目"+imusics.size());
-            DownloadListAdapter favouriteListAdapt = new DownloadListAdapter(getActivity(),imusics);
-            lvLocalMusic.setAdapter(favouriteListAdapt);
-       
+          adapter.setDownloadInfoList(imusics);
+         adapter.notifyDataSetChanged();
+        }
+    
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.i("audio111", "onPause: ");
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        DownloadAlter();
+        Log.i("audio111", "onResume: ");
     }
 }

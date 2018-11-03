@@ -9,6 +9,15 @@ public class RecentlyMusicListInfo extends LitePalSupport {
     private String image;
     private String uri;
     private String Lrc_uri;
+    private String playTime;
+    
+    public String getPlayTime() {
+        return playTime;
+    }
+    
+    public void setPlayTime(String playTime) {
+        this.playTime = playTime;
+    }
     
     public String getUri() {
         return uri;

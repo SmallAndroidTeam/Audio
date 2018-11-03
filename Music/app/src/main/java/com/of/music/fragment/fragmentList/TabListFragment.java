@@ -68,7 +68,8 @@ public class TabListFragment extends Fragment implements  View.OnClickListener{
         albumListFragment = new AlbumListFragment();
         downloadListFragment = new DownloadListFragment();
         usbListFragment = new USBListFragment();
-
+        FragmentAlter.setRecentlyFragment(recentlyListFragment);
+        FragmentAlter.setDownloadFragmenet(downloadListFragment);
         mFragmentList.add(recentlyListFragment);
         mFragmentList.add(favoriteListFragment);
         mFragmentList.add(musicListFragment);
@@ -80,7 +81,7 @@ public class TabListFragment extends Fragment implements  View.OnClickListener{
         mFragmentAdapter = new TabListFragmentAdapter(getFragmentManager(), mFragmentList);
 
         vpTablist = (ViewPager) view.findViewById(R.id.vp_tablist);
-        vpTablist.setOffscreenPageLimit(4);//设置viewpager的缓存为4帧
+        vpTablist.setOffscreenPageLimit(7);//设置viewpager的缓存为4帧
         vpTablist.setAdapter(mFragmentAdapter);
         mFragmentAdapter.notifyDataSetChanged();
         vpTablist.setCurrentItem(2);//默认显示单曲列表
@@ -94,12 +95,12 @@ public class TabListFragment extends Fragment implements  View.OnClickListener{
 
             @Override
             public void onPageSelected(int i) {
-
+            seleteTab(i);
             }
 
             @Override
             public void onPageScrollStateChanged(int i) {
-
+      
             }
         });
 
@@ -112,38 +113,66 @@ public class TabListFragment extends Fragment implements  View.OnClickListener{
         resetTvColor();
         switch (v.getId()) {
         case R.id.tv_recently:
-            vpTablist.setCurrentItem(0, true);
-            tvRecently.setTextColor(getResources().getColor(R.color.red));
+            seleteTab(0);
             break;
         case R.id.tv_favority:
-            vpTablist.setCurrentItem(1, true);
-            tvFavority.setTextColor(getResources().getColor(R.color.red));
+            seleteTab(1);
             break;
         case R.id.tv_song:
-            vpTablist.setCurrentItem(2, true);
-            tvSong.setTextColor(getResources().getColor(R.color.red));
+            seleteTab(2);
             break;
         case R.id.tv_artist:
-            vpTablist.setCurrentItem(3, true);
-            tvArtist.setTextColor(getResources().getColor(R.color.red));
+            seleteTab(3);
             break;
         case R.id.tv_album:
-            vpTablist.setCurrentItem(4, true);
-            tvAlbum.setTextColor(getResources().getColor(R.color.red));
+            seleteTab(4);
             break;
         case R.id.tv_download:
-            vpTablist.setCurrentItem(5, true);
-            tvDownload.setTextColor(getResources().getColor(R.color.red));
+            seleteTab(5);
             break;
         case R.id.tv_usb:
-            vpTablist.setCurrentItem(6, true);
-            tvUsb.setTextColor(getResources().getColor(R.color.red));
+          seleteTab(6);
             break;
         default:
                 break;
          }
     }
 
+    public void seleteTab(int index){
+        resetTvColor();
+        switch (index){
+            case 0:
+                vpTablist.setCurrentItem(0, true);
+                tvRecently.setTextColor(getResources().getColor(R.color.red));
+                break;
+            case 1:
+                vpTablist.setCurrentItem(1, true);
+                tvFavority.setTextColor(getResources().getColor(R.color.red));
+                break;
+            case 2:
+                vpTablist.setCurrentItem(2, true);
+                tvSong.setTextColor(getResources().getColor(R.color.red));
+                break;
+            case 3:
+                vpTablist.setCurrentItem(3, true);
+                tvArtist.setTextColor(getResources().getColor(R.color.red));
+                break;
+            case 4:
+                vpTablist.setCurrentItem(4, true);
+                tvAlbum.setTextColor(getResources().getColor(R.color.red));
+                break;
+            case 5:
+                vpTablist.setCurrentItem(5, true);
+                tvDownload.setTextColor(getResources().getColor(R.color.red));
+                break;
+            case  6:
+                vpTablist.setCurrentItem(6, true);
+                tvUsb.setTextColor(getResources().getColor(R.color.red));
+                break;
+                
+        }
+    
+    }
     private void resetTvColor(){
         tvRecently.setTextColor(getResources().getColor(R.color.text_color));
         tvFavority.setTextColor(getResources().getColor(R.color.text_color));
