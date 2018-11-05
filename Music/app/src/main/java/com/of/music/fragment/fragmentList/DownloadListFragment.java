@@ -82,7 +82,7 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
     private Loader<Cursor> loader;
     private DownloadListAdapter adapter;
     private List<DownloadMusicInfo> imusics=new ArrayList<>();
-    private DownloadMusicOperater downloadMusicOperater;
+    public  static DownloadMusicOperater downloadMusicOperater;
    
     @Bind(R.id.downloadsrl)
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -142,16 +142,14 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
     
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Log.i("download",imusics.get(position).getTime());
+        Log.i("altertime",imusics.get(position).getTime()+"//"+"a");
         LocalMusicFragment.sMusicList=downloadlist;
         MusicService.playingMusicIndex=position;
         new MusicService().initMusic();
         Intent intent = new Intent(getActivity(), MusicService.class);
         intent.setAction(MusicService.TOGGLEPAUSE_ACTION);
         Objects.requireNonNull(getActivity()).startService(intent);
-        downloadMusicOperater.alter(imusics.get(position).getTitle(),String.valueOf(System.currentTimeMillis()));
-        DownloadMusicOperater downloadMusicOperater1=new DownloadMusicOperater(getActivity());
-        Log.i("download",downloadMusicOperater1.queryMany().get(position).getTime());
+       
     }
     
     @Override

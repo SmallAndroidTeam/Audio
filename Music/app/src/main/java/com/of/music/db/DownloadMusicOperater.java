@@ -18,9 +18,10 @@ public class DownloadMusicOperater{
     private String TAG="downloadMusic";
     public DownloadMusicOperater(Context context) {
         dbHelper = new DownloadMusicOpenHelper(context, "downloadmusicData", null, 1);
+       
         db = dbHelper.getWritableDatabase();
     }
-    //如果下载的视频大于1G则先把视频下载下来，再通过子线程把最先下载的视频删除,直到下载的总视频大小不大于1G
+    //如果下载的音乐大于1G则先把音乐下载下来，再通过子线程把最先下载的音乐删除,直到下载的总视频大小不大于1G
     public  synchronized void keepDownloadVideoTotalSize(final String DownLoadPath){
         if(DownLoadPath==null){
             return;
@@ -102,12 +103,12 @@ public class DownloadMusicOperater{
         
         db.execSQL("Update downloadmusicData set data=? where name=?",new String[]{data,title});
     }
-    // 删除联系人
+    // 删除联系人根据歌名
     public void delete(String name) {
         db.execSQL("delete from downloadmusicData where name=?", new String[] { name });
     }
     
-    // 查询联系人
+    // 查询联系人根据歌名
     public DownloadMusicInfo queryOne(String name) {
         DownloadMusicInfo lxr = new DownloadMusicInfo();
         Cursor c = db.rawQuery("select * from downloadmusicData where name= ?", new String[] { name });

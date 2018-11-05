@@ -333,7 +333,7 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
             
         }.execute();
     }
-
+//分享
     private void share(final OnlineMusic onlineMusic) {
         new ShareOnlineMusic(this, onlineMusic.getTitle(), onlineMusic.getSong_id()) {
             @Override
@@ -352,11 +352,11 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
             }
         }.execute();
     }
-
+//查看歌手信息
     private void artistInfo(OnlineMusic onlineMusic) {
        ArtistInfoActivity.start(this,onlineMusic.getTing_uid());
     }
-
+//下载歌曲
     private void download(final OnlineMusic onlineMusic) {
         new DownloadOnlineMusic(this, onlineMusic) {
             @Override

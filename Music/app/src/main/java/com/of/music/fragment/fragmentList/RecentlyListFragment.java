@@ -84,13 +84,12 @@ public class RecentlyListFragment extends BaseFragment implements AdapterView.On
    public void onMoreClick(final int position) {
         String[] items = new String[]{"移除"};
         Music music=musics.get(position);
-        String name=music.getTitle();
-        String uri=imusicArrayList.get(position).getUri();
       final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
         dialog.setTitle(music.getTitle());
        dialog.setItems(items, new DialogInterface.OnClickListener() {
            @Override
             public void onClick(DialogInterface dialog, int which) {
+//               从数据库删除数据，并将适配器中的数据删除，然后更新
                 LitePal.deleteAll(RecentlyMusicListInfo.class,"uri=?",imusicArrayList.get(position).getUri());
                 Log.i("delete","         "+LitePal.findAll(RecentlyMusicListInfo.class).size());
                 imusicArrayList.remove(position);

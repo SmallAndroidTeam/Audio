@@ -38,8 +38,11 @@ public abstract class DownloadOnlineMusic extends DownloadMusic {
         File lrcFile = new File(FileUtils.getLrcDir() + lrcFileName);
         if (!TextUtils.isEmpty(mOnlineMusic.getLrclink()) && !lrcFile.exists()&&mOnlineMusic.getLrclink().startsWith("http")) {
             HttpClient.downloadFile(mOnlineMusic.getLrclink(), FileUtils.getLrcDir(), lrcFileName, null);
+            music.setLrcpath(FileUtils.getLrcDir()+lrcFileName);
+        }else{
+            music.setLrcpath(FileUtils.getLrcDir()+lrcFileName);
         }
-        music.setLrcpath(FileUtils.getLrcDir()+lrcFileName);
+      
         Log.i("musicsize","   "+ FileUtils.getLrcDir()+lrcFileName+"     ");
         // 下载封面
         String albumFileName = FileUtils.getAlbumFileName(artist, title);

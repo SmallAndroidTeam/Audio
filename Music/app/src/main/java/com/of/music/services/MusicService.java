@@ -36,6 +36,7 @@ import com.of.music.Application.App;
 import com.of.music.SharedPreferencesToSaveEQSeekBar.SharedPreferencesHelper;
 import com.of.music.Toast.OnlyOneToast;
 import com.of.music.activity.EqualizerActivity;
+import com.of.music.db.DownloadMusicOperater;
 import com.of.music.defineViewd.VisualizerView;
 import com.of.music.fragment.LocalMusicFragment;
 import com.of.music.fragment.fragmentList.DownloadListFragment;
@@ -77,10 +78,10 @@ public final class MusicService extends Service {
     public static LrcView showLrcView;
     private Timer timer;
     public static boolean isPlay=false;
-    public static String s;
-    public static String ss;
-    public static String sss;
-    public static  String ssss;
+    public static String musicArtist;
+    public static String musicIcon;
+    public static String musicUri;
+    public static  String musicLrcpath;
     public static  final String SEND_PROGRESS="com.of.music.progress";
     public static final String TOGGLEPAUSE_ACTION = "com.of.music.togglepause";
     public static final String PREVIOUS_ACTION = "com.of.music.previous";
@@ -101,7 +102,7 @@ public final class MusicService extends Service {
     private static RemoteViews remoteViews;
     private static   AppWidgetManager appWidgetManager;
     private static  ComponentName componentName;
-    
+    private DownloadMusicOperater downloadMusicOperater;
     private static boolean ForegroundIsExist=false;//判断前台服务是否存在
     private final BroadcastReceiver mIntentReceiver=new BroadcastReceiver() {
         @Override
@@ -216,10 +217,10 @@ public final class MusicService extends Service {
                     if (musicTitle != null) {
                         musicTitle.setText(LocalMusicFragment.sMusicList.get(playingMusicIndex).getTitle());
                     }
-                    s=LocalMusicFragment.sMusicList.get(playingMusicIndex).getArtist();                        //获取歌曲信息
-                    ss=LocalMusicFragment.sMusicList.get(playingMusicIndex).getImage();
-                    sss=LocalMusicFragment.sMusicList.get(playingMusicIndex).getUri();
-                    ssss=LocalMusicFragment.sMusicList.get(playingMusicIndex).getLrcpath();
+                    musicArtist=LocalMusicFragment.sMusicList.get(playingMusicIndex).getArtist();                        //获取歌曲信息
+                    musicIcon=LocalMusicFragment.sMusicList.get(playingMusicIndex).getImage();
+                    musicUri=LocalMusicFragment.sMusicList.get(playingMusicIndex).getUri();
+                    musicLrcpath=LocalMusicFragment.sMusicList.get(playingMusicIndex).getLrcpath();
                     Intent UpdateIntent=new Intent(UPDATE_ACTION);
                     handleCommandIntent(UpdateIntent);
                     if (mPlayMusicSeekBar != null)
@@ -253,13 +254,15 @@ public final class MusicService extends Service {
                 OnlyOneToast.makeText(LocalMusicFragment.activity, "暂无歌曲");
             }
         }
+//        每次播放歌曲都会调用initMusic()，添加到最近播放列表里
         RecentlyMusicListInfo recentlyMusicListInfo=new RecentlyMusicListInfo();
-        recentlyMusicListInfo.setImage(ss);
-        recentlyMusicListInfo.setArtist(s);
-        recentlyMusicListInfo.setLrc_uri(ssss);
-        recentlyMusicListInfo.setUri(sss);
+        recentlyMusicListInfo.setImage(musicIcon);
+        recentlyMusicListInfo.setArtist(musicArtist);
+        recentlyMusicListInfo.setLrc_uri(musicLrcpath);
+        recentlyMusicListInfo.setUri(musicUri);
         recentlyMusicListInfo.setName(LocalMusicFragment.sMusicList.get(playingMusicIndex).getTitle());
         recentlyMusicListInfo.setPlayTime(String.valueOf(System.currentTimeMillis()));
+//        过滤播放相同的歌曲，将之前那首歌的播放记录更新为最新的记录
         Cursor cursor=LitePal.findBySQL("select count(*) from RecentlyMusicListInfo where name = ?", recentlyMusicListInfo.getName());
         Log.i("audio11", "initMusic: ");
       if(cursor.moveToFirst()){
@@ -281,6 +284,12 @@ public final class MusicService extends Service {
        {
            ((RecentlyListFragment)FragmentAlter.getRecentlyFragment()).AlterAdapter();
        }
+       
+       if(FragmentAlter.getDownloadFragmenet()!=null){
+           DownloadListFragment.downloadMusicOperater.alter(LocalMusicFragment.sMusicList.get(playingMusicIndex).getTitle(),String.valueOf(System.currentTimeMillis()));
+           Log.i("altertime",String.valueOf(System.currentTimeMillis())+"//"+"b");
+           ((DownloadListFragment)FragmentAlter.getDownloadFragmenet()).DownloadAlter();
+       }
         return true;
     }
     
@@ -297,6 +306,46 @@ public final class MusicService extends Service {
         if(path!=null)
             showLrcView.setLrcPath(path);
     }
+    
+    /**
+     * 返回当前播放的进度
+     * @return
+     */
+    public   int getMusicCurrentPosition(){
+      if(isSatisfyingPlayConditions()&&mediaPlayer!=null){
+          return mediaPlayer.getCurrentPosition();
+      }else
+      {
+          return 0;
+      }
+    }
+    
+    /**
+     *获取当前播放音乐的总的播放时间
+     * @return
+     */
+    public int getMusicDuration(){
+        if(isSatisfyingPlayConditions()&&mediaPlayer!=null){
+            return mediaPlayer.getDuration();
+        }else
+        {
+            return 0;
+        }
+    }
+    
+    /**
+     *
+     * @return (当前正在播放返回true,否则返回false）
+     */
+    public boolean isPlaying(){
+        if(isSatisfyingPlayConditions()&&mediaPlayer!=null){
+        return  mediaPlayer.isPlaying();
+        }else{
+            return  false;
+        }
+    }
+    
+    
     
     public void startMusic(){
         synchronized (this){
@@ -574,10 +623,10 @@ public final class MusicService extends Service {
             NotificationChange(action);
             boolean isLike=false;
             String song=MusicService.musicTitle.getText().toString();
-            String artist=MusicService.s;
-            String song_Image=MusicService.ss;
-            String uri=MusicService.sss;
-            String Lrc_uri=MusicService.ssss;
+            String artist=MusicService.musicArtist;
+            String song_Image=MusicService.musicIcon;
+            String uri=MusicService.musicUri;
+            String Lrc_uri=MusicService.musicLrcpath;
             isLike= LocalMusicFragment.lxrOperator.CheckIsDataAlreadyInDBorNot(song);
             Log.i(TAG, "onClick: "+isLike);
             if(LocalMusicFragment.sMusicList.size()==0){
