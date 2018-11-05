@@ -246,6 +246,45 @@ public final class MusicService extends Service {
                         mPlayMusicStartTimeTextView.setText(changeDigitsToTwoDigits(mediaPlayer.getCurrentPosition() / 1000 / 60) + ":" + changeDigitsToTwoDigits(mediaPlayer.getCurrentPosition() / 1000 % 60));
                     if (mPlayMusicStopTimeTextView != null)
                         mPlayMusicStopTimeTextView.setText(changeDigitsToTwoDigits((mediaPlayer.getDuration()) / 1000 / 60) + ":" + changeDigitsToTwoDigits(mediaPlayer.getDuration() / 1000 % 60));
+    
+                    //        每次播放歌曲都会调用initMusic()，添加到最近播放列表里
+    
+                    RecentlyMusicListInfo recentlyMusicListInfo=new RecentlyMusicListInfo();
+                    recentlyMusicListInfo.setImage(musicIcon);
+                    recentlyMusicListInfo.setArtist(musicArtist);
+                    recentlyMusicListInfo.setLrc_uri(musicLrcpath);
+                    recentlyMusicListInfo.setUri(musicUri);
+                    recentlyMusicListInfo.setName(LocalMusicFragment.sMusicList.get(playingMusicIndex).getTitle());
+                    recentlyMusicListInfo.setPlayTime(String.valueOf(System.currentTimeMillis()));
+//        过滤播放相同的歌曲，将之前那首歌的播放记录更新为最新的记录
+                    Cursor cursor=LitePal.findBySQL("select count(*) from RecentlyMusicListInfo where name = ?", recentlyMusicListInfo.getName());
+                    Log.i("audio11", "initMusic: ");
+                    if(cursor.moveToFirst()){
+                        Log.i("audio11", "initMusic:1 "+cursor.getInt(0));
+                        if(cursor.getInt(0)>0){
+                            recentlyMusicListInfo.updateAll("name = ?",recentlyMusicListInfo.getName());
+                        }else{
+                            recentlyMusicListInfo.save();
+                        }
+                    }else{
+                        Log.i("audio11", "initMusic:2 ");
+                        recentlyMusicListInfo.save();
+                    }
+
+
+//        RecentlyListFragment recentlyListFragment=new RecentlyListFragment();
+//      recentlyListFragment.AlterAdapter();
+                    if(FragmentAlter.getRecentlyFragment()!=null)
+                    {
+                        ((RecentlyListFragment)FragmentAlter.getRecentlyFragment()).AlterAdapter();
+                    }
+    
+                    if(FragmentAlter.getDownloadFragmenet()!=null){
+                        DownloadListFragment.downloadMusicOperater.alter(LocalMusicFragment.sMusicList.get(playingMusicIndex).getTitle(),String.valueOf(System.currentTimeMillis()));
+                        Log.i("altertime",String.valueOf(System.currentTimeMillis())+"//"+"b");
+                        ((DownloadListFragment)FragmentAlter.getDownloadFragmenet()).DownloadAlter();
+                    }
+                    
                 } catch (IOException e) {
                     e.printStackTrace();
                     return false;
@@ -254,42 +293,6 @@ public final class MusicService extends Service {
                 OnlyOneToast.makeText(LocalMusicFragment.activity, "暂无歌曲");
             }
         }
-//        每次播放歌曲都会调用initMusic()，添加到最近播放列表里
-        RecentlyMusicListInfo recentlyMusicListInfo=new RecentlyMusicListInfo();
-        recentlyMusicListInfo.setImage(musicIcon);
-        recentlyMusicListInfo.setArtist(musicArtist);
-        recentlyMusicListInfo.setLrc_uri(musicLrcpath);
-        recentlyMusicListInfo.setUri(musicUri);
-        recentlyMusicListInfo.setName(LocalMusicFragment.sMusicList.get(playingMusicIndex).getTitle());
-        recentlyMusicListInfo.setPlayTime(String.valueOf(System.currentTimeMillis()));
-//        过滤播放相同的歌曲，将之前那首歌的播放记录更新为最新的记录
-        Cursor cursor=LitePal.findBySQL("select count(*) from RecentlyMusicListInfo where name = ?", recentlyMusicListInfo.getName());
-        Log.i("audio11", "initMusic: ");
-      if(cursor.moveToFirst()){
-          Log.i("audio11", "initMusic:1 "+cursor.getInt(0));
-          if(cursor.getInt(0)>0){
-           recentlyMusicListInfo.updateAll("name = ?",recentlyMusicListInfo.getName());
-          }else{
-              recentlyMusicListInfo.save();
-          }
-      }else{
-          Log.i("audio11", "initMusic:2 ");
-          recentlyMusicListInfo.save();
-      }
-     
-        
-//        RecentlyListFragment recentlyListFragment=new RecentlyListFragment();
-//      recentlyListFragment.AlterAdapter();
-       if(FragmentAlter.getRecentlyFragment()!=null)
-       {
-           ((RecentlyListFragment)FragmentAlter.getRecentlyFragment()).AlterAdapter();
-       }
-       
-       if(FragmentAlter.getDownloadFragmenet()!=null){
-           DownloadListFragment.downloadMusicOperater.alter(LocalMusicFragment.sMusicList.get(playingMusicIndex).getTitle(),String.valueOf(System.currentTimeMillis()));
-           Log.i("altertime",String.valueOf(System.currentTimeMillis())+"//"+"b");
-           ((DownloadListFragment)FragmentAlter.getDownloadFragmenet()).DownloadAlter();
-       }
         return true;
     }
     

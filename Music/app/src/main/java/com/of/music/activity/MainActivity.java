@@ -14,6 +14,7 @@ import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
 import android.os.Build;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -550,7 +551,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         monlineMusicButton.setOnClickListener(this);
         msettingButton.setOnClickListener(this);
         searchMusicButton.setOnClickListener(this);
-
+    
     }
 
     @Override
@@ -575,9 +576,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 selectTab(2);
                 break;
             case R.id.set:
-                if(musicTitle.getVisibility()==View.VISIBLE){
-                    musicTitle.setVisibility(View.INVISIBLE);
-                }
                 drawerLayout.openDrawer(Gravity.START);
                 break;
             case R.id.search:

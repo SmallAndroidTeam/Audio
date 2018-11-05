@@ -82,7 +82,7 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
         if(getRequestedOrientation()!= ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE){
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
-            setContentView(R.layout.activity_online_music);
+        setContentView(R.layout.activity_online_music);
         setTitle(mListInfo.getTitle());
         Log.i("mListInfo","         "+mListInfo);
         initView();
