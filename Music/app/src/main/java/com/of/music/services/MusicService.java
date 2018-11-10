@@ -310,7 +310,9 @@ public final class MusicService extends Service {
                         mPlayMusicStopTimeTextView.setText(changeDigitsToTwoDigits((mediaPlayer.getDuration()) / 1000 / 60) + ":" + changeDigitsToTwoDigits(mediaPlayer.getDuration() / 1000 % 60));
     
                     //        每次播放歌曲都会调用initMusic()，添加到最近播放列表里
-    
+
+
+
                     RecentlyMusicListInfo recentlyMusicListInfo=new RecentlyMusicListInfo();
                     recentlyMusicListInfo.setImage(musicIcon);
                     recentlyMusicListInfo.setArtist(musicArtist);

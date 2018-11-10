@@ -253,9 +253,12 @@ public class LrcView extends View {
 	// 外部提供方法
 	// 设置lrc的路径
 	public void setLrcPath(final  String path) {
+
 		reset();
+		if(path==null){
+			return;
+		}
 		File file = new File(path);
-		
 		if (!file.exists()) {
 			if(path.indexOf("http")!=-1){//是网络歌词路径
 			  new Thread(new Runnable() {

@@ -59,8 +59,10 @@ import org.litepal.LitePal;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.sql.Time;
 import java.util.ArrayList;
@@ -70,6 +72,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public final class MusicAidlService extends Service {
     public static MediaPlayer mediaPlayer;
@@ -122,6 +128,8 @@ public final class MusicAidlService extends Service {
     private final static int INIT_MUSCIC_SERVICE=0;//初始化music服务
     private  boolean isExecutionInit=false;//判断是否正在执行初始化函数
     private String thirdApplicationPackageName;//调用此服务的第三方应用的包名
+    private List<String> mLrcs = new ArrayList<String>(); // 存放歌词
+    private List<Long> mTimes = new ArrayList<Long>(); // 存放时间
     private MusicOperator lxrOperator;
     @SuppressLint("HandlerLeak")
     private final Handler handler=new Handler() {
@@ -279,6 +287,8 @@ public final class MusicAidlService extends Service {
                     Log.i("hz11111", "initMusic: "+musicList.get(playingMusicIndex).getUri());
                     mediaPlayer.setDataSource(musicList.get(playingMusicIndex).getUri());
                     mediaPlayer.prepare();
+
+                    getLrc(musicList.get(playingMusicIndex).getLrcpath());//开启线程获取当前的歌词
                     musicArtist=musicList.get(playingMusicIndex).getArtist();                        //获取歌曲信息
                     musicIcon=musicList.get(playingMusicIndex).getImage();
                     musicUri=musicList.get(playingMusicIndex).getUri();
@@ -844,6 +854,26 @@ public final class MusicAidlService extends Service {
         }
 
         @Override
+        public List<String> getCurrentPlayMusicAllLyric() throws RemoteException {//获取当前播放歌曲的所有歌词
+            return mLrcs;
+        }
+
+        @Override
+        public String getCurrentPlayMusicOneLyric() throws RemoteException {// 获取当前播放歌曲正在播放的那一句歌词
+            int currentPlayMusicLyricIndex=getCurrentPlayMusicLyricIndex();//获取当前播放的歌词的下标;
+            if(currentPlayMusicLyricIndex>mLrcs.size()-1){
+                return null;
+            }else{
+                return mLrcs.get(currentPlayMusicLyricIndex);
+            }
+        }
+
+        @Override
+        public int getCurrentPlayMusicOneLyricIndex() throws RemoteException {//获取当前播放歌曲正在播放的那一句歌词在所有歌词的下标
+            return getCurrentPlayMusicLyricIndex();//获取当前播放的歌词的下标;
+        }
+
+        @Override
         public void setMusicPlayProgressListener(MusicPlayProgressListener musicPlayProgressListener) throws RemoteException {
             //设置播放进度监听
             remoteCallbackList.register(musicPlayProgressListener);
@@ -873,6 +903,11 @@ public final class MusicAidlService extends Service {
             return super.onTransact(code, data, reply, flags);
         }
     };
+
+
+
+
+
 
     private void handleCommandIntent(Intent intent) {
 
@@ -1221,4 +1256,151 @@ public final class MusicAidlService extends Service {
         }
         super.onDestroy();
     }
+
+
+
+
+
+
+    // 解析时间
+    private Long parseTime(String time) {
+        // 03:02.12
+        String[] min = time.split(":");
+        String[] sec = min[1].split("\\.");
+
+        long minInt = Long.parseLong(min[0].replaceAll("\\D+", "")
+                .replaceAll("\r", "").replaceAll("\n", "").trim());
+        long secInt = Long.parseLong(sec[0].replaceAll("\\D+", "")
+                .replaceAll("\r", "").replaceAll("\n", "").trim());
+        long milInt = Long.parseLong(sec[1].replaceAll("\\D+", "")
+                .replaceAll("\r", "").replaceAll("\n", "").trim());
+
+        return minInt * 60 * 1000 + secInt * 1000 + milInt * 10;
+    }
+
+
+
+    private int getCurrentPlayMusicLyricIndex(){ //获取当前播放的歌词的下标
+       int currentProgress=getMusicCurrentPosition();//获取当前播放歌曲的进度
+        if(mTimes.size()==0){
+            return 0;
+        }else{
+            int position=0;
+            for(int i=0;i<mTimes.size();i++){
+                position=i;
+                if(currentProgress<=mTimes.get(i)){
+                    return position;
+                }
+            }
+            if(position>mTimes.size()-1){
+            position=mTimes.size()-1;
+            }
+            return position;
+        }
+    }
+
+
+    // 解析每行
+    private String[] parseLine(String line) {
+        Matcher matcher = Pattern.compile("\\[\\d.+\\].+").matcher(line);
+        // 如果形如：[xxx]后面啥也没有的，则return空
+        if (!matcher.matches()) {
+            System.out.println("throws " + line);
+            return null;
+        }
+
+        line = line.replaceAll("\\[", "");
+        String[] result = line.split("\\]");
+        result[0] = String.valueOf(parseTime(result[0]));
+
+        return result;
+    }
+
+
+
+    //通过歌词路径获取歌词，将对应的时间和歌词分别用List集合存起来
+    public void getLrc(final  String path) {
+        synchronized (this){
+            mLrcs.clear();
+            mTimes.clear();
+            if(path==null){
+                return;
+            }
+            final File file = new File(path);
+            if (!file.exists()) {
+                if(path.indexOf("http")!=-1){//是网络歌词路径
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                OkHttpClient okHttpClient=new OkHttpClient();
+                                Request request=new Request.Builder().url(path).build();
+                                Response response=okHttpClient.newCall(request).execute();
+                                String lrc=response.body().string();
+                                String[] lrcLine=lrc.split("\n");
+                                String[] arr;
+                                for(String line:lrcLine){
+                                    arr = parseLine(line);
+                                    if (arr == null) continue;
+
+                                    // 如果解析出来只有一个
+                                    if (arr.length == 1) {
+                                        String last = mLrcs.remove(mLrcs.size() - 1);
+                                        mLrcs.add(last + arr[0]);
+                                        continue;
+                                    }
+                                    mTimes.add(Long.parseLong(arr[0]));
+                                    mLrcs.add(arr[1]);
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }).start();
+                }
+                return;
+            }
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    BufferedReader reader = null;
+                    try {
+                        reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+
+                        String line = "";
+                        String[] arr;
+                        while (null != (line = reader.readLine())) {
+                            arr = parseLine(line);
+                            if (arr == null) continue;
+
+                            // 如果解析出来只有一个
+                            if (arr.length == 1) {
+                                String last = mLrcs.remove(mLrcs.size() - 1);
+                                mLrcs.add(last + arr[0]);
+                                continue;
+                            }
+                            mTimes.add(Long.parseLong(arr[0]));
+                            mLrcs.add(arr[1]);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        if(reader != null) {
+                            try {
+                                reader.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }).start();
+        }
+    }
+
+
+
+
 }
