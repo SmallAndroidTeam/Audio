@@ -839,13 +839,8 @@ public final class MusicAidlService extends Service {
         }
 
         @Override
-        public boolean currentMusicListIsEmpty() throws RemoteException {//当前的音乐列表是否为空
-            if(musicList.size()==0)
-            {
-                return  true;
-            }else{
-                return false;
-            }
+        public int getCurrentMusicListSize() throws RemoteException {//获取当前的音乐列表大小
+           return  musicList.size();
         }
 
         @Override
