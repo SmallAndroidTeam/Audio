@@ -47,7 +47,6 @@ public class LocalMusicFragment extends Fragment implements View.OnClickListener
     public static String currentPlayMode=playMode[3];//当前的音乐播放模式
     public static Activity activity;
     public static TextView musicTitle;
-    public static ArrayList<Music> sMusicList = new ArrayList<Music>(); // 存放歌曲列表
     private LrcView showLrcView;
     private float marginleft=40;//歌单和专辑图片距离左边的距离(单位dp)
     private LinearLayout PlayBoundaryFragment;
@@ -175,13 +174,13 @@ public class LocalMusicFragment extends Fragment implements View.OnClickListener
     private void initPlayMusic(View view) {
         //判断服务是否以正在运行
         if(MusicService.playingMusicIndex!=-1){
-
-            musicTitle.setText(sMusicList.get(MusicService.playingMusicIndex).getTitle());
+            Log.i("hz11111", "initPlayMusic: 11");
+            musicTitle.setText(MusicService.musicList.get(MusicService.playingMusicIndex).getTitle());
 
             mPlayMusicSeekBar.setMax(MusicService.mediaPlayer.getDuration());
-            if (sMusicList.get(MusicService.playingMusicIndex).getImage() != null) {//如果音乐专辑图片存在
+            if (MusicService.musicList.get(MusicService.playingMusicIndex).getImage() != null) {//如果音乐专辑图片存在
                 //  OnlyOneToast.makeText(localMusicFragment.activity,sMusicList.get(playingMusicIndex).getImage());
-                Bitmap bitmap = MusicIconLoader.getInstance().load(sMusicList.get(MusicService.playingMusicIndex).getImage());
+                Bitmap bitmap = MusicIconLoader.getInstance().load(MusicService.musicList.get(MusicService.playingMusicIndex).getImage());
                 if (MusicImage != null)
                     MusicImage.setImageBitmap(bitmap);
             } else {
@@ -202,25 +201,23 @@ public class LocalMusicFragment extends Fragment implements View.OnClickListener
             }
 
         }else{
+            Log.i("hz11111", "initPlayMusic: 22");
             App.sContext=view.getContext();//设置上下文的环境
             MusicUtils.initMusicList();
-            sMusicList= MusicUtils.sMusicList;
-            if(sMusicList.size()>0){
+            MusicService.setMusicList(MusicUtils.sMusicList);
+            if( MusicService.musicList.size()>0){
                 MusicService.playingMusicIndex=0;
             }
             new MusicService().initMusic();
         }
 
 
-        Log.i(TAG, "Music数量"+sMusicList.size());
-        for(Music music:sMusicList){
-            Log.i(TAG, "initPlayMusic: "+music.getUri());
-        }
+        Log.i(TAG, "Music数量"+ MusicService.musicList.size());
 
     }
 
     private void setLrc(){
-        String path=sMusicList.get(MusicService.playingMusicIndex).getLrcpath();
+        String path= MusicService.musicList.get(MusicService.playingMusicIndex).getLrcpath();
         showLrcView.setLrcPath(path);
     }
     private void initEvents() {
@@ -236,7 +233,7 @@ public class LocalMusicFragment extends Fragment implements View.OnClickListener
         mPlayMusicSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                if(sMusicList.size()==0){
+                if( MusicService.musicList.size()==0){
                     OnlyOneToast.makeText(activity,"暂无歌曲");
                     mPlayMusicSeekBar.setProgress(0);
                 }
@@ -287,7 +284,7 @@ public class LocalMusicFragment extends Fragment implements View.OnClickListener
 
         switch (view.getId()){
             case R.id.playMusicButton:
-                if(sMusicList.size()==0){
+                if( MusicService.musicList.size()==0){
                     OnlyOneToast.makeText(view.getContext(),"暂无歌曲");
                     return;
                 }
@@ -297,9 +294,8 @@ public class LocalMusicFragment extends Fragment implements View.OnClickListener
                 break;
             case R.id.nextMusicButton:
 
-                if(sMusicList.size()==0){
+                if( MusicService.musicList.size()==0){
                     OnlyOneToast.makeText(view.getContext(),"暂无歌曲");
-
                     return;
                 }
                 Intent intent1=new Intent(activity,MusicService.class);
@@ -307,7 +303,8 @@ public class LocalMusicFragment extends Fragment implements View.OnClickListener
                 view.getContext().startService(intent1);
                 break;
             case R.id.prevMusicButton:
-                if(sMusicList.size()==0){
+
+                if( MusicService.musicList.size()==0){
                     OnlyOneToast.makeText(view.getContext(),"暂无歌曲");
                     return;
                 }

@@ -143,7 +143,7 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Log.i("altertime",imusics.get(position).getTime()+"//"+"a");
-        LocalMusicFragment.sMusicList=downloadlist;
+        MusicService.setMusicList(downloadlist);
         MusicService.playingMusicIndex=position;
         new MusicService().initMusic();
         Intent intent = new Intent(getActivity(), MusicService.class);
@@ -237,7 +237,8 @@ public class DownloadListFragment extends BaseFragment implements AdapterView.On
                     Intent intent =
                             new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://".concat(music.getMusicPath())));
                     getContext().sendBroadcast(intent);
-                    LocalMusicFragment.sMusicList.remove(music);
+                   MusicService.musicList.remove(music);
+
                     downloadMusicOperater.delete(music.getTitle());
                 }
             }

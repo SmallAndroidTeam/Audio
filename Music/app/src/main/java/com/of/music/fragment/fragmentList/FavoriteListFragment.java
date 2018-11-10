@@ -91,9 +91,9 @@ public class FavoriteListFragment extends Fragment {
                     musicList.add(music);
                 }
 
-                if(!(LocalMusicFragment.sMusicList).equals(musicList))//点击之后变化歌单，如果当前歌单和此歌单不一致，则把当前的歌词设置为此歌单
+                if(!(MusicService.musicList).equals(musicList))//点击之后变化歌单，如果当前歌单和此歌单不一致，则把当前的歌词设置为此歌单
                 {
-                    LocalMusicFragment.sMusicList=musicList;
+                    MusicService.setMusicList(musicList);
                 }
 
                 //设置当前播放的音乐下标

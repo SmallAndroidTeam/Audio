@@ -142,9 +142,9 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
       user_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
        @Override
        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        if(!(LocalMusicFragment.sMusicList).equals(MusicUtils.sMusicList))//点击之后变化歌单，如果当前歌单和此歌单不一致，则把当前的歌词设置为此歌单
+        if(!(MusicService.musicList).equals(MusicUtils.sMusicList))//点击之后变化歌单，如果当前歌单和此歌单不一致，则把当前的歌词设置为此歌单
         {
-         LocalMusicFragment.sMusicList=MusicUtils.sMusicList;
+            MusicService.setMusicList(MusicUtils.sMusicList);
         }
 
         //设置当前播放的音乐下标

@@ -204,7 +204,7 @@ public class OnlineMusicActivity extends BaseActivity implements OnItemClickList
           public void run() {
               if(getCount==0){
                   Log.i("teste11111","      "+arrayList.size()+"///"+mMusicList.size());
-                  LocalMusicFragment.sMusicList = arrayList;
+                  MusicService.setMusicList(arrayList);
                   MusicService.playingMusicIndex =index;
                   runOnUiThread(new Runnable() {
                       @Override

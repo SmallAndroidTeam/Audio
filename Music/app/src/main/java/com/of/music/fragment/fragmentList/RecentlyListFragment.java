@@ -72,7 +72,7 @@ public class RecentlyListFragment extends BaseFragment implements AdapterView.On
    @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
        Log.i("recently","从Recentlylist播放"+imusicArrayList.get(position).getName());
-        LocalMusicFragment.sMusicList=musics;
+       MusicService.setMusicList(musics);
         MusicService.playingMusicIndex =position;
        new MusicService().initMusic();
        Intent intent = new Intent(getActivity(), MusicService.class);

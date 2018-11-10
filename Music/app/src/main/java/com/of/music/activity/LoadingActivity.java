@@ -67,7 +67,7 @@ public class LoadingActivity extends Activity {
     private void initLrcFontSize() {
        //px sp dp dip
         int screeHeight=getResources().getDisplayMetrics().heightPixels;
-        int marginLeft=(int)(1.0*screeHeight/6);
+        int marginLeft=(int)(1.0*screeHeight/9);
         LrcView.defaultTextSize=DensityUtil.px2sp(this, (marginLeft));//设置默认的歌词大小
         LrcView.defaultDividerHeight=marginLeft/2;
     }
@@ -89,7 +89,6 @@ public class LoadingActivity extends Activity {
                 LoadingActivity.this.overridePendingTransition(R.anim.in_form_right,R.anim.out_to_left);
             }
         },SPLASH_DELAY_MILLIS);
-
     }
 
     private void getPermission(){

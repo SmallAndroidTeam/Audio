@@ -1,5 +1,6 @@
 package com.of.music.SharedPreferencesToSaveEQSeekBar;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -16,10 +17,13 @@ public class SharedPreferencesHelper {
      * 保存手机里面的名字
      */private SharedPreferences.Editor editor;
 
+    @SuppressLint("CommitPrefEdits")
     public SharedPreferencesHelper(Context context, String FILE_NAME) {
-        sharedPreferences = context.getSharedPreferences(FILE_NAME,
-                Context.MODE_PRIVATE);
-        editor = sharedPreferences.edit();
+        if(context!=null){
+            sharedPreferences = context.getSharedPreferences(FILE_NAME,
+                    Context.MODE_PRIVATE);
+            editor = sharedPreferences.edit();
+        }
     }
 
     /**

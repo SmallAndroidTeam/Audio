@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.of.music">
@@ -16,11 +15,13 @@
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- USB 权限 -->
     <!-- 声明使用usb -->
-    <uses-permission android:name="android.hardware.usb.host" android:required="false"/>
+    <uses-permission
+        android:name="android.hardware.usb.host"
+        android:required="false" />
     <uses-permission android:name="android.hardware.usb.accessory" />
     <!-- 蓝牙相关权限 -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -31,16 +32,19 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <!-- 使用音场效果必要的权限 -->
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <!-- 获取弹出系统对话框的权限 -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     // 手机必须支持USB主机特性(OTG)
-    <uses-feature android:name="android.hardware.usb.host"/>
-  <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-feature android:name="android.hardware.usb.host" />
+
+    <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <permission android:name="com.ofilm.test.viewpager1.playpermission"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <permission android:name="com.ofilm.test.viewpager1.playpermission" />
+
     <application
         android:name=".Application.App"
         android:allowBackup="true"
@@ -55,6 +59,7 @@
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -62,17 +67,26 @@
             android:name=".activity.MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="landscape" />
-        <activity android:name=".activity.EqualizerActivity"
-            android:launchMode="singleTask"/>
-        <activity android:name=".activity.ArtistInfoActivity"
-            android:launchMode="singleTask"/>
-        <activity android:name=".activity.OnlineMusicActivity"
-            android:launchMode="singleTask"
+        <activity
+            android:name=".activity.EqualizerActivity"
+            android:launchMode="singleTask" />
+        <activity
+            android:name=".activity.ArtistInfoActivity"
+            android:launchMode="singleTask" />
+        <activity
+            android:name=".activity.OnlineMusicActivity"
+            android:launchMode="singleTask" />
+        <activity
+            android:name=".activity.MusicInfoActivity"
+            android:launchMode="singleTask" />
 
-            />
-        <activity android:name=".activity.MusicInfoActivity"
-            android:launchMode="singleTask"/>
-        <service android:name=".services.MusicService" />
+        <service
+            android:name=".services.MusicService"
+            android:enabled="true"
+            android:exported="true"
+            >
+
+        </service>
 
         <receiver android:name=".widget.appwidget_provider">
             <intent-filter>
@@ -82,7 +96,7 @@
                 <action android:name="com.of.music.progress" />
                 <action android:name="com.of.music.next" />
                 <action android:name="com.of.music.STOP_ACTION" />
-                <action android:name="com.of.music.LOVE_BROADCAST"/>
+                <action android:name="com.of.music.LOVE_BROADCAST" />
             </intent-filter>
 
             <meta-data
@@ -116,12 +130,24 @@
             android:enabled="true"
             android:exported="true">
             <intent-filter android:priority="200">
-                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"/>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
             </intent-filter>
             <intent-filter android:priority="200">
-                <action android:name="android.hardware.usb.action.USB_DEVICE_DETACHED"/>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_DETACHED" />
             </intent-filter>
         </receiver>
+
+        <service
+            android:name=".services.MusicAidlService"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":remote">
+            <intent-filter>
+                <action android:name="com.android.oflim.action" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

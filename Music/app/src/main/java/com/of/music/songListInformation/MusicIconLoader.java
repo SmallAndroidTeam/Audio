@@ -37,7 +37,6 @@ public class MusicIconLoader {
 
 		final String key = Encrypt.md5(uri);
 		Bitmap bmp = getFromCache(key);
-
 		if (bmp != null)
 			return bmp;
 

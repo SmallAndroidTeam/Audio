@@ -1,5 +1,6 @@
 package com.of.music.services;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -19,14 +20,15 @@ import android.media.audiofx.Visualizer;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.Parcel;
+import android.os.RemoteCallbackList;
+import android.os.RemoteException;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -35,7 +37,6 @@ import com.of.music.R;
 import com.of.music.Application.App;
 import com.of.music.SharedPreferencesToSaveEQSeekBar.SharedPreferencesHelper;
 import com.of.music.Toast.OnlyOneToast;
-import com.of.music.activity.EqualizerActivity;
 import com.of.music.db.DownloadMusicOperater;
 import com.of.music.defineViewd.VisualizerView;
 import com.of.music.fragment.LocalMusicFragment;
@@ -46,19 +47,27 @@ import com.of.music.info.FavouriteMusicListInfo;
 import com.of.music.info.MusicName;
 import com.of.music.info.RecentlyMusicListInfo;
 import com.of.music.songListInformation.Music;
+import com.of.music.songListInformation.MusicController;
 import com.of.music.songListInformation.MusicIconLoader;
+import com.of.music.songListInformation.MusicPlayProgressListener;
 import com.of.music.songListInformation.MusicUtils;
 import com.of.music.ui.LrcView;
 import com.of.music.widget.appwidget_provider;
 
 import org.litepal.LitePal;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class MusicService extends Service {
     public static MediaPlayer mediaPlayer=new MediaPlayer();
@@ -71,7 +80,7 @@ public final class MusicService extends Service {
     public static TextView mPlayMusicStartTimeTextView;
     public static  TextView mPlayMusicStopTimeTextView;
     public static  SeekBar mPlayMusicSeekBar;
-    private final Handler handler=new Handler();
+
     private  static Runnable runnable;
     public static ImageView mPlayMusicButton;
     public static ImageView MusicImage;//歌曲的专辑图片
@@ -104,13 +113,9 @@ public final class MusicService extends Service {
     private static  ComponentName componentName;
     private DownloadMusicOperater downloadMusicOperater;
     private static boolean ForegroundIsExist=false;//判断前台服务是否存在
-    private final BroadcastReceiver mIntentReceiver=new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            handleCommandIntent(intent);
-        }
-    };
-    
+
+    public static  ArrayList<Music> musicList=new ArrayList<>();//歌曲列表
+
     // 定义系统的频谱
     public Visualizer mVisualizer;
     // 定义系统的均衡器
@@ -119,6 +124,57 @@ public final class MusicService extends Service {
     public static final float VISUALIZER_HEIGHT_DIP = 50f;
     private SharedPreferencesHelper sharedPreferencesHelper = new SharedPreferencesHelper(App.sContext,"EqualizerSeekbar");
     public int progress_pre=0;
+    public final static int INIT_MUSCIC_SERVICE=0;//初始化music服务
+    @SuppressLint("HandlerLeak")
+    private final Handler handler=new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case INIT_MUSCIC_SERVICE://初始化服务
+                    try{
+                        initMusic();
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+
+                    break;
+                    default:
+                        break;
+            }
+
+        }
+
+    };
+
+    private final BroadcastReceiver mIntentReceiver=new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String processName=getProcessName();
+            Log.i("hz111111", "onReceive: "+processName+"//package:"+getPackageName());
+            //判断进程名，保证只有主进程运行
+            if(!TextUtils.isEmpty(processName)&&processName.contentEquals(getPackageName()))
+            {
+                Log.i("hz111111", "onReceive: ");
+                handleCommandIntent(intent);
+            }
+        }
+    };
+
+    //获取进程名
+    public  String getProcessName() {
+        try {
+            File file = new File("/proc/" + android.os.Process.myPid() + "/" + "cmdline");
+            BufferedReader mBufferedReader = new BufferedReader(new FileReader(file));
+            String processName = mBufferedReader.readLine().trim();
+            mBufferedReader.close();
+            return processName;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     @Override
     public void onCreate() {
         //注册广播
@@ -139,48 +195,63 @@ public final class MusicService extends Service {
                 autoPlayMusic();
             }
         });
+        mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra) {
+                Log.i("hz111", "onError: ");
+                nextMusic();
+                return false;
+            }
+        });
         runnable = new Runnable() {
             @Override
             public void run() {
                 //设置widget里面的进度条
                 notifyChange(SEND_PROGRESS);
-                if (mPlayMusicSeekBar != null)
-                    mPlayMusicSeekBar.setProgress(mediaPlayer.getCurrentPosition());
-                if (mPlayMusicStartTimeTextView != null)
-                    mPlayMusicStartTimeTextView.setText(changeDigitsToTwoDigits(mediaPlayer.getCurrentPosition() / 1000 / 60) + ":" + changeDigitsToTwoDigits(mediaPlayer.getCurrentPosition() / 1000 % 60));
-                if (showLrcView != null && showLrcView.hasLrc()) {
-                    showLrcView.changeCurrent(mediaPlayer.getCurrentPosition());
-                }
-                
+               try{
+                   if (mPlayMusicSeekBar != null&&mediaPlayer!=null)
+                       mPlayMusicSeekBar.setProgress(mediaPlayer.getCurrentPosition());
+                   if (mPlayMusicStartTimeTextView != null)
+                       mPlayMusicStartTimeTextView.setText(changeDigitsToTwoDigits(mediaPlayer.getCurrentPosition() / 1000 / 60) + ":" + changeDigitsToTwoDigits(mediaPlayer.getCurrentPosition() / 1000 % 60));
+                   if (showLrcView != null && showLrcView.hasLrc()) {
+                       showLrcView.changeCurrent(mediaPlayer.getCurrentPosition());
+                   }
+               }catch (Exception e){
+               e.printStackTrace();
+               }
                 handler.postDelayed(this, 500);
             }
         };
         
         super.onCreate();
     }
-    
-    
+
+//设置音乐列表
+    public static void setMusicList(ArrayList<Music> musicList) {
+        MusicService.musicList.clear();
+        MusicService.musicList.addAll(musicList);
+        Log.i("hz11111", "setMusicList:   "+musicList.size());
+    }
+
+    @SuppressLint("DefaultLocale")
     public static String changeDigitsToTwoDigits(int digit){//将一个数变为二位数
-        if(digit<10){
-            return "0"+digit;
-        }else
-        {
-            return ""+digit;
-        }
+     return String.format("%02d",digit);
     }
     public    boolean  initMusic(){
         synchronized (this) {
             if (isSatisfyingPlayConditions()) {
+                if(mediaPlayer==null){
+                    mediaPlayer=new MediaPlayer();
+                }
                 mediaPlayer.reset();
                 try {
-                    Log.i("download11", "initMusic: "+LocalMusicFragment.sMusicList.get(playingMusicIndex).getUri()+"//"+
-                            LocalMusicFragment.sMusicList.size());
-                    String musicAddress=LocalMusicFragment.sMusicList.get(playingMusicIndex).getUri();
+                    Log.i("download11", "initMusic: "+musicList.get(playingMusicIndex).getUri()+"//"+
+                            musicList.size());
+                    String musicAddress=musicList.get(playingMusicIndex).getUri();
                     while(!musicAddress.toLowerCase().startsWith("http")&&!new File(musicAddress).exists()){
-                        ArrayList<Music> sMusicList= LocalMusicFragment.sMusicList;
-                        sMusicList.remove(playingMusicIndex);
-                        LocalMusicFragment.sMusicList=sMusicList;
-                        if(sMusicList.size()==0){
+                        Log.i("hz11111", "initMusic: 删除");
+                        musicList.remove(playingMusicIndex);
+                        if(musicList.size()==0){
                             playingMusicIndex=-1;
                             if (musicTitle != null) {
                                 musicTitle.setText("无标题");
@@ -200,38 +271,29 @@ public final class MusicService extends Service {
                             stopMusic();
                             return false;
                         }
-                        Log.i("download11", "initMusic: "+sMusicList.size());
-                        playingMusicIndex=playingMusicIndex>=sMusicList.size()-1?0:playingMusicIndex+1;
-                        musicAddress=LocalMusicFragment.sMusicList.get(playingMusicIndex).getUri();
+                        Log.i("download11", "initMusic: "+musicList.size());
+                        playingMusicIndex=playingMusicIndex>=musicList.size()-1?0:playingMusicIndex+1;
+                        musicAddress=musicList.get(playingMusicIndex).getUri();
                     }
-                    
-                    mediaPlayer.setDataSource(LocalMusicFragment.sMusicList.get(playingMusicIndex).getUri());
-                    mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-                        @Override
-                        public boolean onError(MediaPlayer mp, int what, int extra) {
-                            nextMusic();
-                            return false;
-                        }
-                    });
+                    Log.i("hz11111", "initMusic: "+musicList.get(playingMusicIndex).getUri());
+                    mediaPlayer.setDataSource(musicList.get(playingMusicIndex).getUri());
                     mediaPlayer.prepare();
                     if (musicTitle != null) {
-                        musicTitle.setText(LocalMusicFragment.sMusicList.get(playingMusicIndex).getTitle());
+                        musicTitle.setText(musicList.get(playingMusicIndex).getTitle());
                     }
-                    musicArtist=LocalMusicFragment.sMusicList.get(playingMusicIndex).getArtist();                        //获取歌曲信息
-                    musicIcon=LocalMusicFragment.sMusicList.get(playingMusicIndex).getImage();
-                    musicUri=LocalMusicFragment.sMusicList.get(playingMusicIndex).getUri();
-                    musicLrcpath=LocalMusicFragment.sMusicList.get(playingMusicIndex).getLrcpath();
+                    musicArtist=musicList.get(playingMusicIndex).getArtist();                        //获取歌曲信息
+                    musicIcon=musicList.get(playingMusicIndex).getImage();
+                    musicUri=musicList.get(playingMusicIndex).getUri();
+                    musicLrcpath=musicList.get(playingMusicIndex).getLrcpath();
                     Intent UpdateIntent=new Intent(UPDATE_ACTION);
                     handleCommandIntent(UpdateIntent);
                     if (mPlayMusicSeekBar != null)
                         mPlayMusicSeekBar.setMax(mediaPlayer.getDuration());
-                    if (LocalMusicFragment.sMusicList.get(MusicService.playingMusicIndex).getImage() != null) {//如果音乐专辑图片存在
+                    if (musicList.get(MusicService.playingMusicIndex).getImage() != null) {//如果音乐专辑图片存在
                         //  OnlyOneToast.makeText(localMusicFragment.activity,sMusicList.get(playingMusicIndex).getImage());
-                        
-                        Bitmap bitmap = MusicIconLoader.getInstance().load(LocalMusicFragment.sMusicList.get(MusicService.playingMusicIndex).getImage());
+                        Bitmap bitmap = MusicIconLoader.getInstance().load(musicList.get(MusicService.playingMusicIndex).getImage());
                         if (MusicImage != null)
                             MusicImage.setImageBitmap(bitmap);
-                        
                     } else {
                         if (MusicImage != null)
                             MusicImage.setImageResource(R.drawable.image);
@@ -254,7 +316,7 @@ public final class MusicService extends Service {
                     recentlyMusicListInfo.setArtist(musicArtist);
                     recentlyMusicListInfo.setLrc_uri(musicLrcpath);
                     recentlyMusicListInfo.setUri(musicUri);
-                    recentlyMusicListInfo.setName(LocalMusicFragment.sMusicList.get(playingMusicIndex).getTitle());
+                    recentlyMusicListInfo.setName(musicList.get(playingMusicIndex).getTitle());
                     recentlyMusicListInfo.setPlayTime(String.valueOf(System.currentTimeMillis()));
 //        过滤播放相同的歌曲，将之前那首歌的播放记录更新为最新的记录
                     Cursor cursor=LitePal.findBySQL("select count(*) from RecentlyMusicListInfo where name = ?", recentlyMusicListInfo.getName());
@@ -280,35 +342,38 @@ public final class MusicService extends Service {
                     }
     
                     if(FragmentAlter.getDownloadFragmenet()!=null){
-                        DownloadListFragment.downloadMusicOperater.alter(LocalMusicFragment.sMusicList.get(playingMusicIndex).getTitle(),String.valueOf(System.currentTimeMillis()));
+                        DownloadListFragment.downloadMusicOperater.alter(musicList.get(playingMusicIndex).getTitle(),String.valueOf(System.currentTimeMillis()));
                         Log.i("altertime",String.valueOf(System.currentTimeMillis())+"//"+"b");
                         ((DownloadListFragment)FragmentAlter.getDownloadFragmenet()).DownloadAlter();
                     }
                     
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     return false;
                 }
             } else {
+                Log.i("hz11111", "initMusic: ");
                 OnlyOneToast.makeText(LocalMusicFragment.activity, "暂无歌曲");
             }
         }
         return true;
     }
-    
+
     //判断是否满足播放条件
     private boolean isSatisfyingPlayConditions(){
-        int size=LocalMusicFragment.sMusicList.size();
+        int size=musicList.size();
+        Log.i("hz111", "isSatisfyingPlayConditions: "+musicList.size()+"//"+playingMusicIndex);
         if(playingMusicIndex<0||size==0||playingMusicIndex>size-1){
             return  false;
         }
         return  true;
     }
     private static void setLrc(){//设置歌词的路径
-        String path=LocalMusicFragment.sMusicList.get(MusicService.playingMusicIndex).getLrcpath();
+        String path=musicList.get(MusicService.playingMusicIndex).getLrcpath();
         if(path!=null)
             showLrcView.setLrcPath(path);
     }
+
     
     /**
      * 返回当前播放的进度
@@ -347,12 +412,11 @@ public final class MusicService extends Service {
             return  false;
         }
     }
-    
-    
-    
+
+
+
     public void startMusic(){
         synchronized (this){
-            
             if(!isSatisfyingPlayConditions()){
                 OnlyOneToast.makeText(LocalMusicFragment.activity,"暂无歌曲");
                 return;
@@ -373,6 +437,7 @@ public final class MusicService extends Service {
     public void autoPlayMusic(){
         synchronized (this) {
             if (!isSatisfyingPlayConditions()) {
+                Log.i("hz11111", "autoPlayMusic: ");
                 OnlyOneToast.makeText(getApplicationContext(), "暂无歌曲");
                 return;
             }
@@ -388,7 +453,7 @@ public final class MusicService extends Service {
             //只改变播放音乐的下标
             switch (i) {
                 case 0://顺序播放
-                    if (playingMusicIndex == (LocalMusicFragment.sMusicList.size() - 1)) {
+                    if (playingMusicIndex == (musicList.size() - 1)) {
                         playingMusicIndex = 0;
                         if(!initMusic()){
                             OnlyOneToast.makeText(getApplicationContext(),"当前无歌曲");
@@ -419,9 +484,9 @@ public final class MusicService extends Service {
                     handler.post(runnable);
                     break;
                 case 3://随机播放
-                    int MusicIndex =new Random().nextInt(LocalMusicFragment.sMusicList.size());
-                    while (MusicIndex == playingMusicIndex&&LocalMusicFragment.sMusicList.size()>1) {
-                        MusicIndex = new Random().nextInt(LocalMusicFragment.sMusicList.size());
+                    int MusicIndex =new Random().nextInt(musicList.size());
+                    while (MusicIndex == playingMusicIndex&&musicList.size()>1) {
+                        MusicIndex = new Random().nextInt(musicList.size());
                     }
                     playingMusicIndex = MusicIndex;
                     if(!initMusic()){
@@ -456,6 +521,7 @@ public final class MusicService extends Service {
     public void nextMusic(){
         synchronized (this) {
             if (!isSatisfyingPlayConditions()) {
+                Log.i("hz11111", "nextMusic: ");
                 OnlyOneToast.makeText(LocalMusicFragment.activity, "暂无歌曲");
                 return;
             }
@@ -473,12 +539,12 @@ public final class MusicService extends Service {
                 case 0://顺序播放
                 case 1://列表循环
                 case 2://单曲循环
-                    playingMusicIndex = (playingMusicIndex == LocalMusicFragment.sMusicList.size() - 1) ? 0 : (playingMusicIndex + 1);
+                    playingMusicIndex = (playingMusicIndex ==musicList.size() - 1) ? 0 : (playingMusicIndex + 1);
                     break;
                 case 3://随机播放
-                    int MusicIndex =new Random().nextInt(LocalMusicFragment.sMusicList.size());
-                    while (MusicIndex == playingMusicIndex&&LocalMusicFragment.sMusicList.size()>1) {
-                        MusicIndex = new Random().nextInt(LocalMusicFragment.sMusicList.size());
+                    int MusicIndex =new Random().nextInt(musicList.size());
+                    while (MusicIndex == playingMusicIndex&&musicList.size()>1) {
+                        MusicIndex = new Random().nextInt(musicList.size());
                     }
                     playingMusicIndex = MusicIndex;
                     break;
@@ -487,7 +553,8 @@ public final class MusicService extends Service {
             }
             Log.i(TAG, "NextMusic: " + playingMusicIndex);
             if(!initMusic()){
-                OnlyOneToast.makeText(getApplicationContext(),"当前无歌曲");
+                Log.i("hz11111", "nextMusic: 222");
+              //  OnlyOneToast.makeText(getApplicationContext(),"当前无歌曲");
                 return;
             }
             mediaPlayer.start();
@@ -495,10 +562,12 @@ public final class MusicService extends Service {
         }
         
     }
-    
+
+
     public void prevMusic(){
         synchronized (this) {
             if (!isSatisfyingPlayConditions()) {
+                Log.i("hz11111", "prevMusic: ");
                 OnlyOneToast.makeText(LocalMusicFragment.activity, "暂无歌曲");
                 return;
             }
@@ -516,12 +585,12 @@ public final class MusicService extends Service {
                 case 0://顺序播放
                 case 1://列表循环
                 case 2://单曲循环
-                    playingMusicIndex = (playingMusicIndex == 0) ? (LocalMusicFragment.sMusicList.size() - 1) : (playingMusicIndex - 1);
+                    playingMusicIndex = (playingMusicIndex == 0) ? (musicList.size() - 1) : (playingMusicIndex - 1);
                     break;
                 case 3://随机播放
-                    int MusicIndex =new Random().nextInt(LocalMusicFragment.sMusicList.size());
-                    while (MusicIndex == playingMusicIndex&&LocalMusicFragment.sMusicList.size()>1) {
-                        MusicIndex = new Random().nextInt(LocalMusicFragment.sMusicList.size());
+                    int MusicIndex =new Random().nextInt(musicList.size());
+                    while (MusicIndex == playingMusicIndex&&musicList.size()>1) {
+                        MusicIndex = new Random().nextInt(musicList.size());
                     }
                     playingMusicIndex = MusicIndex;
                     break;
@@ -529,7 +598,7 @@ public final class MusicService extends Service {
                     break;
             }
             if(!initMusic()){
-                OnlyOneToast.makeText(getApplicationContext(),"当前无歌曲");
+                //OnlyOneToast.makeText(getApplicationContext(),"当前无歌曲");
                 return;
             }
             mediaPlayer.start();
@@ -546,29 +615,53 @@ public final class MusicService extends Service {
             }
         },time);
     }
+
+    /**
+     * 绑定服务
+     * @param intent
+     * @return
+     */
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+         return null;
     }
-    
+
+
+    /**
+     * 判断播放下标是否满足播放条件
+     * @param position
+     * @return
+     */
+      private boolean isSatisfyPlayCondition(int position){
+          if(position<0||position>musicList.size()-1){
+              return false;
+          }else{
+              return true;
+          }
+      }
+
+
     private void handleCommandIntent(Intent intent) {
+
         String action=intent.getAction();
         //可能已经在桌面建立了widget，一启动后没初始化歌单列表
-        if(LocalMusicFragment.sMusicList.size()==0)
+        if(musicList.size()==0)
         {
             App.sContext=getApplicationContext();
             MusicUtils.initMusicList();
             if(MusicUtils.sMusicList.size()>0)
             {
-                LocalMusicFragment.sMusicList=MusicUtils.sMusicList;
+                setMusicList(MusicUtils.sMusicList);
                 playingMusicIndex=0;
                 initMusic();
             }
         }
         
         if(playingMusicIndex==-1)
-        {   OnlyOneToast.makeText(getApplicationContext(),"暂无歌曲");
+        {
+            Log.i("hz11111", "handleCommandIntent: ");
+            OnlyOneToast.makeText(getApplicationContext(),"暂无歌曲");
             return;
         }
         //widget创建或者刷新第一步都要执行这动作
@@ -632,7 +725,7 @@ public final class MusicService extends Service {
             String Lrc_uri=MusicService.musicLrcpath;
             isLike= LocalMusicFragment.lxrOperator.CheckIsDataAlreadyInDBorNot(song);
             Log.i(TAG, "onClick: "+isLike);
-            if(LocalMusicFragment.sMusicList.size()==0){
+            if(musicList.size()==0){
                 OnlyOneToast.makeText(getApplicationContext(),song);
                 return;
             }
@@ -705,12 +798,12 @@ public final class MusicService extends Service {
                         mNotification.contentView.setImageViewResource(R.id.widget_play,R.drawable.widget_play_selector);
                     }
                 }else if(PREVIOUS_ACTION.equals(what)||NEXT_ACTION.equals(what))
-                {  String widget_title = LocalMusicFragment.sMusicList.get(playingMusicIndex).getTitle();
+                {  String widget_title = musicList.get(playingMusicIndex).getTitle();
                     mNotification.contentView.setTextViewText(R.id.widget_content, widget_title);//设置歌曲名
                     mNotification.contentView.setProgressBar(R.id.widget_progress, mediaPlayer.getDuration(), mediaPlayer.getCurrentPosition(), false);
                     
-                    if (LocalMusicFragment.sMusicList.get(MusicService.playingMusicIndex).getImage() != null) {//如果音乐专辑图片存在
-                        Bitmap bitmap = MusicIconLoader.getInstance().load(LocalMusicFragment.sMusicList.get(MusicService.playingMusicIndex).getImage());
+                    if (musicList.get(MusicService.playingMusicIndex).getImage() != null) {//如果音乐专辑图片存在
+                        Bitmap bitmap = MusicIconLoader.getInstance().load(musicList.get(MusicService.playingMusicIndex).getImage());
                         mNotification.contentView.setImageViewBitmap(R.id.widget_image, bitmap);
                     } else {
                         mNotification.contentView.setImageViewResource(R.id.widget_image, R.drawable.image);
@@ -770,8 +863,8 @@ public final class MusicService extends Service {
             final Intent intent1 = new Intent();
             intent1.setAction(MUSIC_CHANGED);
             intent1.putExtra("playing", mediaPlayer.isPlaying());
-            intent1.putExtra("albumuri",  LocalMusicFragment.sMusicList.get(MusicService.playingMusicIndex).getImage());
-            intent1.putExtra("MusicTitle",LocalMusicFragment.sMusicList.get(playingMusicIndex).getTitle());
+            intent1.putExtra("albumuri", musicList.get(MusicService.playingMusicIndex).getImage());
+            intent1.putExtra("MusicTitle",musicList.get(playingMusicIndex).getTitle());
             boolean isLike=false;
             if(LocalMusicFragment.lxrOperator!=null) {
                 isLike = LocalMusicFragment.lxrOperator.CheckIsDataAlreadyInDBorNot(musicTitle.getText().toString());
@@ -816,12 +909,12 @@ public final class MusicService extends Service {
     }
     //初始前台服务
     private void initNotification(){
-        String widget_title = LocalMusicFragment.sMusicList.get(playingMusicIndex).getTitle();
+        String widget_title =musicList.get(playingMusicIndex).getTitle();
         widgetRemoteViews.setTextViewText(R.id.widget_content, widget_title);//设置歌曲名
         // widgetRemoteViews.setProgressBar(R.id.widget_progress, mediaPlayer.getDuration(), mediaPlayer.getCurrentPosition(), false);
         
-        if (LocalMusicFragment.sMusicList.get(MusicService.playingMusicIndex).getImage() != null) {//如果音乐专辑图片存在
-            Bitmap bitmap = MusicIconLoader.getInstance().load(LocalMusicFragment.sMusicList.get(MusicService.playingMusicIndex).getImage());
+        if (musicList.get(MusicService.playingMusicIndex).getImage() != null) {//如果音乐专辑图片存在
+            Bitmap bitmap = MusicIconLoader.getInstance().load(musicList.get(MusicService.playingMusicIndex).getImage());
             widgetRemoteViews.setImageViewBitmap(R.id.widget_image, bitmap);
         } else {
             widgetRemoteViews.setImageViewResource(R.id.widget_image, R.drawable.image);
@@ -844,8 +937,6 @@ public final class MusicService extends Service {
         } else {
             widgetRemoteViews.setImageViewResource(R.id.widget_play, R.drawable.widget_play_selector);
         }
-        
-        
     }
     private Notification  getmNotification(){
         final int PAUSE_FLAG = 0x1;
@@ -915,6 +1006,7 @@ public final class MusicService extends Service {
     public int onStartCommand(final Intent intent, int flags, int startId) {
         if(intent==null)
             return super.onStartCommand(intent, flags, startId);
+        Log.i("hz11111", "onStartCommand:   "+musicList.size());
         if(!isSatisfyingPlayConditions()){
             OnlyOneToast.makeText(getApplication(),"暂无歌曲");
             return super.onStartCommand(intent, flags, startId);
@@ -932,13 +1024,21 @@ public final class MusicService extends Service {
         }
         if(intent.getAction()!=null)
         {
-            handleCommandIntent(intent);
+            try {
+                if(mediaPlayer!=null){
+                    handleCommandIntent(intent);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
         }
         
         return super.onStartCommand(intent, flags, startId);
     }
     
-    
+
+
     @Override
     public void onDestroy() {//当关闭服务时
         mediaPlayer.release();
