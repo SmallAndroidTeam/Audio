@@ -666,23 +666,23 @@ public final class MusicAidlService extends Service {
     private RemoteCallbackList<MusicPlayProgressListener> remoteCallbackList=new RemoteCallbackList<>();
     private final MusicController.Stub stub=new MusicController.Stub() {
         @Override
-        public List<Music> getLocalMusicList() throws RemoteException {//获取本地的音乐列表
+        public List<Music> of_getLocalMusicList() throws RemoteException {//获取本地的音乐列表
             return MusicUtils.sMusicList;
         }
 
         @Override
-        public List<Music> getCurrentMusicList() throws RemoteException {//获取当期的播放列表
+        public List<Music> of_getCurrentMusicList() throws RemoteException {//获取当期的播放列表
             return  musicList;
         }
 
         @Override
-        public void setCurrentMusicList(List<Music> list) throws RemoteException {//设置当前的播放列表
+        public void of_setCurrentMusicList(List<Music> list) throws RemoteException {//设置当前的播放列表
             musicList.clear();
             musicList.addAll(list);
         }
 
         @Override
-        public boolean setCurrentPlayIndex(int position) throws RemoteException {//设置当前的播放下标
+        public boolean of_setCurrentPlayIndex(int position) throws RemoteException {//设置当前的播放下标
             if(!isSatisfyPlayCondition(position)){
                 return false;
             }else{
@@ -692,17 +692,17 @@ public final class MusicAidlService extends Service {
         }
 
         @Override
-        public int getCurrentPlayIndex() throws RemoteException {//获取当前的播放下标
+        public int of_getCurrentPlayIndex() throws RemoteException {//获取当前的播放下标
             return playingMusicIndex;
         }
 
         @Override
-        public List<Music> getUsbMusicList() throws RemoteException {//获取U盘音乐列表(目前没实现)
+        public List<Music> of_getUsbMusicList() throws RemoteException {//获取U盘音乐列表(目前没实现)
             return null;
         }
 
         @Override
-        public void playCurrentSelectedMusic(int position) throws RemoteException {//播放选中的音乐下标的歌曲
+        public void of_playCurrentSelectedMusic(int position) throws RemoteException {//播放选中的音乐下标的歌曲
             if(isSatisfyPlayCondition(position)){
                 playingMusicIndex=position;
                 if(initMusic()){//如果初始化成功
@@ -718,7 +718,7 @@ public final class MusicAidlService extends Service {
         }
 
         @Override
-        public Music getPlayMusicInfo() throws RemoteException {//获取当前播放的音乐的信息
+        public Music of_getPlayMusicInfo() throws RemoteException {//获取当前播放的音乐的信息
             if(isSatisfyPlayCondition(playingMusicIndex)){
                 return musicList.get(playingMusicIndex);
             }
@@ -726,7 +726,7 @@ public final class MusicAidlService extends Service {
         }
 
         @Override
-        public boolean musicIsPlaying() throws RemoteException {//判断音乐是否正在播放
+        public boolean of_musicIsPlaying() throws RemoteException {//判断音乐是否正在播放
             if(mediaPlayer!=null){
                 return mediaPlayer.isPlaying();
             }
@@ -734,7 +734,7 @@ public final class MusicAidlService extends Service {
         }
 
         @Override
-        public void startCurrentPlayIndexMusic() throws RemoteException {//播放当前音乐下标的歌曲
+        public void of_startCurrentPlayIndexMusic() throws RemoteException {//播放当前音乐下标的歌曲
             if(mediaPlayer!=null&&!mediaPlayer.isPlaying()){
                 mediaPlayer.start();
                 handler.post(runnable);
@@ -744,7 +744,7 @@ public final class MusicAidlService extends Service {
             }
         }
         @Override
-        public void pauseCurrentPlayIndexMusic() throws RemoteException {//暂停当前的音乐下标的歌曲
+        public void of_pauseCurrentPlayIndexMusic() throws RemoteException {//暂停当前的音乐下标的歌曲
             if(mediaPlayer!=null&&mediaPlayer.isPlaying()){
                 mediaPlayer.pause();
                 notifyChange(META_CHANGED);//更新widget
@@ -754,7 +754,7 @@ public final class MusicAidlService extends Service {
         }
 
         @Override
-        public void stopCurrentPlayIndexMusic() throws RemoteException {//停止当前音乐下标的歌曲
+        public void of_stopCurrentPlayIndexMusic() throws RemoteException {//停止当前音乐下标的歌曲
             if(mediaPlayer!=null){
                 mediaPlayer.stop();
 
@@ -833,12 +833,12 @@ public final class MusicAidlService extends Service {
         }
 
         @Override
-        public void initMusicService() throws RemoteException {
+        public void of_initMusicService() throws RemoteException {
             handler.sendEmptyMessage(INIT_MUSCIC_SERVICE);
         }
 
         @Override
-        public boolean setPlayMode(int type) throws RemoteException {//设置播放模式
+        public boolean of_setPlayMode(int type) throws RemoteException {//设置播放模式
 
             if(type<0||type>playMode.length){
                 return false;
@@ -849,17 +849,17 @@ public final class MusicAidlService extends Service {
         }
 
         @Override
-        public int getCurrentMusicListSize() throws RemoteException {//获取当前的音乐列表大小
+        public int of_getCurrentMusicListSize() throws RemoteException {//获取当前的音乐列表大小
            return  musicList.size();
         }
 
         @Override
-        public List<String> getCurrentPlayMusicAllLyric() throws RemoteException {//获取当前播放歌曲的所有歌词
+        public List<String> of_getCurrentPlayMusicAllLyric() throws RemoteException {//获取当前播放歌曲的所有歌词
             return mLrcs;
         }
 
         @Override
-        public String getCurrentPlayMusicOneLyric() throws RemoteException {// 获取当前播放歌曲正在播放的那一句歌词
+        public String of_getCurrentPlayMusicOneLyric() throws RemoteException {// 获取当前播放歌曲正在播放的那一句歌词
             int currentPlayMusicLyricIndex=getCurrentPlayMusicLyricIndex();//获取当前播放的歌词的下标;
             if(currentPlayMusicLyricIndex>mLrcs.size()-1){
                 return null;
@@ -869,18 +869,18 @@ public final class MusicAidlService extends Service {
         }
 
         @Override
-        public int getCurrentPlayMusicOneLyricIndex() throws RemoteException {//获取当前播放歌曲正在播放的那一句歌词在所有歌词的下标
+        public int of_getCurrentPlayMusicOneLyricIndex() throws RemoteException {//获取当前播放歌曲正在播放的那一句歌词在所有歌词的下标
             return getCurrentPlayMusicLyricIndex();//获取当前播放的歌词的下标;
         }
 
         @Override
-        public void setMusicPlayProgressListener(MusicPlayProgressListener musicPlayProgressListener) throws RemoteException {
+        public void of_setMusicPlayProgressListener(MusicPlayProgressListener musicPlayProgressListener) throws RemoteException {
             //设置播放进度监听
             remoteCallbackList.register(musicPlayProgressListener);
         }
 
         @Override
-        public void cancelMusicPlayProgressListener(MusicPlayProgressListener musicPlayProgressListener) throws RemoteException {
+        public void of_cancelMusicPlayProgressListener(MusicPlayProgressListener musicPlayProgressListener) throws RemoteException {
             //取消播放进度监听
             remoteCallbackList.unregister(musicPlayProgressListener);
         }
