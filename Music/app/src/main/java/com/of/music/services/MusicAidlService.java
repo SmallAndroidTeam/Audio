@@ -28,10 +28,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.ImageView;
 import android.widget.RemoteViews;
-import android.widget.SeekBar;
-import android.widget.TextView;
 
 import com.of.music.R;
 import com.of.music.Application.App;
@@ -40,7 +37,6 @@ import com.of.music.Toast.OnlyOneToast;
 import com.of.music.db.DownloadMusicOperater;
 import com.of.music.db.MusicOperator;
 import com.of.music.defineViewd.VisualizerView;
-import com.of.music.fragment.LocalMusicFragment;
 import com.of.music.fragment.fragmentList.DownloadListFragment;
 import com.of.music.fragment.fragmentList.FragmentAlter;
 import com.of.music.fragment.fragmentList.RecentlyListFragment;
@@ -50,9 +46,9 @@ import com.of.music.info.RecentlyMusicListInfo;
 import com.of.music.songListInformation.Music;
 import com.of.music.songListInformation.MusicController;
 import com.of.music.songListInformation.MusicIconLoader;
+import com.of.music.songListInformation.MusicListChangeListener;
 import com.of.music.songListInformation.MusicPlayProgressListener;
 import com.of.music.songListInformation.MusicUtils;
-import com.of.music.ui.LrcView;
 import com.of.music.widget.appwidget_provider;
 
 import org.litepal.LitePal;
@@ -63,8 +59,6 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URLEncoder;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -78,15 +72,15 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public final class MusicAidlService extends Service {
-    public static MediaPlayer mediaPlayer;
-    public static int playingMusicIndex=-1;//正在播放音乐的下标
-    private static NotificationManager notificationManager;
+    public  MediaPlayer mediaPlayer;
+    public  int playingMusicIndex=-1;//正在播放音乐的下标
+    private  NotificationManager notificationManager;
     private RemoteViews widgetRemoteViews;
     public static enum playAction{start,pause,next,prev,widet}
     private String TAG="Music";
-    private  static Runnable runnable;
+    private   Runnable runnable;
     private Timer timer;
-    public static boolean isPlay=false;
+    public  boolean isPlay=false;
     public  String musicArtist;
     public  String musicIcon;
     public  String musicUri;
@@ -107,16 +101,17 @@ public final class MusicAidlService extends Service {
     public static final String UPDATE_ACTION="com.of.music.aidl.update";
     public final static String[] playMode=new String[]{"list_mode","circulate_mode","singlecycle_mode","randomplay_mode"};//播放模式
     public  String currentPlayMode=playMode[3];//当前的音乐播放模式
-    private static final int NotificationId=1001;
-    private static  Notification mNotification;
+    private  final int NotificationId=1001;
+    private   Notification mNotification;
     private final static int UpdateForeground=0x1;
-    private static RemoteViews remoteViews;
-    private static   AppWidgetManager appWidgetManager;
-    private static  ComponentName componentName;
+    private  RemoteViews remoteViews;
+    private    AppWidgetManager appWidgetManager;
+    private   ComponentName componentName;
     private DownloadMusicOperater downloadMusicOperater;
-    private static boolean ForegroundIsExist=false;//判断前台服务是否存在
+    private  boolean ForegroundIsExist=false;//判断前台服务是否存在
     private boolean isInitComplete=false;//判断是否第一次初始化服务完成
-    public static  ArrayList<Music> musicList=new ArrayList<>();//歌曲列表
+    public   ArrayList<Music> musicList=new ArrayList<>();//歌曲列表
+    public  ArrayList<Music> oldMusicList=new ArrayList<>();//歌曲列表的副本，用于判断歌曲列表是否变化
     // 定义系统的频谱
     public Visualizer mVisualizer;
     // 定义系统的均衡器
@@ -131,6 +126,7 @@ public final class MusicAidlService extends Service {
     private List<String> mLrcs = new ArrayList<String>(); // 存放歌词
     private List<Long> mTimes = new ArrayList<Long>(); // 存放时间
     private MusicOperator lxrOperator;
+    private int musicListSize=0;//存储音乐列表的长度，用于判断音乐列表是否变化了
     @SuppressLint("HandlerLeak")
     private final Handler handler=new Handler() {
         @Override
@@ -156,11 +152,10 @@ public final class MusicAidlService extends Service {
         public void onReceive(Context context, Intent intent) {
 
        String processName=getProcessName();
-            Log.i("hz111111", "onReceive: "+processName+"//package:"+getPackageName());
+
        //判断进程名
        if(!TextUtils.isEmpty(processName)&&processName.contentEquals(getPackageName()+":remote"))
        {
-           Log.i("hz111111", "onReceive: ");
            handleCommandIntent(intent);
        }
 
@@ -216,11 +211,13 @@ public final class MusicAidlService extends Service {
             @Override
             public void run() {
                 //设置widget里面的进度条
+                if(isInitComplete)
                 notifyChange(SEND_PROGRESS);
+
                 //执行进度条监听
-                int n=remoteCallbackList.beginBroadcast();//获取监听事件的个数
+                int n= musicPlayProgressListenerRemoteCallbackList.beginBroadcast();//获取监听事件的个数
                 for(int i=0;i<n;i++){
-                    MusicPlayProgressListener musicPlayProgressListener=remoteCallbackList.getBroadcastItem(i);
+                    MusicPlayProgressListener musicPlayProgressListener= musicPlayProgressListenerRemoteCallbackList.getBroadcastItem(i);
                     if(musicPlayProgressListener!=null){
                         try {
                             if(mediaPlayer!=null) {
@@ -244,19 +241,60 @@ public final class MusicAidlService extends Service {
                         }
                     }
                 }
-                remoteCallbackList.finishBroadcast();
-                handler.postDelayed(this, 500);
+                musicPlayProgressListenerRemoteCallbackList.finishBroadcast();
+
+               //执行列表变化监听
+                int  m=musicListChangeListenerRemoteCallbackList.beginBroadcast();
+                for(int i=0;i<m;i++){
+                    MusicListChangeListener musicListChangeListener=musicListChangeListenerRemoteCallbackList.getBroadcastItem(i);
+                    if(musicListChangeListener!=null){
+                      if(oldMusicList.size()!=0&&!musicList.containsAll(oldMusicList)){//如果音乐列表副本和音乐列表内容不一致
+                          try {
+                              musicListChangeListener.musicListChangeListener(true);
+                              oldMusicList.clear();
+                              oldMusicList.addAll(musicList);//重新备份音乐列表副本
+                          } catch (Exception e) {
+                              e.printStackTrace();
+                          }
+                      }else{
+                          try {
+                              if(oldMusicList.size()==0&&musicList.size()!=0){
+                                  musicListChangeListener.musicListChangeListener(true);
+                                  oldMusicList.clear();
+                                  oldMusicList.addAll(musicList);//重新备份音乐列表副本
+                                  }else{
+                                  musicListChangeListener.musicListChangeListener(false);
+                              }
+
+                          } catch (Exception e) {
+                              e.printStackTrace();
+                          }
+                      }
+                    }
+
+                }
+              musicListChangeListenerRemoteCallbackList.finishBroadcast();
+
+                handler.postDelayed(this, 100);
             }
         };
+
         lxrOperator=new MusicOperator(getApplicationContext());
+
+        handler.post(runnable);
         super.onCreate();
     }
 
     //设置音乐列表
-    public static void setMusicList(ArrayList<Music> musicList) {
-        MusicAidlService.musicList.clear();
-        MusicAidlService.musicList.addAll(musicList);
-        Log.i("hz11111", "setMusicList:   "+musicList.size());
+    public  void setMusicList(ArrayList<Music> musicList) {
+
+            this.musicList.clear();
+             oldMusicList.clear();
+            if(musicList!=null){
+                this.musicList.addAll(musicList);
+                oldMusicList.addAll(musicList);
+            }
+
     }
 
     public    boolean  initMusic(){
@@ -269,22 +307,18 @@ public final class MusicAidlService extends Service {
                 try {
                     isExecutionInit=true;//用于判断是否正在执行此函数
                     mediaPlayer.reset();
-                    Log.i("download11", "initMusic: "+musicList.get(playingMusicIndex).getUri()+"//"+
-                            musicList.size());
                     String musicAddress=musicList.get(playingMusicIndex).getUri();
                     while(!musicAddress.toLowerCase().startsWith("http")&&!new File(musicAddress).exists()){
-                        Log.i("hz11111", "initMusic: 删除");
                         musicList.remove(playingMusicIndex);
                         if(musicList.size()==0){
                             playingMusicIndex=-1;
                             stopMusic();
                             return false;
                         }
-                        Log.i("download11", "initMusic: "+musicList.size());
                         playingMusicIndex=playingMusicIndex>=musicList.size()-1?0:playingMusicIndex+1;
                         musicAddress=musicList.get(playingMusicIndex).getUri();
                     }
-                    Log.i("hz11111", "initMusic: "+musicList.get(playingMusicIndex).getUri());
+
                     mediaPlayer.setDataSource(musicList.get(playingMusicIndex).getUri());
                     mediaPlayer.prepare();
 
@@ -306,16 +340,13 @@ public final class MusicAidlService extends Service {
                     recentlyMusicListInfo.setPlayTime(String.valueOf(System.currentTimeMillis()));
                     //        过滤播放相同的歌曲，将之前那首歌的播放记录更新为最新的记录
                     Cursor cursor=LitePal.findBySQL("select count(*) from RecentlyMusicListInfo where name = ?", recentlyMusicListInfo.getName());
-                    Log.i("audio11", "initMusic: ");
                     if(cursor.moveToFirst()){
-                        Log.i("audio11", "initMusic:1 "+cursor.getInt(0));
                         if(cursor.getInt(0)>0){
                             recentlyMusicListInfo.updateAll("name = ?",recentlyMusicListInfo.getName());
                         }else{
                             recentlyMusicListInfo.save();
                         }
                     }else{
-                        Log.i("audio11", "initMusic:2 ");
                         recentlyMusicListInfo.save();
                     }
 
@@ -329,7 +360,6 @@ public final class MusicAidlService extends Service {
 
                     if(FragmentAlter.getDownloadFragmenet()!=null){
                         DownloadListFragment.downloadMusicOperater.alter(musicList.get(playingMusicIndex).getTitle(),String.valueOf(System.currentTimeMillis()));
-                        Log.i("altertime",String.valueOf(System.currentTimeMillis())+"//"+"b");
                         ((DownloadListFragment)FragmentAlter.getDownloadFragmenet()).DownloadAlter();
                     }
                 } catch (Exception e) {
@@ -343,7 +373,6 @@ public final class MusicAidlService extends Service {
             } else {
                 isInitComplete=true;//第一次初始化服务完成
                 isExecutionInit=false;//用于判断是否正在执行此函数
-                Log.i("hz11111", "initMusic: ");
                 OnlyOneToast.makeText(MusicAidlService.this, "暂无歌曲");
             }
 
@@ -426,7 +455,6 @@ public final class MusicAidlService extends Service {
     public void autoPlayMusic(){
         synchronized (this) {
             if (!isSatisfyingPlayConditions()) {
-                Log.i("hz11111", "autoPlayMusic: ");
                 OnlyOneToast.makeText(getApplicationContext(), "暂无歌曲");
                 return;
             }
@@ -510,8 +538,6 @@ public final class MusicAidlService extends Service {
     public void nextMusic(){
         synchronized (this) {
             if (!isSatisfyingPlayConditions()) {
-                Log.i("hz11111", "nextMusic: ");
-
                 OnlyOneToast.makeText(MusicAidlService.this, "暂无歌曲");
                 return;
             }
@@ -543,7 +569,6 @@ public final class MusicAidlService extends Service {
             }
             Log.i(TAG, "NextMusic: " + playingMusicIndex);
             if(!initMusic()){
-                Log.i("hz11111", "nextMusic: 222");
                 //  OnlyOneToast.makeText(getApplicationContext(),"当前无歌曲");
                 return;
             }
@@ -558,7 +583,6 @@ public final class MusicAidlService extends Service {
     public void prevMusic(){
         synchronized (this) {
             if (!isSatisfyingPlayConditions()) {
-                Log.i("hz11111", "prevMusic: ");
                 OnlyOneToast.makeText(MusicAidlService.this, "暂无歌曲");
                 return;
             }
@@ -598,7 +622,7 @@ public final class MusicAidlService extends Service {
         }
     }
 
-    public static void timing(int time){
+    public  void timing(int time){
         Timer nTimer = new Timer();
         nTimer.schedule(new TimerTask() {
             @Override
@@ -616,20 +640,16 @@ public final class MusicAidlService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        Log.i("hz1111", "onBind: 00");
         if(intent!=null&&intent.getAction().contentEquals("com.android.oflim.action")){//只有发出特定消息才会绑定服务
-            Log.i("hz1111", "onBind: 11");
             App.sContext=getApplicationContext();
             MusicUtils.initMusicList();
             return stub;
         }
-        Log.i("hz1111", "onBind: 22");
         return null;
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        Log.i("hz1111111", "onUnbind: ");
          stopSelf();//如果解除绑定则摧毁服务
         return super.onUnbind(intent);
     }
@@ -663,7 +683,8 @@ public final class MusicAidlService extends Service {
     }
 
     //RemoteCallbackList是专门用于删除跨进程listener的接口，它是一个泛型，支持管理任意的AIDL接口
-    private RemoteCallbackList<MusicPlayProgressListener> remoteCallbackList=new RemoteCallbackList<>();
+    private RemoteCallbackList<MusicPlayProgressListener> musicPlayProgressListenerRemoteCallbackList =new RemoteCallbackList<>();
+    private RemoteCallbackList<MusicListChangeListener> musicListChangeListenerRemoteCallbackList=new RemoteCallbackList<>();
     private final MusicController.Stub stub=new MusicController.Stub() {
         @Override
         public List<Music> of_getLocalMusicList() throws RemoteException {//获取本地的音乐列表
@@ -677,8 +698,7 @@ public final class MusicAidlService extends Service {
 
         @Override
         public void of_setCurrentMusicList(List<Music> list) throws RemoteException {//设置当前的播放列表
-            musicList.clear();
-            musicList.addAll(list);
+        setMusicList((ArrayList<Music>) list);
         }
 
         @Override
@@ -876,13 +896,25 @@ public final class MusicAidlService extends Service {
         @Override
         public void of_setMusicPlayProgressListener(MusicPlayProgressListener musicPlayProgressListener) throws RemoteException {
             //设置播放进度监听
-            remoteCallbackList.register(musicPlayProgressListener);
+            musicPlayProgressListenerRemoteCallbackList.register(musicPlayProgressListener);
         }
 
         @Override
         public void of_cancelMusicPlayProgressListener(MusicPlayProgressListener musicPlayProgressListener) throws RemoteException {
             //取消播放进度监听
-            remoteCallbackList.unregister(musicPlayProgressListener);
+            musicPlayProgressListenerRemoteCallbackList.unregister(musicPlayProgressListener);
+        }
+
+        @Override
+        public void of_setMusicListChangeListener(MusicListChangeListener musicListChangeListener) throws RemoteException {
+            //设置音乐列表变化监听
+            musicListChangeListenerRemoteCallbackList.register(musicListChangeListener);
+        }
+
+        @Override
+        public void of_cancelMusicListChangeListener(MusicListChangeListener musicListChangeListener) throws RemoteException {
+            //取消音乐列表变化监听
+            musicListChangeListenerRemoteCallbackList.unregister(musicListChangeListener);
         }
 
         @Override
@@ -927,7 +959,6 @@ public final class MusicAidlService extends Service {
 
         if(playingMusicIndex==-1)
         {
-            Log.i("hz11111", "handleCommandIntent: ");
             OnlyOneToast.makeText(getApplicationContext(),"暂无歌曲");
             return;
         }
@@ -1242,7 +1273,6 @@ public final class MusicAidlService extends Service {
 
     @Override
     public void onDestroy() {//当关闭服务时
-        Log.i("hz1111111", "onDestroy: ");
         try{
             ForegroundIsExist=false;
             mNotification=null;
@@ -1251,6 +1281,7 @@ public final class MusicAidlService extends Service {
             mediaPlayer.release();
             unregisterReceiver(mIntentReceiver);
             stopForeground(true);
+            handler.removeCallbacks(runnable);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -1274,28 +1305,28 @@ public final class MusicAidlService extends Service {
                 .replaceAll("\r", "").replaceAll("\n", "").trim());
         long milInt = Long.parseLong(sec[1].replaceAll("\\D+", "")
                 .replaceAll("\r", "").replaceAll("\n", "").trim());
-
-        return minInt * 60 * 1000 + secInt * 1000 + milInt * 10;
+        return minInt * 60 * 1000 + secInt * 1000 + milInt;
     }
 
 
-
     private int getCurrentPlayMusicLyricIndex(){ //获取当前播放的歌词的下标
-       int currentProgress=getMusicCurrentPosition();//获取当前播放歌曲的进度
-        if(mTimes.size()==0){
-            return 0;
-        }else{
-            int position=0;
-            for(int i=0;i<mTimes.size();i++){
-                position=i;
-                if(currentProgress<=mTimes.get(i)){
-                    return position;
+        synchronized (this){
+            int currentProgress=getMusicCurrentPosition();//获取当前播放歌曲的进度
+            if(mTimes.size()==0){
+                return 0;
+            }else{
+                int position=0;
+                for(int i=0;i<mTimes.size();i++){
+                    position=i;
+                    if(currentProgress<mTimes.get(i)){
+                        return (position==0)?0:position-1;
+                    }
                 }
+                if(position>mTimes.size()-1){
+                    position=mTimes.size()-1;
+                }
+                return position;
             }
-            if(position>mTimes.size()-1){
-            position=mTimes.size()-1;
-            }
-            return position;
         }
     }
 
@@ -1308,18 +1339,16 @@ public final class MusicAidlService extends Service {
             System.out.println("throws " + line);
             return null;
         }
-
         line = line.replaceAll("\\[", "");
         String[] result = line.split("\\]");
         result[0] = String.valueOf(parseTime(result[0]));
-
         return result;
     }
 
 
 
     //通过歌词路径获取歌词，将对应的时间和歌词分别用List集合存起来
-    public void getLrc(final  String path) {
+    public  void getLrc(final  String path) {
         synchronized (this){
             mLrcs.clear();
             mTimes.clear();
@@ -1384,6 +1413,10 @@ public final class MusicAidlService extends Service {
                             mTimes.add(Long.parseLong(arr[0]));
                             mLrcs.add(arr[1]);
                         }
+//                        Log.i("hasfdasdf", "路径:"+path);
+//                        for(int i=0;i<mTimes.size();i++){
+//                            Log.i("hasfdasdf", mTimes.get(i)+"   "+mLrcs.get(i));
+//                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     } finally {
@@ -1399,8 +1432,5 @@ public final class MusicAidlService extends Service {
             }).start();
         }
     }
-
-
-
 
 }
