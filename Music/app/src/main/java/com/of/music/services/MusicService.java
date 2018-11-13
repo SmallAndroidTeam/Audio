@@ -136,7 +136,6 @@ public final class MusicService extends Service {
                     }catch (Exception e){
                         e.printStackTrace();
                     }
-
                     break;
                     default:
                         break;
@@ -924,7 +923,7 @@ public final class MusicService extends Service {
         boolean isLike=false;
         if(LocalMusicFragment.lxrOperator!=null) {
             isLike = LocalMusicFragment.lxrOperator.CheckIsDataAlreadyInDBorNot(musicTitle.getText().toString());
-            if (isLike == true) {
+            if (isLike) {
                 widgetRemoteViews.setImageViewResource(R.id.widget_love,R.drawable.like_image_selected);
                 
             } else {
@@ -1000,7 +999,7 @@ public final class MusicService extends Service {
             }
             
         }else{
-            mNotification.contentView=remoteViews;
+            mNotification.contentView=widgetRemoteViews;
         }
         return mNotification;
     }
@@ -1022,7 +1021,6 @@ public final class MusicService extends Service {
                 
             }
         }).start();
-        
         }
         if(intent.getAction()!=null)
         {

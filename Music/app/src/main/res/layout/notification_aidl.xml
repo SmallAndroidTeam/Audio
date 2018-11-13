@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="65dp"
-    android:background="@color/widget_background_color"
+    android:background="#6b5ee2"
     android:padding="@dimen/widget_margin">
     <ImageView
         android:scaleType="centerCrop"
@@ -15,15 +15,15 @@
         />
     <TextView
         android:id="@+id/widget_content"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
         android:layout_toRightOf="@id/widget_image"
         android:layout_toLeftOf="@+id/audio_stop"
         android:text="音乐"
         android:textSize="13sp"
-        android:singleLine="true"
         android:ellipsize="end"
+        android:singleLine="true"
         android:textColor="@android:color/white"/>
      <ImageButton
          android:id="@+id/audio_stop"
@@ -46,6 +46,7 @@
         <!--android:layout_height="2dp" />-->
     <ImageView
         android:id="@+id/widget_love"
+        android:visibility="gone"
         android:src="@drawable/widget_star_selector"
         android:layout_alignParentBottom="true"
         android:layout_toRightOf="@id/widget_image"

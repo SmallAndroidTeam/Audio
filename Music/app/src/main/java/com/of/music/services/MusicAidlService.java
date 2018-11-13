@@ -191,7 +191,7 @@ public final class MusicAidlService extends Service {
         registerReceiver(mIntentReceiver,intentFilter);
         mediaPlayer=new MediaPlayer();
         isInitComplete=false;//第一次初始化服务未完成
-        widgetRemoteViews =new RemoteViews(this.getPackageName(),R.layout.notification);
+        widgetRemoteViews =new RemoteViews(this.getPackageName(),R.layout.notification_aidl);
         notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -1107,7 +1107,6 @@ public final class MusicAidlService extends Service {
                             mNotification.contentView.setImageViewResource(R.id.widget_love,R.drawable.like_image_selected);
                         } else {
                             mNotification.contentView.setImageViewResource(R.id.widget_love,R.drawable.like_image);
-
                         }
                     }
                 }
@@ -1262,7 +1261,7 @@ public final class MusicAidlService extends Service {
             }
 
         }else{
-            mNotification.contentView=remoteViews;
+            mNotification.contentView=widgetRemoteViews;
         }
         return mNotification;
     }
